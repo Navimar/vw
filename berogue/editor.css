@@ -1,0 +1,14 @@
+*{
+	padding:0;
+	margin:0;
+}
+
+.menu {
+   left: 0;
+   position: fixed;
+   width: 200px;
+   height: 50px;
+   background: white;
+   top: 0;
+}
+
