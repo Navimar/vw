@@ -26,7 +26,7 @@ window.onload = function () {
 function onStart() {
     model.holst = [];
     model.wound = [];
-    model.itm = [];
+    model.inv = [];
     model.hand = "hand";
     for (let x = -1; x < 10; x++) {
         model.wound.push("bottle");
@@ -113,7 +113,7 @@ function onServer(val) {
                 // model.holst[x][y] = ["wall"];
             }
             if (x == -1) {
-                for (let z of model.holst[0][y]){
+                for (let z of model.holst[0][y]) {
                     model.holst[x][y].push(z);
                 }
             }
@@ -124,11 +124,12 @@ function onServer(val) {
     model.wound = val.wound;
     model.message = val.message;
     model.hand = val.hand;
-    model.itm = val.itm;
+    model.inv = val.inv;
     model.delay = val.delay;
     model.mass = val.mass;
     model.connected = val.connected;
     model.error = val.error;
+    model.time=val.time;
     for (let v of val.obj) {
         let ok = true;
         for (let m of model.obj) {
@@ -251,7 +252,7 @@ function move(fx, fy, tx, ty, speed, timeDiff) {
 
 function render(model) {
     resize();
-    $("#ping").html("Пинг: " + model.ping + "</br>Расчет: " + model.delay + "</br> Ходит: " + model.mass + "</br> x: " + model.px + "</br> y: " + model.py + "</br> Игроков: " + model.connected + "</br> Err: " + model.error+"</br> Клиент: "+(Date.now() - model.dtStartLoop));
+    $("#ping").html("Пинг: " + model.ping + "</br>Расчет: " + model.delay + "</br> Ходит: " + model.mass + "</br> x: " + model.px + "</br> y: " + model.py + "</br> Игроков: " + model.connected + "</br> Err: " + model.error + "</br> Клиент: " + (Date.now() - model.dtStartLoop + "</br> Время:" + model.time));
     for (let y = -1; y < 10; y++) {
         for (let x = -1; x < 10; x++) {
             drawImg("grass", x + model.trx, y + model.try);
@@ -278,7 +279,7 @@ function render(model) {
     for (let o of model.obj) {
         drawImg(o.img, o.sx, o.sy);
         // if (!(o.x == 4 && o.y == 4)) {
-        //     drawTxt(o.id, o.sx, o.sy);
+            drawTxt(o.id, o.sx, o.sy);
         //     drawSize("friend", o.sx - 0.3, o.sy - 0.3, 0.3, 0.3);
         // }
     }
@@ -296,10 +297,10 @@ function render(model) {
         drawImg(model.wound[l], 9, l);
     }
     let itma = 0;
-    // for (let i of model.itm) {
-    //     drawImg(i.img, -1, itma);
-    //     itma++;
-    // }
+    for (let i of model.inv) {
+        drawImg(i.img, -1, itma);
+        itma++;
+    }
 
     for (let o of model.obj) {
         // drawImg("from", o.x, o.y);
