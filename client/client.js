@@ -126,10 +126,11 @@ function onServer(val) {
     model.hand = val.hand;
     model.inv = val.inv;
     model.delay = val.delay;
-    model.mass = val.mass;
+    model.cnMass = val.cnMass;
     model.connected = val.connected;
     model.error = val.error;
-    model.time=val.time;
+    model.time = val.time;
+    model.cnActive = val.cnActive;
     for (let v of val.obj) {
         let ok = true;
         for (let m of model.obj) {
@@ -252,7 +253,7 @@ function move(fx, fy, tx, ty, speed, timeDiff) {
 
 function render(model) {
     resize();
-    $("#ping").html("Пинг: " + model.ping + "</br>Расчет: " + model.delay + "</br> Ходит: " + model.mass + "</br> x: " + model.px + "</br> y: " + model.py + "</br> Игроков: " + model.connected + "</br> Err: " + model.error + "</br> Клиент: " + (Date.now() - model.dtStartLoop + "</br> Время:" + model.time));
+    $("#ping").html("Пинг: " + model.ping + "</br>Расчет: " + model.delay + "</br> Ходит: " + model.cnActive + "</br> x: " + model.px + "</br> y: " + model.py + "</br> Игроков: " + model.connected + "</br> Err: " + model.error + "</br> Клиент: " + (Date.now() - model.dtStartLoop + "</br> Время:" + model.time));
     for (let y = -1; y < 10; y++) {
         for (let x = -1; x < 10; x++) {
             drawImg("grass", x + model.trx, y + model.try);
@@ -279,7 +280,7 @@ function render(model) {
     for (let o of model.obj) {
         drawImg(o.img, o.sx, o.sy);
         // if (!(o.x == 4 && o.y == 4)) {
-            drawTxt(o.id, o.sx, o.sy);
+        //     drawTxt(o.id, o.sx, o.sy);
         //     drawSize("friend", o.sx - 0.3, o.sy - 0.3, 0.3, 0.3);
         // }
     }

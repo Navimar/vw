@@ -27,12 +27,13 @@ function onStart() {
     world.map = new Map();
     world.logic = new Map();
     world.logic.set(0, []);
-    world.cnMass=0;
-    world.cnId=0;
-    // for (let a = 0; a < 500; a++) {
-    //     addobj(_.random(-50, 50), _.random(-50, 50), "aphid");
-    // }
+    world.cnMass = 0;
+    world.cnId = 0;
+
     let wid = 150;
+    for (let a = 0; a < 5000; a++) {
+        addobj(_.random(-wid, wid), _.random(-wid, wid), "aphid");
+    }
     for (let a = 0; a < 30000; a++) {
         addobj(_.random(-wid, wid), _.random(-wid, wid), "highgrass");
     }
@@ -95,7 +96,7 @@ function out() {
         send.message = p.message;
         send.delay = Date.now() - world.dtStartLoop;
         send.cnMass = world.cnMass;
-        send.cnActive =world.active;
+        send.cnActive = world.cnActive;
         send.error = world.error;
         send.connected = world.connected;
         send.time = world.time;
@@ -135,6 +136,7 @@ function onLoop() {
         if (p.x == undefined || p.y == undefined) {
             p.x = 0;
             p.y = 0;
+            p.solid=true;
             p.dirx = 0;
             p.diry = 0;
             p.order = "stop";
@@ -144,7 +146,7 @@ function onLoop() {
             p.tire = 0;
             p.hand = "hand";
             p.slct = 0;
-            addtoMap("0 0", p);
+            addtoMap(p.x, p.y, p);
             for (let a = 0; a < 9; a++) {
                 p.wound[a] = "life";
             }
@@ -211,6 +213,7 @@ function onLoop() {
                 if (t) {
                     p.tire = 7;
                 }
+                // moveForced(p, p.x + p.dirx, p.y + p.diry);
                 move(p, p.x + p.dirx, p.y + p.diry);
                 // let hg = isHere(p.x, p.y, "highgrass");
                 // if (hg != false) {
@@ -328,56 +331,40 @@ function logic(obj) {
             }
             break;
         case "aphid":
-        function m() {
-            if (_.random(1)) {
-                let plus = _.random(-1, 1);
-                move(obj, obj.x + plus, obj.y);
-            } else {
-                let plus = _.random(-1, 1);
-                move(obj, obj.x, obj.y + plus);
-            }
-        }
-
             if (obj.new == true) {
                 obj.satiety = 15;
                 obj.solid = true;
                 obj.img = "aphid";
                 obj.terrain = false;
                 obj.new = false;
-            } else {
+            }
+            else {
+                if (obj.satiety < 10 && world.map.has(obj.id)) {
+                    let i = world.map.get(obj.id)[0];
+                    transform(i, "jelly");
+                    drop(i, obj.x, obj.y);
+                    obj.img = "aphid";
+                }
+                else {
+                    let hg = isHere(obj.x, obj.y, "highgrass");
+                    if (hg != false) {
+                        obj.satiety += 15;
+                        obj.img = "aphid2";
+                        put(hg, obj);
+                    } else {
+                        if (_.random(1)) {
+                            let plus = _.random(-1, 1);
+                            move(obj, obj.x + plus, obj.y);
+                        } else {
+                            let plus = _.random(-1, 1);
+                            move(obj, obj.x, obj.y + plus);
+                        }
+                    }
+                }
+
                 obj.satiety--;
                 if (obj.satiety == 0) {
-                    obj.mass--;
-                }
-                let mass = obj.mass;
-                switch (mass) {
-                    case 0:
-                        transform(obj, "highgrass");
-                        break;
-                    case 1:
-                        let hg = isHere(obj.x, obj.y, "highgrass");
-                        if (hg != false) {
-                            obj.mass += 1;
-                            obj.satiety += 15;
-                            obj.img = "aphid2";
-                            moveInv(hg, obj);
-                        } else {
-                            m();
-                        }
-                        break;
-                    case 2:
-                        if (obj.satiety < 10) {
-                            let i = world.map.get(obj.id)[0];
-                            transform(i, "jelly");
-                            drop(obj.x, obj.y, i);
-                            obj.mass--;
-                            obj.img = "aphid";
-                            world.error= i.id;
-                        }
-                        m();
-                        break;
-                    default:
-                        break;
+                    transform(obj, "highgrass");
                 }
             }
             tire(15, obj);
@@ -416,19 +403,39 @@ function tire(time, obj) {
 }
 
 function isHere(x, y, typ) {
-    let k = x + " " + y;
-    if (world.map.has(k)) {
-        for (let o of world.map.get(k)) {
-            if (o.typ == typ) {
-                return o;
+    if (_.isFinite(x) && _.isFinite(y)) {
+        let k = x + " " + y;
+        if (world.map.has(k)) {
+            for (let o of world.map.get(k)) {
+                if (o.typ == typ) {
+                    return o;
+                }
             }
         }
+    } else {
+        world.error("isHere x or y not finite");
     }
+
     return false;
 }
 
-function addtoMap(k, obj) {
-    // let k = x + " " + y;
+
+function addtoMap(x, y, obj) {
+    addto(x + " " + y, obj);
+    obj.x = x;
+    obj.y = y;
+    obj.carrier = false;
+}
+
+function addtoInv(carrier, obj) {
+    addto(carrier.id, obj);
+    obj.x = false;
+    obj.y = false;
+    obj.carrier = carrier.id;
+
+}
+
+function addto(k, obj) {
     if (world.map.has(k)) {
         let i = world.map.get(k);
         i.push(obj);
@@ -438,101 +445,89 @@ function addtoMap(k, obj) {
     }
 }
 
-function drop(x, y, obj) {
-    obj.x = x;
-    obj.y = y;
-    removeMap(obj.id, obj);
-    addtoMap(x + " " + y, obj);
+function removefromInv(obj, carrier) {
+    remove(obj.carrier, obj);
 }
 
-function removeMap(key, obj) {
-    if (world.map.has(key)) {
-        let m = world.map.get(key);
+function removefromMap(obj) {
+    if (obj.x === false || obj.y === false) {
+        world.error = "removefromMap error";
+        return false;
+    }
+    remove(obj.x + " " + obj.y, obj);
+}
+
+function remove(k, obj) {
+    if (world.map.has(k)) {
+        let m = world.map.get(k);
         for (let i in m) {
             if (obj === m[i]) {
-                // itm.img = "meat";
                 m.splice(i, 1);
             }
         }
+    } else {
+        world.error = "remove error. Key = " + k;
     }
 }
 
+function put(obj, carrier) {
+    removefromMap(obj);
+    addtoInv(carrier.id, obj);
+}
+
+function drop(obj, x, y) {
+    removefromInv(obj);
+    addtoMap(x, y, obj);
+}
+
+function moveForced(obj, x, y) {
+    removefromMap(obj);
+    addtoMap(x, y, obj)
+}
+
+function move(obj, x, y) {
+    if (obj.x === false || obj.y === false) {
+        world.error = "move (obj.x && obj.y) == false";
+        return false;
+    }
+    let solid = false;
+    if (world.map.has(x + " " + y)) {
+        for (let o of world.map.get(x + " " + y)) {
+            if (o.solid == true) {
+                solid = true;
+            }
+        }
+    }
+    if (!solid) {
+        moveForced(obj, x, y);
+    } else {
+        return false;
+    }
+    return true;
+
+}
+
 function addobj(x, y, typ) {
-    let o = {x: x, y: y, id: makeid(), typ: typ, img: typ, new: true, mass: 1};
-    addlogic(x, y, o);
+    let o = {x: x, y: y, id: makeid(), typ: typ, img: typ, new: true};
+    addtoMap(x, y, o);
+    addtologic(o);
     world.cnMass++;
 }
 
-// function addter(x, y, typ) {
-//     let o = {x: x, y: y, id: makeid(), typ: typ, img: typ, new: true, mass: 1, terrain: true};
-//     addlogic(x, y, o);
-// }
-
-function addlogic(x, y, o) {
-    addtoMap(x + " " + y, o);
+function addtologic(o) {
     let i = world.logic.get(world.time);
     i.push(o);
     world.logic.set(world.time, i);
 }
 
-function move(obj, x, y) {
-    let solid = false;
-    let key = obj.x + " " + obj.y;
-    if (world.map.has(key)) {
-        if (world.map.has(x + " " + y)) {
-            for (let o of world.map.get(x + " " + y)) {
-                if (o.solid == true) {
-                    solid = true;
-                }
-            }
-        }
-        if (!solid) {
-            removeMap(key, obj);
-            addtoMap(x + " " + y, obj);
-            obj.x = x;
-            obj.y = y;
-        } else {
-            return false;
-        }
-    } else {
-        world.error = "wrong from " + key;
-    }
-    return true;
-}
 
-function moveInv(itm, obj) {
-    let key = itm.x + " " + itm.y;
-    if (world.map.has(key)) {
-        // let m = world.map.get(key);
-        // for (let i in m) {
-        //     if (itm === m[i]) {
-        //         // itm.img = "meat";
-        //         m.splice(i, 1);
-        //     }
-        // }
-        removeMap(key, itm);
-        let k = obj.id;
-        if (world.map.has(k)) {
-            let i = world.map.get(k);
-            i.push(itm);
-            world.map.set(k, i);
-        } else {
-            world.map.set(k, [itm]);
-        }
-        itm.x = false;
-        itm.y = false;
-    } else {
-        world.error = "wrong from itm" + key;
-    }
-}
-
-function apply(obj, p) {
-    // if (obj.typ == "aphid") {
-    //     if (p.itm == "hand") {
-    //         p.message = "привет " + obj.satiety;
-    //     }
-    // }
-}
+// function apply(obj, p) {
+// if (obj.typ == "aphid") {
+//     if (p.itm == "hand") {
+//         p.message = "привет " + obj.satiety;
+//     }
+// }
+// }
 
 // function take(x, y, p) {
 //     let itm = oip(x, y)[p.slct];
@@ -554,12 +549,12 @@ function apply(obj, p) {
 //         }
 //     }
 // }
-
-function use(p) {
-    if (p.hand.typ == "jelly") {
-        if (remWound(p, "hungry")) {
-            p.hand = "hand";
-            p.message = "Вы съели желейный кубик, он довольно вкусный если не думать о его происхождении";
-        }
-    }
-}
+//
+// function use(p) {
+//     if (p.hand.typ == "jelly") {
+//         if (remWound(p, "hungry")) {
+//             p.hand = "hand";
+//             p.message = "Вы съели желейный кубик, он довольно вкусный если не думать о его происхождении";
+//         }
+//     }
+// }
