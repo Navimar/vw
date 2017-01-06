@@ -2,6 +2,7 @@ const socket = io();
 
 
 var model = {};
+const constSpeed=0.0013;
 // const delta = 0.0001;
 //
 // const key = new Date().getTime();
@@ -105,18 +106,13 @@ function step(lastTime) {
 }
 
 function onServer(val) {
-    // model.holst = val.holst;
-    for (let x = -1; x < 10; x++) {
-        for (let y = -1; y < 10; y++) {
-            model.holst[x][y] = ["grass"];
-            if (x == -1 || x == 9 || y == 9 || y == -1) {
-                // model.holst[x][y] = ["wall"];
-            }
-            if (x == -1) {
-                for (let z of model.holst[0][y]) {
-                    model.holst[x][y].push(z);
-                }
-            }
+    for (let x = 0; x < 9; x++) {
+        let r = model.holst[x][0];
+        model.holst[x][-1] = r;
+    }
+    for (let x = 0; x < 9; x++) {
+        for (let y = 0; y < 9; y++) {
+            model.holst[x][y] = "grass";
         }
     }
     model.dirx = val.dirx;
@@ -142,11 +138,11 @@ function onServer(val) {
             }
         }
         if (ok) {
-            if (!v.terrain) {
-                model.obj.push(v);
-            } else {
-                model.holst[v.x][v.y].push(v.img);
-            }
+            // if (!v.terrain) {
+            model.obj.push(v);
+            // } else {
+            //     model.holst[v.x][v.y] = v.img;
+            // }
         }
     }
     for (let n in model.obj) {
@@ -158,6 +154,8 @@ function onServer(val) {
         }
         if (ok) {
             model.obj[n].outrange = true;
+            model.obj[n].x-=model.dirx;
+            model.obj[n].y-=model.diry;
             // model.obj.splice(n, 1);
         }
     }
@@ -207,15 +205,16 @@ function onStep(timeDiff) {
         // }
         let m;
         if (o.outrange) {
-            m = move(o.sx, o.sy, o.x - model.dirx, o.y - model.diry, 0.0012, timeDiff);
+            // m = move(o.sx, o.sy, o.x - model.dirx, o.y - model.diry, constSpeed, timeDiff);
+            m = move(o.sx, o.sy, o.x, o.y, constSpeed, timeDiff);
         } else {
-            m = move(o.sx, o.sy, o.x, o.y, 0.0012, timeDiff);
+            m = move(o.sx, o.sy, o.x, o.y, constSpeed, timeDiff);
         }
         o.sx = m.x;
         o.sy = m.y;
 
     }
-    model.stamp -= timeDiff * 0.0012;
+    model.stamp -= timeDiff * constSpeed;
     if (model.stamp < 0) {
         model.stamp = 0;
         // model.holstold = model.holst;
@@ -242,7 +241,7 @@ function out(m) {
 
 function vector(fx, fy, tx, ty, s) {
     const v = Math.sqrt(Math.pow(fx - tx, 2) + Math.pow(fy - ty, 2));
-    if (v < 0.05) return {x: 0, y: 0};
+    if (v < 0.005) return {x: 0, y: 0};
     return {x: (tx - fx) * (s / v), y: (ty - fy) * (s / v)};
 }
 
@@ -253,19 +252,18 @@ function move(fx, fy, tx, ty, speed, timeDiff) {
 
 function render(model) {
     resize();
-    $("#ping").html("Пинг: " + model.ping + "</br>Расчет: " + model.delay + "</br> Ходит: " + model.cnActive + "</br> x: " + model.px + "</br> y: " + model.py + "</br> Игроков: " + model.connected + "</br> Err: " + model.error + "</br> Клиент: " + (Date.now() - model.dtStartLoop + "</br> Время:" + model.time));
+    $("#ping").html("Пинг: " + model.ping + "</br>Расчет: " + model.delay + "</br> Ходит: " + model.cnActive + "</br> x: " + model.px + "</br> y: " + model.py + "</br> Игроков: " + model.connected + "</br> Err: " + model.error + "</br> Клиент: " + (Date.now() - model.dtStartLoop + "</br> Время: " + model.time));
     for (let y = -1; y < 10; y++) {
         for (let x = -1; x < 10; x++) {
             drawImg("grass", x + model.trx, y + model.try);
-            for (let h of model.holst[x][y]) {
-                drawImg(h, x + model.trx, y + model.try);
-            }
+            // for (let h of model.holst[x][y]) {
+            // drawImg(model.holst[x][y], x + model.trx, y + model.try);
+            // }
         }
     }
 
 
     for (let a = 0; a < 9; a++) {
-        let i;
         // for (let h of model.holstold[0][a]) {
         //     drawImg(h, -1 + model.trx, a);
         // }
@@ -278,12 +276,16 @@ function render(model) {
     }
 
     for (let o of model.obj) {
-        drawImg(o.img, o.sx, o.sy);
-        // if (!(o.x == 4 && o.y == 4)) {
-        //     drawTxt(o.id, o.sx, o.sy);
-        //     drawSize("friend", o.sx - 0.3, o.sy - 0.3, 0.3, 0.3);
-        // }
+        if(!o.solid) {
+            drawImg(o.img, o.sx, o.sy);
+        }
     }
+    for (let o of model.obj) {
+        if(o.solid) {
+            drawImg(o.img, o.sx, o.sy);
+        }
+    }
+
     for (let a = 0; a < 9; a++) {
         drawImg("black", 9, a);
         drawImg("black", 10, a);

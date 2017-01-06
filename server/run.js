@@ -2,6 +2,7 @@ const _ = require('underscore');
 
 let world = {};
 world.player = [];
+var dtLoop = Date.now();
 
 function Pt(x, y) {
     if (!_.isFinite(x)) throw "x invalid";
@@ -26,39 +27,27 @@ function onStart() {
     world.connected = 0;
     world.map = new Map();
     world.logic = new Map();
-    world.logic.set(0, []);
     world.cnMass = 0;
     world.cnId = 0;
 
-    let wid = 150;
-    for (let a = 0; a < 5000; a++) {
-        addobj(_.random(-wid, wid), _.random(-wid, wid), "aphid");
+    let wid = 1000;
+    for (let a = 0; a < 25000; a++) {
+        addobj(_.random(-wid, wid), _.random(-wid, wid), "mammunt");
     }
-    for (let a = 0; a < 30000; a++) {
+    for (let a = 0; a < 300000; a++) {
         addobj(_.random(-wid, wid), _.random(-wid, wid), "highgrass");
+        addobj(_.random(-wid, wid), _.random(-wid, wid), "wall");
     }
-    for (let a = 0; a < 1; a++) {
-        addobj(1, 1, "jelly");
-    }
-
-    // world.terrain = [];
-    // for (let x = -1000; x < 1000; x++) {
-    //     world.terrain[x] = [];
-    //     for (let y = -1000; y < 1000; y++) {
-    //         if (_.random(1)) {
-    //             world.terrain[x][y] = "highgrass";
-    //         } else {
-    //             // world.terrain[x][y] = "grass";
-    //         }
-    //     }
-    // }
 }
 
 function loop() {
     setInterval(function () {
-        onLoop();
-        out();
-    }, 1000 / 10);
+        if (Date.now() >= dtLoop + 100) {
+            dtLoop += 100;
+            onLoop();
+            out();
+        }
+    }, 0);
 }
 
 function out() {
@@ -76,7 +65,7 @@ function out() {
                 key += p.y + y - 4;
                 if (world.map.has(key)) {
                     for (let r of world.map.get(key)) {
-                        send.obj.push({x: x, y: y, img: r.img, id: r.id, terrain: r.terrain});
+                        send.obj.push({x: x, y: y, img: r.img, id: r.id, solid: r.solid, terrain: r.terrain});
                     }
                 } else {
                     // send.holst[x][y] = ["grass"];
@@ -86,7 +75,7 @@ function out() {
         if (world.map.has(p.id)) {
             send.inv = world.map.get(p.id);
         } else {
-            send.inv = [{img: "meat"}, {img: "bottle"}, {img: "highgrass"}];
+            send.inv = [];
         }
         send.px = p.x;
         send.py = p.y;
@@ -119,13 +108,7 @@ function inputFromClients(io) {
             onOrder(socket, val);
         });
         socket.on('disconnect', function () {
-            // for (i of input){
-            //     if(input[i].socket==socket){
-            //         splice(input,1,i);
-            //     }
-            // }
             world.connected--;
-            // console.log("disconnect " + Global_connected);
         });
     });
 }
@@ -136,7 +119,7 @@ function onLoop() {
         if (p.x == undefined || p.y == undefined) {
             p.x = 0;
             p.y = 0;
-            p.solid=true;
+            p.solid = true;
             p.dirx = 0;
             p.diry = 0;
             p.order = "stop";
@@ -144,16 +127,15 @@ function onLoop() {
             p.satiety = 1000;
             p.wound = [];
             p.tire = 0;
-            p.hand = "hand";
+            p.tool = {typ: "hand"};
             p.slct = 0;
             addtoMap(p.x, p.y, p);
             for (let a = 0; a < 9; a++) {
                 p.wound[a] = "life";
             }
         } else {
-            if (p.tire <= 0 || !_.isFinite(p.tire)) {
-                // console.log(p.tire);
-                let t = true;
+            let m = true;
+            if (p.tire <= 0) {
                 switch (p.order) {
                     case "up":
                         p.dirx = 0;
@@ -172,22 +154,19 @@ function onLoop() {
                         p.diry = 1;
                         break;
                     case "useup":
-                        apply(ofp(p.x, p.y - 1), p);
+                        apply(p.tool, p.x, p.y - 1);
                         p.dirx = 0;
                         p.diry = 0;
                         break;
                     case "useright":
-                        apply(ofp(p.x + 1, p.y), p);
                         p.dirx = 0;
                         p.diry = 0;
                         break;
                     case "useleft":
-                        apply(ofp(p.x - 1, p.y), p);
                         p.dirx = 0;
                         p.diry = 0;
                         break;
                     case "usedown":
-                        apply(ofp(p.x, p.y + 1), p);
                         p.dirx = 0;
                         p.diry = 0;
                         break;
@@ -197,7 +176,7 @@ function onLoop() {
                         p.diry = 0;
                         break;
                     case "take":
-                        // take(p.x, p.y, p);
+                        take(p, 0);
                         p.dirx = 0;
                         p.diry = 0;
                         break;
@@ -205,20 +184,13 @@ function onLoop() {
                         p.dirx = 0;
                         p.diry = 0;
                         p.order = "stop";
-                        t = false;
+                        m = false;
+                        break;
                 }
-                // if (p.x == p.targetx && p.y == p.targety) {
-                //
-                // }
-                if (t) {
+                if (m) {
                     p.tire = 7;
+                    move(p, p.x + p.dirx, p.y + p.diry);
                 }
-                // moveForced(p, p.x + p.dirx, p.y + p.diry);
-                move(p, p.x + p.dirx, p.y + p.diry);
-                // let hg = isHere(p.x, p.y, "highgrass");
-                // if (hg != false) {
-                //     moveInv(hg, p);
-                // }
             } else {
                 p.tire -= 1;
             }
@@ -226,18 +198,8 @@ function onLoop() {
         p.satiety--;
         if (p.satiety <= 0) {
             p.satiety = 1000;
-            // addWound(p, "hungry");
+            addWound(p, "hungry");
         }
-        //     if (condition[h] != undefined) {
-        //         if (condition[h].time + 60000 < new Date().getTime()) {
-        //             condition[h].connected = false;
-        //         } else condition[h].connected = true;
-        //         condition[h].order = input[h].order;
-        //         condition[h].pt = move(condition[h].pt, input[h].order);
-        //     }
-        //     else {
-        //         condition[h] = input[h];
-        //     }
     }
     let m = 0;
     let go = world.logic.get(world.time);
@@ -339,32 +301,53 @@ function logic(obj) {
                 obj.new = false;
             }
             else {
-                if (obj.satiety < 10 && world.map.has(obj.id)) {
-                    let i = world.map.get(obj.id)[0];
-                    transform(i, "jelly");
-                    drop(i, obj.x, obj.y);
-                    obj.img = "aphid";
+                obj.satiety--;
+                if (obj.satiety == 0) {
+                    transform(obj, "highgrass");
                 }
                 else {
-                    let hg = isHere(obj.x, obj.y, "highgrass");
-                    if (hg != false) {
-                        obj.satiety += 15;
-                        obj.img = "aphid2";
-                        put(hg, obj);
-                    } else {
-                        if (_.random(1)) {
-                            let plus = _.random(-1, 1);
-                            move(obj, obj.x + plus, obj.y);
+                    if (world.map.has(obj.id)) {
+                        let i = world.map.get(obj.id)[0];
+                        // console.log(obj.id+":");
+                        // console.log(i);
+                        // transform(i, "jelly");
+                        // drop(i, obj.x, obj.y);
+                        obj.img = "aphid";
+                    }
+                    else {
+                        let hg = isHere(obj.x, obj.y, "highgrass");
+                        if (hg != false) {
+                            obj.satiety += 15;
+                            obj.img = "aphid2";
+                            put(hg, obj);
                         } else {
-                            let plus = _.random(-1, 1);
-                            move(obj, obj.x, obj.y + plus);
+                            if (_.random(1)) {
+                                let plus = _.random(-1, 1);
+                                move(obj, obj.x + plus, obj.y);
+                            } else {
+                                let plus = _.random(-1, 1);
+                                move(obj, obj.x, obj.y + plus);
+                            }
                         }
                     }
                 }
 
-                obj.satiety--;
-                if (obj.satiety == 0) {
-                    transform(obj, "highgrass");
+            }
+            tire(15, obj);
+            break;
+        case "mammunt":
+            if (obj.new == true) {
+                obj.solid = true;
+                obj.img = obj.typ;
+                obj.terrain = false;
+                obj.new = false;
+            } else {
+                if (_.random(1)) {
+                    let plus = _.random(-1, 1);
+                    move(obj, obj.x + plus, obj.y);
+                } else {
+                    let plus = _.random(-1, 1);
+                    move(obj, obj.x, obj.y + plus);
                 }
             }
             tire(15, obj);
@@ -389,18 +372,17 @@ function logic(obj) {
             }
             // tire(100,obj);
             break;
+        case "wall":
+            if (obj.new == true) {
+                obj.terrain = true;
+                obj.solid = true;
+                obj.img = obj.typ;
+            }
+            // tire(100,obj);
+            break;
     }
 }
-function tire(time, obj) {
-    let t = world.time + time;
-    if (world.logic.has(t)) {
-        let i = world.logic.get(t);
-        i.push(obj);
-        world.logic.set(t, i);
-    } else {
-        world.logic.set(t, [obj]);
-    }
-}
+
 
 function isHere(x, y, typ) {
     if (_.isFinite(x) && _.isFinite(y)) {
@@ -415,7 +397,6 @@ function isHere(x, y, typ) {
     } else {
         world.error("isHere x or y not finite");
     }
-
     return false;
 }
 
@@ -427,7 +408,7 @@ function addtoMap(x, y, obj) {
     obj.carrier = false;
 }
 
-function addtoInv(carrier, obj) {
+function addtoInv(obj, carrier) {
     addto(carrier.id, obj);
     obj.x = false;
     obj.y = false;
@@ -445,7 +426,7 @@ function addto(k, obj) {
     }
 }
 
-function removefromInv(obj, carrier) {
+function removefromInv(obj) {
     remove(obj.carrier, obj);
 }
 
@@ -472,7 +453,7 @@ function remove(k, obj) {
 
 function put(obj, carrier) {
     removefromMap(obj);
-    addtoInv(carrier.id, obj);
+    addtoInv(obj, carrier);
 }
 
 function drop(obj, x, y) {
@@ -508,53 +489,50 @@ function move(obj, x, y) {
 }
 
 function addobj(x, y, typ) {
-    let o = {x: x, y: y, id: makeid(), typ: typ, img: typ, new: true};
+    let o = {x: x, y: y, id: makeid(), typ: typ, img: "loading", new: true, terrain: true};
     addtoMap(x, y, o);
-    addtologic(o);
+    let t = world.time + _.random(100);
+    addtologic(o, t);
     world.cnMass++;
 }
 
-function addtologic(o) {
-    let i = world.logic.get(world.time);
-    i.push(o);
-    world.logic.set(world.time, i);
+function addtologic(obj, t) {
+    if (world.logic.has(t)) {
+        let i = world.logic.get(t);
+        i.push(obj);
+        world.logic.set(t, i);
+    } else {
+        world.logic.set(t, [obj]);
+    }
+}
+function tire(time, obj) {
+    let t = world.time + time;
+    addtologic(obj, t);
 }
 
+function take(p, n) {
+    let k = p.x + " " + p.y;
+    if (world.map.has(k)) {
+        let itm = world.map.get(k)[n];
+        put(itm, p);
+    } else {
+        return false;
+    }
+}
 
-// function apply(obj, p) {
-// if (obj.typ == "aphid") {
-//     if (p.itm == "hand") {
-//         p.message = "привет " + obj.satiety;
-//     }
-// }
-// }
+function apply(tool, x, y) {
+    let key;
+    let o = world.map.get(x + " " + y);
+    if (o !== undefined) {
+        for (let obj of o) {
+            key = tool.typ + " " + obj.typ;
+        }
+        if (key == "hand box") {
+            world.error = "apply " + key;
+        }
+        world.error = "apply " + key+" " +obj;
+    } else {
+        world.error = "apply on space";
+    }
 
-// function take(x, y, p) {
-//     let itm = oip(x, y)[p.slct];
-//     if (itm != undefined) {
-//         let id = itm.id;
-//         if (p.hand.typ != null) {
-//             addobj(x, y, p.hand.typ);
-//         }
-//         p.hand = {img: itm.img || itm.typ, typ: itm.typ};
-//         for (let o in world.obj) {
-//             if (world.obj[o].id == id) {
-//                 world.obj.splice(o, 1);
-//             }
-//         }
-//     } else {
-//         if (p.hand.typ != null) {
-//             addobj(x, y, p.hand.typ);
-//             p.hand = "hand";
-//         }
-//     }
-// }
-//
-// function use(p) {
-//     if (p.hand.typ == "jelly") {
-//         if (remWound(p, "hungry")) {
-//             p.hand = "hand";
-//             p.message = "Вы съели желейный кубик, он довольно вкусный если не думать о его происхождении";
-//         }
-//     }
-// }
+}
