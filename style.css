@@ -1,22 +1,23 @@
-*{
-	padding:0;
-	margin:0;
+* {
+    padding: 0;
+    margin: 0;
 }
 
-#console{
-	color: white;
-	position: fixed;
-	width:200px;
-	height: 150px;
-	background: none;
-	font-family: consolas, monospace, arial;
-	text-overflow: ellipsis; 
+#console {
+    color: white;
+    position: fixed;
+    width: 200px;
+    height: 150px;
+    background: none;
+    font-family: consolas, monospace, arial;
+    text-overflow: ellipsis;
 }
 
-#ping{
-	color:white;
-	position:fixed;
-	right:0;
-	top:0;
+#ping {
+    color: white;
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 300px;
 }
 

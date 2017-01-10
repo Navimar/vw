@@ -2,7 +2,7 @@ const socket = io();
 
 
 var model = {};
-const constSpeed=0.0013;
+const constSpeed = 0.0013;
 // const delta = 0.0001;
 //
 // const key = new Date().getTime();
@@ -28,7 +28,7 @@ function onStart() {
     model.holst = [];
     model.wound = [];
     model.inv = [];
-    model.hand = "hand";
+    // model.hand = "hand";
     for (let x = -1; x < 10; x++) {
         model.wound.push("bottle");
         model.holst[x] = [];
@@ -40,6 +40,8 @@ function onStart() {
     model.stamp = 1;
     model.trx = 0;
     model.try = 0;
+    model.selected = 0;
+    model.order = {};
 }
 //
 // function inputMouse() {
@@ -154,8 +156,8 @@ function onServer(val) {
         }
         if (ok) {
             model.obj[n].outrange = true;
-            model.obj[n].x-=model.dirx;
-            model.obj[n].y-=model.diry;
+            model.obj[n].x -= model.dirx;
+            model.obj[n].y -= model.diry;
             // model.obj.splice(n, 1);
         }
     }
@@ -165,9 +167,11 @@ function onServer(val) {
     model.px = val.px;
     model.py = val.py;
 
+
     if (model.targetx == val.px && model.targety == val.py) {
-        if (model.order == "up" || model.order == "down" || model.order == "left" || model.order == "right")
-            model.order = "stop";
+        if (model.order.name == "move")
+            model.order.name = "stop";
+        model.order.val = 0;
     }
     out(model);
 }
@@ -212,7 +216,11 @@ function onStep(timeDiff) {
         }
         o.sx = m.x;
         o.sy = m.y;
-
+        if(model.keyup){
+            // if(model.order.cn==model.lastorder){
+            //
+            // }
+        }
     }
     model.stamp -= timeDiff * constSpeed;
     if (model.stamp < 0) {
@@ -276,12 +284,12 @@ function render(model) {
     }
 
     for (let o of model.obj) {
-        if(!o.solid) {
+        if (!o.solid) {
             drawImg(o.img, o.sx, o.sy);
         }
     }
     for (let o of model.obj) {
-        if(o.solid) {
+        if (o.solid) {
             drawImg(o.img, o.sx, o.sy);
         }
     }
@@ -299,11 +307,17 @@ function render(model) {
     for (let l = 0; l < 9; l++) {
         drawImg(model.wound[l], 9, l);
     }
-    let itma = 0;
+    drawImg("hand", -1, 0);
+    let itma = 1;
     for (let i of model.inv) {
         drawImg(i.img, -1, itma);
         itma++;
     }
+    for (let bag = itma; bag < 9; bag++) {
+        drawImg("slot", -1, bag);
+    }
+    drawImg("select", -1, model.selected);
+
 
     for (let o of model.obj) {
         // drawImg("from", o.x, o.y);
@@ -311,7 +325,7 @@ function render(model) {
 
     let ex = 0;
     let ey = 0;
-    switch (model.order) {
+    switch (model.order.val) {
         case "up":
             ey -= 1;
             break;
@@ -322,18 +336,6 @@ function render(model) {
             ex -= 1;
             break;
         case "down":
-            ey += 1;
-            break;
-        case "useup":
-            ey -= 1;
-            break;
-        case "useright":
-            ex += 1;
-            break;
-        case "useleft":
-            ex -= 1;
-            break;
-        case "usedown":
             ey += 1;
             break;
         default:
@@ -353,37 +355,76 @@ function onKeydown(key) {
         case "up":
             model.targetx = model.px;
             model.targety = model.py - 1;
-            model.order = "up";
+            model.order.name = "move";
+            model.order.val = "up";
             break;
         case "right":
             model.targety = model.py;
             model.targetx = model.px + 1;
-            model.order = "right";
+            model.order.name = "move";
+            model.order.val = "right";
             break;
         case "left":
             model.targety = model.py;
             model.targetx = model.px - 1;
-            model.order = "left";
+            model.order.name = "move";
+            model.order.val = "left";
             break;
         case "down":
             model.targetx = model.px;
             model.targety = model.py + 1;
-            model.order = "down";
+            model.order.name = "move";
+            model.order.val = "down";
+            break;
+        case "useup":
+            model.targetx = model.px;
+            model.targety = model.py - 1;
+            model.order.name = "use";
+            model.order.val = "up";
+            model.order.n = model.selected;
+            break;
+        case "useright":
+            model.targety = model.py;
+            model.targetx = model.px + 1;
+            model.order.name = "use";
+            model.order.val = "right";
+            model.order.n = model.selected;
+            break;
+        case "useleft":
+            model.targety = model.py;
+            model.targetx = model.px - 1;
+            model.order.name = "use";
+            model.order.val = "left";
+            model.order.n = model.selected;
+            break;
+        case "usedown":
+            model.targetx = model.px;
+            model.targety = model.py + 1;
+            model.order.name = "use";
+            model.order.val = "down";
+            model.order.n = model.selected;
+        case "2":
+        case "3":
+        case "4":
+        case "5":
+        case "6":
+        case "7":
+        case "8":
+        case "9":
+        case "1":
+            model.selected = key - 1;
             break;
         default:
-            model.order = key;
-
+            model.order.name = key;
+            model.order.val = 0;
+            break;
     }
     // }
     out(model);
 }
 
-function onKeyup() {
-    // model = (() => {
-    //     let up = model;
-    //     return up;
-    // })();
-    // out(model);
+function onKeyup(key) {
+    model.keyup = true;
 }
 
 // function getMousePos(canvas, evt) {

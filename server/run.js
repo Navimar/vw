@@ -1,58 +1,59 @@
 const _ = require('underscore');
+const world = require('./world');
 
-let world = {};
-world.player = [];
-var dtLoop = Date.now();
-
-function Pt(x, y) {
-    if (!_.isFinite(x)) throw "x invalid";
-    if (!_.isFinite(y)) throw "y invalid";
-    this.x = x;
-    this.y = y;
-}
-
-Pt.prototype.plus = function (pt) {
-    return new Pt(this.x + pt.x, this.y + pt.y);
-};
+let dtLoop = Date.now();
 
 exports.main = function main(io) {
     onStart();
+    // onTest();
     inputFromClients(io);
-    loop();
 };
 
-function onStart() {
-    world.obj = [];
-    world.time = 0;
-    world.connected = 0;
-    world.map = new Map();
-    world.logic = new Map();
-    world.cnMass = 0;
-    world.cnId = 0;
 
-    let wid = 1000;
-    for (let a = 0; a < 25000; a++) {
-        addobj(_.random(-wid, wid), _.random(-wid, wid), "mammunt");
+function onStart() {
+    let commands = [];
+    commands.push({name: "initworld"});
+    let wid = 100;
+    for (let a = 0; a < 250; a++) {
+        commands.push({name: "addobj", x: _.random(-wid, wid), y: _.random(-wid, wid), typ: "mammunt"});
     }
-    for (let a = 0; a < 300000; a++) {
-        addobj(_.random(-wid, wid), _.random(-wid, wid), "highgrass");
-        addobj(_.random(-wid, wid), _.random(-wid, wid), "wall");
+    for (let a = 0; a < 3000; a++) {
+        commands.push({name: "addobj", x: _.random(-wid, wid), y: _.random(-wid, wid), typ: "highgrass"});
+        commands.push({name: "addobj", x: _.random(-wid, wid), y: _.random(-wid, wid), typ: "box"});
     }
+    world.make(commands);
+    loop();
+}
+
+function onTest() {
+    world.make([{name: "initworld"}]);
+    world.make([{name: "addobj", x: 1, y: -1, typ: "mammunt"}]);
+    world.make([{name: "addobj", x: 1, y: -1, typ: "oio"}, false, 0, undefined, null]);
+    world.make([{name: "addobj", x: 1, y: -1, typ: "tester"}]);
+
+    for (let i = 0; i < 100; i++) {
+        world.make([{name: "addobj", x: i, y: -2, typ: "highgrass"}]);
+    }
+    for (let p of world.read.player) {
+
+    }
+
+    loop();
 }
 
 function loop() {
     setInterval(function () {
         if (Date.now() >= dtLoop + 100) {
             dtLoop += 100;
-            onLoop();
-            out();
+            out(onLoop());
         }
     }, 0);
 }
 
-function out() {
+
+function out(dtStartLoop) {
     let send = {};
-    for (let p of world.player) {
+    for (let p of world.read.player) {
         send.holst = [];
         send.obj = [];
         send.wound = [];
@@ -63,8 +64,8 @@ function out() {
                 send.holst[x][y] = [];
                 let key = p.x + x - 4 + " ";
                 key += p.y + y - 4;
-                if (world.map.has(key)) {
-                    for (let r of world.map.get(key)) {
+                if (world.read.map.has(key)) {
+                    for (let r of world.read.map.get(key)) {
                         send.obj.push({x: x, y: y, img: r.img, id: r.id, solid: r.solid, terrain: r.terrain});
                     }
                 } else {
@@ -72,23 +73,20 @@ function out() {
                 }
             }
         }
-        if (world.map.has(p.id)) {
-            send.inv = world.map.get(p.id);
-        } else {
-            send.inv = [];
-        }
+        send.inv = world.read.map.get(p.id);
+        if (send.inv == undefined) send.inv = [];
         send.px = p.x;
         send.py = p.y;
         send.dirx = p.dirx;
         send.diry = p.diry;
         send.hand = p.hand;
         send.message = p.message;
-        send.delay = Date.now() - world.dtStartLoop;
-        send.cnMass = world.cnMass;
-        send.cnActive = world.cnActive;
-        send.error = world.error;
-        send.connected = world.connected;
-        send.time = world.time;
+        send.delay = Date.now() - dtStartLoop;
+        send.cnMass = world.read.cnMass;
+        send.cnActive = world.read.cnActive;
+        send.error = world.read.error;
+        send.connected = world.read.connected;
+        send.time = world.read.time;
         // send.dirx = p.dirx;
         // send.diry = p.diry;
         p.socket.emit('updateState', send);
@@ -114,86 +112,81 @@ function inputFromClients(io) {
 }
 
 function onLoop() {
-    world.dtStartLoop = Date.now();
-    for (let p of world.player) {
-        if (p.x == undefined || p.y == undefined) {
-            p.x = 0;
-            p.y = 0;
-            p.solid = true;
-            p.dirx = 0;
-            p.diry = 0;
-            p.order = "stop";
-            p.img = "hero";
-            p.satiety = 1000;
-            p.wound = [];
-            p.tire = 0;
-            p.tool = {typ: "hand"};
-            p.slct = 0;
-            addtoMap(p.x, p.y, p);
-            for (let a = 0; a < 9; a++) {
-                p.wound[a] = "life";
+    let dtStartLoop = Date.now();
+    let commands = [];
+    for (let p of world.read.player) {
+        let m = true;
+        if (p.tire <= 0) {
+            let tool = world.read.map.get(p.id);
+            if (tool == undefined) {
+                tool = {};
+                tool.typ = "hand";
+            } else {
+                tool = tool[p.order.n - 1];
             }
-        } else {
-            let m = true;
-            if (p.tire <= 0) {
-                switch (p.order) {
-                    case "up":
+            switch (p.order.name) {
+                case "move":
+                    if (p.order.val == "up") {
                         p.dirx = 0;
                         p.diry = -1;
-                        break;
-                    case "right":
+                    }
+                    if (p.order.val == "right") {
                         p.dirx = 1;
                         p.diry = 0;
-                        break;
-                    case "left":
+                    }
+                    if (p.order.val == "left") {
                         p.dirx = -1;
                         p.diry = 0;
-                        break;
-                    case "down":
+                    }
+                    if (p.order.val == "down") {
                         p.dirx = 0;
                         p.diry = 1;
-                        break;
-                    case "useup":
-                        apply(p.tool, p.x, p.y - 1);
+                    }
+                    break;
+                case "use":
+                    if (p.order.val == "up") {
+                        apply(tool, p.x, p.y - 1, p);
                         p.dirx = 0;
                         p.diry = 0;
-                        break;
-                    case "useright":
+                    }
+                    if (p.order.val == "right") {
+                        apply(tool, p.x + 1, p.y, p);
                         p.dirx = 0;
                         p.diry = 0;
-                        break;
-                    case "useleft":
+                    }
+                    if (p.order.val == "left") {
+                        apply(tool, p.x - 1, p.y, p);
                         p.dirx = 0;
                         p.diry = 0;
-                        break;
-                    case "usedown":
+                    }
+                    if (p.order.val == "down") {
+                        apply(tool, p.x, p.y + 1, p);
                         p.dirx = 0;
                         p.diry = 0;
-                        break;
-                    case "use":
-                        // use(p);
-                        p.dirx = 0;
-                        p.diry = 0;
-                        break;
-                    case "take":
-                        take(p, 0);
-                        p.dirx = 0;
-                        p.diry = 0;
-                        break;
-                    default:
-                        p.dirx = 0;
-                        p.diry = 0;
-                        p.order = "stop";
-                        m = false;
-                        break;
-                }
-                if (m) {
-                    p.tire = 7;
-                    move(p, p.x + p.dirx, p.y + p.diry);
-                }
-            } else {
-                p.tire -= 1;
+                    }
+                    break;
+                case "take":
+                    commands.push({name: "take", player: p});
+                    // take(p, 0);
+                    p.dirx = 0;
+                    p.diry = 0;
+                    break;
+                default:
+                    p.dirx = 0;
+                    p.diry = 0;
+                    p.order.name = "stop";
+                    p.order.val = 0;
+                    m = false;
+                    break;
             }
+            if (m) {
+                p.tire = 7;
+                // let k = move(p, p.x + p.dirx, p.y + p.diry);
+                let k = move(p, p.x + p.dirx, p.y + p.diry);
+                world.make([k]);
+            }
+        } else {
+            p.tire -= 1;
         }
         p.satiety--;
         if (p.satiety <= 0) {
@@ -202,16 +195,18 @@ function onLoop() {
         }
     }
     let m = 0;
-    let go = world.logic.get(world.time);
+    let go = world.read.logic.get(world.read.time);
     if (go != undefined) {
         for (let o of go) {
             logic(o);
             m++;
         }
     }
-    world.cnActive = m;
-    world.logic.delete(world.time);
-    world.time++;
+    world.read.cnActive = m;
+    world.read.logic.delete(world.time);
+    world.read.time++;
+    world.make(commands);
+    return dtStartLoop;
 }
 
 function addWound(player, wound) {
@@ -235,23 +230,12 @@ function remWound(player, wound) {
             ok = false;
         }
     }
-    if (ok) {
-        return false;
-    } else return true;
+    return ok;
 }
 
-function makeid() {
-    // let text = "";
-    // let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    //
-    // for (let i = 0; i < 12; i++)
-    //     text += possible.charAt(Math.floor(Math.random() * possible.length));
-    world.cnId++;
-    return world.cnId;
-}
 
 function onOrder(socket, val) {
-    for (let p of world.player) {
+    for (let p of world.read.player) {
         if (p.socket == socket) {
             p.order = val.order;
             p.targetx = val.targetx;
@@ -261,26 +245,30 @@ function onOrder(socket, val) {
 }
 
 function onLogin(val, socket) {
-    let p = {socket: socket, key: val, id: makeid()};
-    world.player.push(p);
-    return p.id;
+    world.make([{name: "addPlayer", socket: socket, val: val}]);
+
+    // return p.id;
 }
 
 function logic(obj) {
+    let commands = [];
+
     function transform(obj, typ) {
         obj.typ = typ;
         obj.new = true;
-        tire(1, obj);
+        // tire(1, obj);
+        commands.push({name: "tire", obj: obj, t: 1});
     }
 
     let s = obj.typ;
     switch (s) {
-        case "test":
+        case "tester":
             if (obj.new) {
                 obj.img = "angel";
                 world.error = "1";
                 obj.new = false;
-                tire(10, obj);
+                commands.push({name: "tire", obj: obj, t: 10});
+                // tire(10, obj);
             } else {
                 transform(obj, "test2");
             }
@@ -288,8 +276,15 @@ function logic(obj) {
         case "test2":
             if (obj.new) {
                 obj.img = "meat";
-                transform(obj, "test");
+                transform(obj, "tester");
                 world.error = "2";
+            }
+            break;
+        case "box":
+            if (obj.new == true) {
+                obj.solid = true;
+                obj.img = obj.typ;
+                obj.new = false;
             }
             break;
         case "aphid":
@@ -333,9 +328,11 @@ function logic(obj) {
                 }
 
             }
-            tire(15, obj);
+            // tire(15, obj);
+            commands.push({name: "tire", obj: obj, t: 15});
             break;
         case "mammunt":
+            let actions = [];
             if (obj.new == true) {
                 obj.solid = true;
                 obj.img = obj.typ;
@@ -344,13 +341,14 @@ function logic(obj) {
             } else {
                 if (_.random(1)) {
                     let plus = _.random(-1, 1);
-                    move(obj, obj.x + plus, obj.y);
+                    commands.push(move(obj, obj.x + plus, obj.y));
                 } else {
                     let plus = _.random(-1, 1);
-                    move(obj, obj.x, obj.y + plus);
+                    commands.push(move(obj, obj.x, obj.y + plus));
                 }
             }
-            tire(15, obj);
+            // tire(15, obj);
+            commands.push({name: "tire", obj: obj, t: 15});
             break;
         case "jelly":
             if (obj.new) {
@@ -359,7 +357,8 @@ function logic(obj) {
                 obj.img = obj.typ;
                 obj.img = "jelly";
                 obj.new = false;
-                tire(50, obj);
+                // tire(50, obj);
+                commands.push({name: "tire", obj: obj, t: 50});
             } else {
                 transform(obj, "aphid");
             }
@@ -381,6 +380,7 @@ function logic(obj) {
             // tire(100,obj);
             break;
     }
+    world.make(commands);
 }
 
 
@@ -401,138 +401,53 @@ function isHere(x, y, typ) {
 }
 
 
-function addtoMap(x, y, obj) {
-    addto(x + " " + y, obj);
-    obj.x = x;
-    obj.y = y;
-    obj.carrier = false;
-}
-
-function addtoInv(obj, carrier) {
-    addto(carrier.id, obj);
-    obj.x = false;
-    obj.y = false;
-    obj.carrier = carrier.id;
-
-}
-
-function addto(k, obj) {
-    if (world.map.has(k)) {
-        let i = world.map.get(k);
-        i.push(obj);
-        world.map.set(k, i);
-    } else {
-        world.map.set(k, [obj]);
-    }
-}
-
-function removefromInv(obj) {
-    remove(obj.carrier, obj);
-}
-
-function removefromMap(obj) {
-    if (obj.x === false || obj.y === false) {
-        world.error = "removefromMap error";
-        return false;
-    }
-    remove(obj.x + " " + obj.y, obj);
-}
-
-function remove(k, obj) {
-    if (world.map.has(k)) {
-        let m = world.map.get(k);
-        for (let i in m) {
-            if (obj === m[i]) {
-                m.splice(i, 1);
-            }
-        }
-    } else {
-        world.error = "remove error. Key = " + k;
-    }
-}
-
-function put(obj, carrier) {
-    removefromMap(obj);
-    addtoInv(obj, carrier);
-}
-
-function drop(obj, x, y) {
-    removefromInv(obj);
-    addtoMap(x, y, obj);
-}
-
-function moveForced(obj, x, y) {
-    removefromMap(obj);
-    addtoMap(x, y, obj)
-}
-
 function move(obj, x, y) {
     if (obj.x === false || obj.y === false) {
         world.error = "move (obj.x && obj.y) == false";
         return false;
     }
     let solid = false;
-    if (world.map.has(x + " " + y)) {
-        for (let o of world.map.get(x + " " + y)) {
+    if (world.read.map.has(x + " " + y)) {
+        for (let o of world.read.map.get(x + " " + y)) {
             if (o.solid == true) {
                 solid = true;
             }
         }
     }
-    if (!solid) {
-        moveForced(obj, x, y);
+    if (solid) {
     } else {
-        return false;
-    }
-    return true;
-
-}
-
-function addobj(x, y, typ) {
-    let o = {x: x, y: y, id: makeid(), typ: typ, img: "loading", new: true, terrain: true};
-    addtoMap(x, y, o);
-    let t = world.time + _.random(100);
-    addtologic(o, t);
-    world.cnMass++;
-}
-
-function addtologic(obj, t) {
-    if (world.logic.has(t)) {
-        let i = world.logic.get(t);
-        i.push(obj);
-        world.logic.set(t, i);
-    } else {
-        world.logic.set(t, [obj]);
-    }
-}
-function tire(time, obj) {
-    let t = world.time + time;
-    addtologic(obj, t);
-}
-
-function take(p, n) {
-    let k = p.x + " " + p.y;
-    if (world.map.has(k)) {
-        let itm = world.map.get(k)[n];
-        put(itm, p);
-    } else {
-        return false;
+        // moveForced(obj, x, y);
+        return {name: "move", obj: obj, x: x, y: y}
     }
 }
 
-function apply(tool, x, y) {
+
+function apply(tool, x, y, p) {
+    if (tool == undefined) {
+        tool = {};
+        tool.typ = "hand";
+    }
+    let commands = [];
     let key;
-    let o = world.map.get(x + " " + y);
+    let o = world.read.map.get(x + " " + y);
     if (o !== undefined) {
         for (let obj of o) {
             key = tool.typ + " " + obj.typ;
+            switch (key) {
+                case "hand box":
+                    commands.push({name: "put", obj: obj, carrier: p});
+                    break;
+                default:
+                    commands.push({name:"error",text:key});
+                    break;
+            }
         }
-        if (key == "hand box") {
-            world.error = "apply " + key;
-        }
-        world.error = "apply " + key+" " +obj;
     } else {
-        world.error = "apply on space";
+        key = tool.typ + " space";
+        if (key == "box space") {
+            commands.push({name: "drop", obj: tool, x:x,y:y});
+        }
+        commands.push({name:"error",text:key});
     }
-
+    world.make(commands);
 }
