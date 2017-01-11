@@ -403,6 +403,7 @@ function onKeydown(key) {
             model.order.name = "use";
             model.order.val = "down";
             model.order.n = model.selected;
+            break;
         case "2":
         case "3":
         case "4":
