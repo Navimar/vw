@@ -5,12 +5,25 @@ let highgrass = {
 module.exports.highgrass = highgrass;
 
 let wolf = {
-    img: "wolf",
+    onCreate: (data) => {
+        data.img = "wolf"
+    },
+    img: (data) => {
+        return data.img;
+    },
     z: 14,
-    isSolid:true,
-    onTurn:(data,wd)=>{
-      let target = wd.find([aphid,"player"]);
-      wd.moveTo(target);
+    isSolid: true,
+    onTurn: (data, wd) => {
+        let target = wd.find(stone);
+        if (target) {
+            wd.moveTo(target);
+            data.img = "redwolf";
+        } else {
+            wd.move(wd.dirRnd);
+            data.img = "wolf";
+        }
+        wd.nextTurn(10);
+    },
 };
 module.exports.wolf = wolf;
 
