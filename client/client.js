@@ -1,11 +1,7 @@
 const socket = io();
-
-
-var model = {};
 const constSpeed = 0.0013;
-// const delta = 0.0001;
-//
-// const key = new Date().getTime();
+
+let model = {};
 
 // function Pt(x, y) {
 //     if (!_.isFinite(x)) throw "x invalid";
@@ -173,7 +169,7 @@ function onServer(val) {
             model.order.name = "stop";
         model.order.val = 0;
     }
-    out(model);
+    out();
 }
 
 function onStep(timeDiff) {
@@ -216,7 +212,7 @@ function onStep(timeDiff) {
         }
         o.sx = m.x;
         o.sy = m.y;
-        if(model.keyup){
+        if (model.keyup) {
             // if(model.order.cn==model.lastorder){
             //
             // }
@@ -239,17 +235,17 @@ function onStep(timeDiff) {
 }
 
 
-function out(m) {
+function out() {
     model.date = new Date().getTime();
     socket.emit("ping");
-    let send = {order: m.order, targetx: m.targetx, targety: m.targety, slct: 0};
+    let send = {order: model.order, targetx: model.targetx, targety: model.targety};
     socket.emit("order", send);
 }
 
 
 function vector(fx, fy, tx, ty, s) {
     const v = Math.sqrt(Math.pow(fx - tx, 2) + Math.pow(fy - ty, 2));
-    if (v < 0.005) return {x: 0, y: 0};
+    if (v < 0.01) return {x: 0, y: 0};
     return {x: (tx - fx) * (s / v), y: (ty - fy) * (s / v)};
 }
 
@@ -270,28 +266,8 @@ function render(model) {
         }
     }
 
-
-    for (let a = 0; a < 9; a++) {
-        // for (let h of model.holstold[0][a]) {
-        //     drawImg(h, -1 + model.trx, a);
-        // }
-        // i = model.holstold[a][8][0];
-        // drawImg(i, 9 + model.trx, a);
-        // i = model.holstold[a][0][0];
-        // drawImg(i, a, 9 + model.try);
-        // i = model.holstold[8][a][0];
-        // drawImg(i, a, -1 + model.try);
-    }
-
     for (let o of model.obj) {
-        if (!o.solid) {
-            drawImg(o.img, o.sx, o.sy);
-        }
-    }
-    for (let o of model.obj) {
-        if (o.solid) {
-            drawImg(o.img, o.sx, o.sy);
-        }
+        drawImg(o.img, o.sx, o.sy);
     }
 
     for (let a = 0; a < 9; a++) {
@@ -404,6 +380,13 @@ function onKeydown(key) {
             model.order.val = "down";
             model.order.n = model.selected;
             break;
+        case "usehere":
+            model.targetx = model.px;
+            model.targety = model.py;
+            model.order.name = "use";
+            model.order.val = "here";
+            model.order.n = model.selected;
+            break;
         case "2":
         case "3":
         case "4":
@@ -421,7 +404,7 @@ function onKeydown(key) {
             break;
     }
     // }
-    out(model);
+    out();
 }
 
 function onKeyup(key) {

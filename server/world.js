@@ -4,45 +4,6 @@ const direction = util.dir;
 
 let world = {};
 
-//     commands.forEach(function (item, i, arr) {
-//         switch (item.name) {
-//             case "initworld":
-//
-//                 break;
-//             case "addobj":
-//                 addobj(item.typ, item.x, item.y);
-//                 break;
-//             case "move":
-//                 relocate(item.obj, item.x, item.y);
-//                 break;
-//             case "addPlayer":
-//                 addPlayer(item.val, item.socket);
-//                 break;
-//             case "tire":
-//                 tire(item.t, item.obj);
-//                 break;
-//             case "take":
-//                 take(item.player, 0);
-//                 break;
-//             case "put":
-//                 put(item.obj, item.carrier);
-//                 break;
-//             case "drop":
-//                 drop(item.obj, item.x, item.y);
-//                 break;
-//             case "error":
-// //                if (world.error==item.text){
-// //                    world.cnError++;
-// //                    world.error = " ("+world.cnError+")";
-// //                }else{
-//                 world.cnError =1;
-//                 world.error = item.text;
-// //                }
-//                 break;
-//             default:
-//                 world.error = "unknown command " + item.name;
-//         }
-//     });
 module.exports.initWorld = function () {
     world.player = [];
     world.time = 0;
@@ -53,7 +14,7 @@ module.exports.initWorld = function () {
     world.cnId = 0;
     world.cnError = 1;
     world.error = "everything is fine";
-}
+};
 
 function removefromMap(obj) {
     if (obj.x === false || obj.y === false) {
@@ -85,6 +46,7 @@ module.exports.addPlayer = function addPlayer(val, socket) {
     p.dirx = 0;
     p.diry = 0;
     p.order = "stop";
+    p.order.n = 0;
     p.img = "hero";
     p.satiety = 1000;
     p.wound = [];
@@ -92,7 +54,10 @@ module.exports.addPlayer = function addPlayer(val, socket) {
     p.tool = {typ: "hand"};
     p.slct = 0;
     p.tp = {
-        img: "hero"
+        player: true,
+        img: "hero",
+        isSolid:true,
+        z: -1,
     };
     for (let a = 0; a < 9; a++) {
         p.wound[a] = "life";
@@ -102,16 +67,14 @@ module.exports.addPlayer = function addPlayer(val, socket) {
 
 };
 
-function take(p, n) {
-    let k = p.x + " " + p.y;
-    let itm = world.map.get(k)[n];
-    if (itm != undefined && itm.typ != "player") {
-        // console.log(itm);
-        put(itm, p);
-    } else {
-        return false;
+module.exports.pickUp = function pickUp(objTaker, tp) {
+    let k = objTaker.x + " " + objTaker.y;
+    for (let o of world.map.get(k)) {
+        if (o.tp === tp) {
+            put(o, objTaker);
+        }
     }
-}
+};
 
 function addtologic(obj, t) {
     if (world.logic.has(t)) {
@@ -121,6 +84,16 @@ function addtologic(obj, t) {
     } else {
         world.logic.set(t, [obj]);
     }
+    obj.nextTurn = t;
+}
+
+function cancelTurn(obj) {
+    let objArr = world.logic.get(obj.nextTurn);
+    for (let o in objArr) {
+        if (objArr[o] === obj) {
+            objArr.splice(o, 1);
+        }
+    }
 }
 
 
@@ -128,11 +101,12 @@ function put(obj, carrier) {
     removefromMap(obj);
     addtoInv(obj, carrier);
 }
+module.exports.put = put;
 
-function drop(obj, x, y) {
+module.exports.drop = function drop(obj, x, y) {
     removefromInv(obj);
     addtoMap(x, y, obj);
-}
+};
 
 function addtoInv(obj, carrier) {
     addto(carrier.id, obj);
@@ -188,12 +162,12 @@ module.exports.createObj = function createObj(tp, x, y) {
 };
 
 
-module.exports.has = function has(tp, obj) {
+module.exports.inv = function inv(tp, obj) {
     let inv = world.map.get(obj.id);
     if (inv != undefined) {
         for (let k of inv) {
             if (k.tp === tp) {
-                return true
+                return k;
             }
         }
     }
@@ -213,6 +187,11 @@ module.exports.lay = function lay(tp, x, y) {
     return false;
 };
 
+module.exports.trade = function trade(obj, carrier) {
+    removefromInv(obj);
+    addtoInv(obj,carrier);
+};
+
 module.exports.move = function move(obj, dir) {
     let x = obj.x + dir.x;
     let y = obj.y + dir.y;
@@ -222,13 +201,37 @@ module.exports.move = function move(obj, dir) {
     // }
 
     // if (world.map.has(x + " " + y)) {
-        // if (!_.any(world.map.get(x + " " + y), (e) => {
-        //         return e.tp.isSolid;
-        //     })) {
-            relocate(obj, x, y);
-        // }
+    if (!_.any(world.map.get(x + " " + y), (e) => {
+            return e.tp.isSolid;
+        })) {
+        relocate(obj, x, y);
+    }
     // }
 };
+
+module.exports.addWound = function addWound(player, wound) {
+    let ok = true;
+    for (let x in player.wound) {
+        if (player.wound[x] == "life" && ok) {
+            player.wound[x] = wound;
+            ok = false;
+        }
+    }
+    if (ok) {
+        player.message = ("Вы погибли");
+    }
+};
+
+module.exports.removeWound = function removeWound(player, wound) {
+    let ok = true;
+    for (let x in player.wound) {
+        if (player.wound[x] == wound && ok) {
+            player.wound[x] = "life";
+            ok = false;
+        }
+    }
+    return ok;
+}
 
 function relocate(obj, x, y) {
     removefromMap(obj);
@@ -244,13 +247,13 @@ module.exports.nextTurn = nextTurn;
 
 module.exports.transform = function transform(obj, tp) {
     obj.tp = tp;
-    obj.needSkipTurn = true;
-    if(tp.onCreate) {
-        let data={};
+    if (tp.onCreate) {
+        let data = {};
         obj.tp.onCreate(data);
         obj.data = data;
     }
-    if(tp.onTurn) {
+    // cancelTurn(obj);
+    if (tp.onTurn) {
         nextTurn(1, obj);
     }
 };
