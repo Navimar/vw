@@ -1,10 +1,23 @@
-let highgrass = {
+let meta = {};
+meta.player = {
+    player: true,
+    img: "hero",
+    isSolid: true,
+    z: -1,
+};
+
+meta.highgrass = {
     img: "highgrass",
     z: 0
 };
-module.exports.highgrass = highgrass;
 
-let wolf = {
+meta.test = {
+    img: "angel",
+    onTurn: (data, wd) => {
+
+    }
+};
+meta.wolf = {
     onCreate: (data) => {
         data.img = "wolf"
     },
@@ -14,43 +27,33 @@ let wolf = {
     z: 14,
     isSolid: true,
     onTurn: (data, wd) => {
-        let target = wd.find(stone);
-        if (target) {
-            wd.moveTo(target);
-            data.img = "redwolf";
-        } else {
-            wd.move(wd.dirRnd);
-            data.img = "wolf";
-        }
+        let t = wd.find(meta.player);
+        wd.moveTo(t.x, t.y);
         wd.nextTurn(10);
     },
 };
-module.exports.wolf = wolf;
 
-let stone = {
+meta.stone = {
     img: "stone",
     z: 1
 };
-module.exports.stone = stone;
 
-let kaka = {
+meta.kaka = {
     img: "kaka",
     z: 2,
     onApply: (obj, wd) => {
         wd.getOut(obj.x, obj.y);
     }
 };
-module.exports.kaka = kaka;
 
-let tree = {
+meta.tree = {
     z: 20,
     img: "tree",
     isSolid: true,
 
 };
-module.exports.tree = tree;
 
-let box = {
+meta.box = {
     z: 10,
     img: "box",
     isSolid: true,
@@ -58,10 +61,9 @@ let box = {
         wd.getOut(obj.x, obj.y);
     }
 };
-module.exports.box = box;
 
 
-let jelly = {
+meta.jelly = {
     z: 5,
     img: "jelly",
     onCreate(data){
@@ -72,20 +74,19 @@ let jelly = {
             data.new = false;
             wd.nextTurn(700);
         } else {
-            wd.transform(wd.me, aphid);
+            wd.transform(wd.me, meta.aphid);
         }
     },
     onApply: (obj, wd) => {
         if (obj.tp.player) {
             wd.trade(obj);
-            wd.transform(wd.me, kaka);
+            wd.transform(wd.me, meta.kaka);
             wd.removeWound(obj, "hungry");
         }
     },
 };
-module.exports.jelly = jelly;
 
-let aphid = {
+meta.aphid = {
     z: 15,
     img: (data) => {
         if (data.sat)
@@ -98,10 +99,10 @@ let aphid = {
         data.sat = false;
     },
     onTurn: (data, wd) => {
-        if (wd.inv(highgrass)) {
+        if (wd.inv(meta.highgrass)) {
             if (data.convert > 70) {
-                let hg = wd.inv(highgrass);
-                wd.transform(hg, jelly);
+                let hg = wd.inv(meta.highgrass);
+                wd.transform(hg, meta.jelly);
                 wd.drop(hg);
                 data.sat = false;
             } else {
@@ -112,10 +113,10 @@ let aphid = {
         } else {
             data.satiety -= 1;
             if (data.satiety == 0) {
-                wd.transform(wd.me, highgrass);
+                wd.transform(wd.me, meta.highgrass);
             } else {
-                if (wd.isHere(highgrass)) {
-                    wd.pickUp(highgrass);
+                if (wd.isHere(meta.highgrass)) {
+                    wd.pickUp(meta.highgrass);
                     data.satiety = 70;
                     data.convert = 0;
                 } else {
@@ -127,4 +128,4 @@ let aphid = {
     }
 };
 
-module.exports.aphid = aphid;
+module.exports = meta;

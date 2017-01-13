@@ -5,17 +5,62 @@ const direction = require('./util');
 
 
 let dtLoop = Date.now();
+let flTest = true;
 
 exports.main = function main(io) {
     onStart();
     inputFromClients(io);
 };
 
+function test(val, ok, text) {
+    if (text == undefined) {
+        text = "";
+    }
+    if (val === ok) {
+        console.log("OK " + text);
+    } else {
+        console.log("ERROR!!! " + val + ", expected " + ok + " " + text);
+        flTest = false;
+    }
+}
+
+let makeTest = () => {
+    world.initWorld("objArrInPoint");
+    world.createObj(meta.test, 5, 5);
+    world.createObj(meta.highgrass, 5, 5);
+    test(world.objArrInPoint(5, 5)[0].tp, meta.test, "");
+    test(world.objArrInPoint(5, 5)[1].tp, meta.highgrass, "");
+
+    world.initWorld("findInPoint");
+    world.createObj(meta.test, 0, 0);
+    test(world.findInPoint(meta.test, 0, 0).tp.img, "angel", "find in 0 0");
+    world.createObj(meta.test, -5, -5);
+    test(world.find(meta.test, -4, -4).y, -5, "find in negarive coor");
+    world.addPlayer();
+    test(world.findInPoint(meta.player, 0, 0).x, 0, "find player");
+
+    world.initWorld("find");
+    world.createObj(meta.test, 0, 0);
+    test(world.find(meta.test, 2, 2).x, 0, "find at 0 0");
+    world.addPlayer();
+    test(world.find(meta.player, 2, 2).x, 0, "find Player");
+    world.createObj(meta.test, 5, 5);
+    test(world.find(meta.test, 4, 4).y, 5);
+    test(world.find(meta.test, 3, 7).y, 5);
+    test(world.find(meta.test, 10, 10), false);
+    test(world.find(meta.test, 5, 5).y, 5, "find same point");
+
+
+};
+
+
 function onStart() {
-    world.initWorld();
-    // world.createWorld();
-    world.createTest();
-    loop();
+    makeTest();
+    if (flTest) {
+        world.initWorld();
+        world.createWorld();
+        loop();
+    }
 }
 
 function loop() {
@@ -30,6 +75,7 @@ function loop() {
 
 function onLoop() {
     let dtStartLoop = Date.now();
+
     function wrapper(me) {
         return {
             me,
@@ -44,32 +90,35 @@ function onLoop() {
             getOut: (x, y) => world.drop(me, x, y),
             trade: (obj) => world.trade(me, obj),
             removeWound: (player, string) => world.removeWound(player, string),
-            moveTo: (target) => {
+            moveTo: (x, y) => {
                 let dir;
-                let xWant = _.random(target.x - me.x);
-                let yWant = _.random(target.y - me.y);
-                if (Math.abs(xWant) > Math.abs(yWant)) {
-                    if (xWant == 0) {
-                        return true;
-                    }
-                    if (xWant > 0) {
+
+                function goX() {
+                    if (me.x - x > 0) {
                         dir = direction.left;
                     } else {
                         dir = direction.right;
                     }
-                } else {
-                    if (yWant == 0) {
-                        return true;
-                    }
-                    if (yWant > 0) {
+                }
+
+                function goY() {
+                    if (me.y - y > 0) {
                         dir = direction.up;
                     } else {
                         dir = direction.down;
                     }
                 }
-                world.move(me, dir)
+
+                let xWant = Math.abs(me.x - x);
+                let yWant = Math.abs(me.y - y);
+                if (_.random(xWant) > _.random(yWant)) {
+                    goX();
+                } else {
+                    goY();
+                }
+                world.move(me, dir);
             },
-            find: (tp) => world.find(tp, me.x, me.y),
+            find: (target) => world.find(target, me.x, me.y),
         };
     }
 

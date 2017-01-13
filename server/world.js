@@ -5,7 +5,7 @@ const meta = require('./rule.js');
 
 let world = {};
 
-world.initWorld = function () {
+world.initWorld = function (text) {
     world.player = [];
     world.time = 0;
     world.connected = 0;
@@ -14,7 +14,11 @@ world.initWorld = function () {
     world.cnMass = 0;
     world.cnId = 0;
     world.cnError = 1;
+    world.test = true;
     world.error = "everything is fine";
+    if (text != undefined) {
+        console.log(text)
+    }
 };
 
 function removefromMap(obj) {
@@ -54,12 +58,7 @@ world.addPlayer = (val, socket) => {
     p.tire = 0;
     p.tool = {typ: "hand"};
     p.slct = 0;
-    p.tp = {
-        player: true,
-        img: "hero",
-        isSolid: true,
-        z: -1,
-    };
+    p.tp = meta.player;
     for (let a = 0; a < 9; a++) {
         p.wound[a] = "life";
     }
@@ -72,7 +71,7 @@ world.pickUp = (objTaker, tp) => {
     let k = objTaker.x + " " + objTaker.y;
     for (let o of world.map.get(k)) {
         if (o.tp === tp) {
-            put(o, objTaker);
+            world.put(o, objTaker);
         }
     }
 };
@@ -98,13 +97,12 @@ function cancelTurn(obj) {
 }
 
 
-function put(obj, carrier) {
+world.put = (obj, carrier) => {
     removefromMap(obj);
     addtoInv(obj, carrier);
-}
-module.exports.put = put;
+};
 
-module.exports.drop = function drop(obj, x, y) {
+world.drop = function (obj, x, y) {
     removefromInv(obj);
     addtoMap(x, y, obj);
 };
@@ -160,6 +158,7 @@ world.createObj = function (tp, x, y) {
         addtologic(o, t);
     }
     world.cnMass++;
+    return o;
 };
 
 
@@ -188,26 +187,28 @@ world.lay = function lay(tp, x, y) {
     return false;
 };
 
-module.exports.trade = function trade(obj, carrier) {
+world.trade = function (obj, carrier) {
     removefromInv(obj);
     addtoInv(obj, carrier);
 };
 
 world.move = function (obj, dir) {
-    let x = obj.x + dir.x;
-    let y = obj.y + dir.y;
-    // if (obj.x === false || obj.y === false) {
-    //     world.error = "move (obj.x && obj.y) == false";
-    //     return false;
-    // }
+    if (_.isFinite(obj.x) && _.isFinite(obj.y)) {
+        let x = obj.x + dir.x;
+        let y = obj.y + dir.y;
+        // if (obj.x === false || obj.y === false) {
+        //     world.error = "move (obj.x && obj.y) == false";
+        //     return false;
+        // }
 
-    // if (world.map.has(x + " " + y)) {
-    if (!_.any(world.map.get(x + " " + y), (e) => {
-            return e.tp.isSolid;
-        })) {
-        relocate(obj, x, y);
+        // if (world.map.has(x + " " + y)) {
+        if (!_.any(world.map.get(x + " " + y), (e) => {
+                return e.tp.isSolid;
+            })) {
+            relocate(obj, x, y);
+        }
+        // }
     }
-    // }
 };
 
 world.addWound = (player, wound) => {
@@ -266,46 +267,51 @@ world.createWorld = () => {
         world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
         world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
     }
-    for (let a = 0; a < 50; a++) {
+    for (let a = 0; a < 5000; a++) {
         world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));
 
     }
 };
 
-world.createTest = () => {
-    world.initWorld();
-    world.createObj(meta.aphid, 5, 5);
-    world.createObj(meta.jelly, -1, -1);
-    world.createObj(meta.wolf, -2, -4);
-    world.createObj(meta.stone, 0, -2);
-    for (let a = 0; a < 30; a++) {
-        for (let b = 0; b < 30; b++) {
-
-            world.createObj(meta.highgrass, a, b);
+world.objArrInPoint = (x, y) => {
+    if (world.map.has(x + " " + y)) {
+        let obj = world.map.get(x + " " + y);
+        if (obj.length > 0) {
+            return obj;
         }
     }
+    return false;
 };
 
-world.find = (tp, x, y) => {
-    function findTarget(x, y) {
-        if (world.map.has(x + " " + y)) {
-            for (let o of world.map.get(x + " " + y)) {
-                if (o.tp === tp) {
-                    return o;
-                }
+
+world.findInPoint = (tp, x, y) => {
+    let o = world.objArrInPoint(x, y);
+    if (Array.isArray(o)) {
+        for (let item of o) {
+            if (tp === item.tp) {
+                return item;
             }
         }
     }
+    return false;
+};
+world.find = (tp, x, y) => {
+    function findInSircle(a) {
+        for (let xx = x - a; xx < x + a; xx++) {
+            for (let yy = y - a; yy < y + a; yy++) {
+                // if (Math.abs(xx - x + yy - y) == a) {
+                    let f = world.findInPoint(tp, xx, yy);
+                    if (f) return f;
+                // }
+            }
+        }
+        return false;
+    }
+
 
     for (let a = 0; a < 4; a++) {
-        for (let xx = x - a; xx <= x + a; xx++) {
-            findTarget(xx, y + a);
-            findTarget(xx, y - a);
-        }
-        for (let yy = y - a; yy <= y + a; yy++) {
-            findTarget(x + a, yy);
-            findTarget(x - a, yy);
-        }
+        let f = findInSircle(a);
+        if (f) return f;
     }
     return false;
 };
