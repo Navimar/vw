@@ -1,0 +1,99 @@
+#main {
+    width: 33%;
+    margin: auto;
+    text-align: center;
+    left: 33%;
+    margin-top: 0;
+}
+#tasklist{
+    padding-top: 50px;
+}
+.task {
+    text-transform: lowercase;
+    font-family: arial, consolas;
+}
+
+.selected {
+    margin-left: -3px;
+    margin-right:-3px;
+    border-left: #df0008 solid 3px;
+    border-right: #df0008 solid 3px;
+}
+.unsorted{
+    background: #333;
+
+}
+.stop{
+    background: darkslategrey;
+}
+body {
+    padding: 0;
+    /*background: black url(img/space.jpg) 100% 100%;*/
+    background: black;
+    font-size: x-large;
+    color: whitesmoke;
+    margin: 0;
+}
+
+#add {
+    top: 0;
+    background: black;
+    left: 33%;
+    position: fixed;
+    text-transform: lowercase;
+    text-align: center;
+    height: 30px;
+    font-size: x-large;
+    color: whitesmoke;
+    border: none;
+    width: 33%;
+    padding: 5px;
+}
+
+.text {
+
+}
+
+#btnDone {
+    padding: 0;
+    margin: 0;
+    background: white;
+    border: none;
+    border-radius: 3px;
+    height: 50px;
+    width: 200px;
+    font-size: x-large;
+    color: black;
+}
+
+#leftblock {
+    font-size: x-large;
+    color: whitesmoke;
+    position: fixed;
+    font-family: arial;
+}
+
+#leftblock input {
+    width: 200px;
+    padding: 0;
+    margin: 0;
+    font-size: x-large;
+}
+
+.btnClear {
+    color: white;
+    margin-bottom: 0;
+    background: red;
+    font-size: x-large;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+#leftblock div {
+    /* vertical-align: bottom; */
+    margin-bottom: 10px;
+}

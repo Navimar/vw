@@ -8,6 +8,8 @@ app.use(express.static(__dirname + '/img'));
 app.use(express.static(__dirname + '/scripts'));
 app.use(express.static(__dirname + '/client'));
 app.use(express.static(__dirname + '/test'));
+app.use(express.static(__dirname + '/ntd'));
+app.use(express.static(__dirname + '/static'));
 app.use(express.static(__dirname + '/lib'));
 app.use(express.static(__dirname + '/'));
 
@@ -20,11 +22,10 @@ app.get('/log', function (req, res){
     res.status(200).send(text);
 });
 
-
 run.main(io);
 
-var port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
-var ip = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
+let port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
+let ip = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
 http.listen(port, ip, function () {
     console.log('listening...');
 });

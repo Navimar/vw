@@ -260,6 +260,7 @@ function render(model) {
     for (let y = -1; y < 10; y++) {
         for (let x = -1; x < 10; x++) {
             drawImg("grass", x + model.trx, y + model.try);
+            // drawImg("grass", x, y);
             // for (let h of model.holst[x][y]) {
             // drawImg(model.holst[x][y], x + model.trx, y + model.try);
             // }
@@ -267,7 +268,8 @@ function render(model) {
     }
 
     for (let o of model.obj) {
-        drawImg(o.img, o.sx, o.sy);
+        // drawImg(o.img, o.sx, o.sy);
+        drawImg(o.img, o.x, o.y);
     }
 
     for (let a = 0; a < 9; a++) {

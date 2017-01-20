@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Nothnig to Do</title>
+    <link rel="stylesheet" type="text/css" href="ntd.css">
+</head>
+<body>
+<div id="leftblock">
+    <div><button id="btnDone">Delete</button></div>
+    <div>start date</div>
+    <div><input class="edit" id="startdate" type="date"><button class="btnClear">X</button></div>
+    <div>start time</div>
+    <div><input class="edit" id="starttime" type="time"><button class="btnClear">X</button></div>
+    <br>
+    <div>due date</div>
+    <div><input class="edit" id="duedate" type="date"><button class="btnClear">X</button></div>
+    <div>due time</div>
+    <div><input class="edit" id="duetime" type="time"><button class="btnClear">X</button></div>
+
+</div>
+<div id="main">
+    <input type="text" placeholder="add new item..." id="add">
+    <div id="tasklist">
+    <div id="t5" class="task">Добро пожаловать в НТД</div>
+    <div id="t10" class="task">Добавьте свою первую задачу</div>
+    </div>
+</div>
+</body>
+<script src="jquery.js" type="text/javascript"> </script>
+<script src="socket.io.js" type="text/javascript"></script>
+<script src="mousetrap.js" type="text/javascript"></script>
+<script src="keys.js" type="text/javascript"></script>
+<script src="ntd-client.js" type="text/javascript"></script>
+<script src="underscore.js" type="text/javascript"></script>
+
+</html>

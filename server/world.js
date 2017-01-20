@@ -44,7 +44,7 @@ function remove(k, obj) {
 
 
 world.addPlayer = (val, socket) => {
-    p = {socket: socket, key: val, id: makeid()};
+    let p = {socket: socket, key: val, id: makeid()};
     p.x = 0;
     p.y = 0;
     p.solid = true;
@@ -64,7 +64,7 @@ world.addPlayer = (val, socket) => {
     }
     addtoMap(p.x, p.y, p);
     world.player.push(p);
-
+    return p;
 };
 
 world.pickUp = (objTaker, tp) => {
@@ -209,6 +209,7 @@ world.move = function (obj, dir) {
         }
         // }
     }
+    return false;
 };
 
 world.addWound = (player, wound) => {
@@ -233,7 +234,7 @@ module.exports.removeWound = function removeWound(player, wound) {
         }
     }
     return ok;
-}
+};
 
 function relocate(obj, x, y) {
     removefromMap(obj);
@@ -252,7 +253,6 @@ world.transform = (obj, tp) => {
         obj.tp.onCreate(data);
         obj.data = data;
     }
-    // cancelTurn(obj);
     if (tp.onTurn) {
         world.nextTurn(1, obj);
     }
@@ -283,6 +283,15 @@ world.objArrInPoint = (x, y) => {
     return false;
 };
 
+world.objArrInInv = (obj) => {
+    if (world.map.has(obj.id)) {
+        let arr = world.map.get(obj.id);
+        if (arr.length > 0) {
+            return arr;
+        }
+    }
+    return false;
+};
 
 world.findInPoint = (tp, x, y) => {
     let o = world.objArrInPoint(x, y);
@@ -300,8 +309,8 @@ world.find = (tp, x, y) => {
         for (let xx = x - a; xx < x + a; xx++) {
             for (let yy = y - a; yy < y + a; yy++) {
                 // if (Math.abs(xx - x + yy - y) == a) {
-                    let f = world.findInPoint(tp, xx, yy);
-                    if (f) return f;
+                let f = world.findInPoint(tp, xx, yy);
+                if (f) return f;
                 // }
             }
         }

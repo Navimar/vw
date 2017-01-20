@@ -29,7 +29,7 @@ meta.wolf = {
     onTurn: (data, wd) => {
         let t = wd.find(meta.player);
         wd.moveTo(t.x, t.y);
-        wd.nextTurn(10);
+        wd.nextTurn(13);
     },
 };
 
@@ -124,7 +124,7 @@ meta.aphid = {
                 }
             }
         }
-        wd.nextTurn(15);
+        wd.nextTurn(20);
     }
 };
 

@@ -2,29 +2,28 @@ const _ = require('underscore');
 const world = require('./world');
 const meta = require('./rule');
 const direction = require('./util');
-
+const fs = require('fs');
 
 let dtLoop = Date.now();
-let flTest = true;
 
 exports.main = function main(io) {
     onStart();
     inputFromClients(io);
 };
 
-function test(val, ok, text) {
-    if (text == undefined) {
-        text = "";
-    }
-    if (val === ok) {
-        console.log("OK " + text);
-    } else {
-        console.log("ERROR!!! " + val + ", expected " + ok + " " + text);
-        flTest = false;
-    }
-}
-
 let makeTest = () => {
+    function test(val, ok, text) {
+        if (text == undefined) {
+            text = "";
+        }
+        if (val === ok) {
+            console.log("OK " + text);
+        } else {
+            console.log("ERROR!!! " + val + ", expected " + ok + " " + text);
+            flTest = false;
+        }
+    }
+    let flTest = true;
     world.initWorld("objArrInPoint");
     world.createObj(meta.test, 5, 5);
     world.createObj(meta.highgrass, 5, 5);
@@ -50,13 +49,17 @@ let makeTest = () => {
     test(world.find(meta.test, 10, 10), false);
     test(world.find(meta.test, 5, 5).y, 5, "find same point");
 
+    world.initWorld("apply");
+    let p = world.addPlayer();
+    apply(direction.right,p);
+    test(world.objArrInInv(p),false,"empty not get in inv");
 
+    return flTest;
 };
 
 
 function onStart() {
-    makeTest();
-    if (flTest) {
+    if (makeTest()) {
         world.initWorld();
         world.createWorld();
         loop();
@@ -73,97 +76,98 @@ function loop() {
     }, 0);
 }
 
-function onLoop() {
-    let dtStartLoop = Date.now();
-
-    function wrapper(me) {
-        return {
-            me,
-            inv: (tp) => world.inv(tp, me),
-            isHere: (tp) => world.lay(tp, me.x, me.y),
-            move: (dir) => world.move(me, dir),
-            dirRnd: direction.dirs[_.random(3)],
-            nextTurn: (time) => world.nextTurn(time, me),
-            transform: (obj, tp) => world.transform(obj, tp),
-            pickUp: (tp) => world.pickUp(me, tp),
-            drop: (obj) => world.drop(obj, me.x, me.y),
-            getOut: (x, y) => world.drop(me, x, y),
-            trade: (obj) => world.trade(me, obj),
-            removeWound: (player, string) => world.removeWound(player, string),
-            moveTo: (x, y) => {
-                let dir;
-
-                function goX() {
-                    if (me.x - x > 0) {
-                        dir = direction.left;
-                    } else {
-                        dir = direction.right;
-                    }
-                }
-
-                function goY() {
-                    if (me.y - y > 0) {
-                        dir = direction.up;
-                    } else {
-                        dir = direction.down;
-                    }
-                }
-
-                let xWant = Math.abs(me.x - x);
-                let yWant = Math.abs(me.y - y);
-                if (_.random(xWant) > _.random(yWant)) {
-                    goX();
-                } else {
-                    goY();
-                }
-                world.move(me, dir);
-            },
-            find: (target) => world.find(target, me.x, me.y),
-        };
-    }
-
-    function apply(dir, p) {
-        let tool = world.map.get(p.id);
+function apply(dir, p) {
+    let tool = world.map.get(p.id);
+    if (tool == undefined) {
+        handTool();
+    } else {
+        tool = tool[p.order.n - 1];
         if (tool == undefined) {
             handTool();
-        } else {
-            tool = tool[p.order.n - 1];
-            if (tool == undefined) {
-                handTool();
-            }
         }
-        function handTool() {
-            tool = {};
-            tool.tp = {
-                onApply: (obj, wd) => {
-                    switch (obj.tp) {
-                        default:
-                            world.put(obj, p);
-                            break;
-                    }
+    }
+    function handTool() {
+        tool = {};
+        tool.tp = {
+            onApply: (obj, wd) => {
+                switch (obj.tp) {
+                    case "space":
+                        break;
+                    default:
+                        world.put(obj, p);
+                        break;
                 }
-            }
-        }
-
-        let x = p.x + dir.x;
-        let y = p.y + dir.y;
-        let o = world.map.get(x + " " + y);
-        if (o && o.length > 0) {
-            o.sort((a, b) => {
-                return b.tp.z - a.tp.z;
-            });
-            if (_.isFunction(tool.tp.onApply)) {
-                tool.tp.onApply(o[0], wrapper(tool));
-            }
-        } else {
-            if (_.isFunction(tool.tp.onApply)) {
-                tool.tp.onApply({tp: "space", x, y}, wrapper(tool));
-            } else {
-                wrapper(tool).getOut(x, y);
             }
         }
     }
 
+    let x = p.x + dir.x;
+    let y = p.y + dir.y;
+    let o = world.map.get(x + " " + y);
+    if (o && o.length > 0) {
+        o.sort((a, b) => {
+            return b.tp.z - a.tp.z;
+        });
+        if (_.isFunction(tool.tp.onApply)) {
+            return tool.tp.onApply(o[0], wrapper(tool));
+        }
+    } else {
+        if (_.isFunction(tool.tp.onApply)) {
+            return tool.tp.onApply({tp: "space", x, y}, wrapper(tool));
+        } else {
+            return wrapper(tool).getOut(x, y);
+        }
+    }
+}
+
+function wrapper(me) {
+    return {
+        me,
+        inv: (tp) => world.inv(tp, me),
+        isHere: (tp) => world.lay(tp, me.x, me.y),
+        move: (dir) => world.move(me, dir),
+        dirRnd: direction.dirs[_.random(3)],
+        nextTurn: (time) => world.nextTurn(time, me),
+        transform: (obj, tp) => world.transform(obj, tp),
+        pickUp: (tp) => world.pickUp(me, tp),
+        drop: (obj) => world.drop(obj, me.x, me.y),
+        getOut: (x, y) => world.drop(me, x, y),
+        trade: (obj) => world.trade(me, obj),
+        removeWound: (player, string) => world.removeWound(player, string),
+        moveTo: (x, y) => {
+            let dir;
+
+            function goX() {
+                if (me.x - x > 0) {
+                    dir = direction.left;
+                } else {
+                    dir = direction.right;
+                }
+            }
+
+            function goY() {
+                if (me.y - y > 0) {
+                    dir = direction.up;
+                } else {
+                    dir = direction.down;
+                }
+            }
+
+            let xWant = Math.abs(me.x - x);
+            let yWant = Math.abs(me.y - y);
+            if (_.random(xWant) > _.random(yWant)) {
+                goX();
+            } else {
+                goY();
+            }
+            world.move(me, dir);
+        },
+        find: (target) => world.find(target, me.x, me.y),
+    };
+}
+
+function onLoop() {
+    let dtStartLoop = Date.now();
 
     for (let p of world.player) {
         if (p.tire <= 0) {
@@ -230,7 +234,7 @@ function onLoop() {
                     break;
             }
             function moveLocal(dir) {
-                p.tire = 7;
+                p.tire = 10;
                 world.move(p, dir);
             }
         } else {
@@ -272,6 +276,7 @@ function onOrder(socket, val) {
 
 function onLogin(val, socket) {
     world.addPlayer(val, socket);
+    return ("success!");
 }
 
 function out(dtStartLoop) {
@@ -341,6 +346,20 @@ function inputFromClients(io) {
         });
         socket.on('order', function (val) {
             onOrder(socket, val);
+        });
+        socket.on('ntd-load', function (val) {
+            fs.readFile('data.txt', 'utf8', function (err,data) {
+                if (err) {
+                    return console.log(err);
+                }
+                socket.emit('model', data);
+            });
+        });
+
+        socket.on('ntd-save', function (val) {
+            fs.writeFile('data.txt', JSON.stringify(val), function (err) {
+                if (err) return console.log(err);
+            });
         });
         socket.on('disconnect', function () {
             world.connected--;
