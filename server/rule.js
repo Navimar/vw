@@ -1,3 +1,5 @@
+const direction = require('./util');
+
 let meta = {};
 meta.player = {
     player: true,
@@ -29,6 +31,7 @@ meta.wolf = {
     onTurn: (data, wd) => {
         let t = wd.find(meta.player);
         wd.moveTo(t.x, t.y);
+        // wd.move(direction.right);
         wd.nextTurn(13);
     },
 };

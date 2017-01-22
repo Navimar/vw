@@ -5,7 +5,7 @@ const meta = require('./rule.js');
 
 let world = {};
 
-world.initWorld = function (text) {
+world.initWorld = function () {
     world.player = [];
     world.time = 0;
     world.connected = 0;
@@ -16,9 +16,7 @@ world.initWorld = function (text) {
     world.cnError = 1;
     world.test = true;
     world.error = "everything is fine";
-    if (text != undefined) {
-        console.log(text)
-    }
+    world.testfail = false;
 };
 
 function removefromMap(obj) {
@@ -43,8 +41,8 @@ function remove(k, obj) {
 }
 
 
-world.addPlayer = (val, socket) => {
-    let p = {socket: socket, key: val, id: makeid()};
+world.addPlayer = (key, socket) => {
+    let p = {socket, key, id: makeid()};
     p.x = 0;
     p.y = 0;
     p.solid = true;

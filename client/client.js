@@ -1,5 +1,6 @@
 const socket = io();
 const constSpeed = 0.0013;
+const pass= "password";
 
 let model = {};
 
@@ -60,14 +61,15 @@ function onStart() {
 
 function inputServer() {
     socket.on('connect', function () {
-        let login = false;
+        let login = pass;
         socket.emit('login', login);
     });
     socket.on('updateState', function (val) {
         onServer(val);
     });
-    socket.on('err', (val) => {
-        console.log(val);
+    socket.on('testFail', (val) => {
+        onTestFail(val);
+        socket.emit('end');
     });
     socket.on('login', (val) => {
         onLogin(val);
@@ -420,3 +422,12 @@ function onKeyup(key) {
 //         evt.clientY - rect.top
 //     );
 // }
+
+function onTestFail(val) {
+    let $body =$('body');
+   $body.html('');
+    val.forEach((item,i,arr)=>{
+        $body.append(item);
+        $body.append("<br>");
+    });
+}

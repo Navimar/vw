@@ -2,7 +2,9 @@
     padding: 0;
     margin: 0;
 }
-
+body{
+    color:white;
+}
 #console {
     color: white;
     position: fixed;
@@ -12,7 +14,22 @@
     font-family: consolas, monospace, arial;
     text-overflow: ellipsis;
 }
-
+#password{
+    background: black;
+    padding:10px;
+    font-size:x-large;
+    border:1px solid white;
+    position:fixed;
+    z-index:1000;
+    top:33%;
+    left:50%;
+    margin-left:-126px;
+    width:250px;
+}
+#password input{
+    font-size:x-large;
+    width:100%;
+}
 #ping {
     color: white;
     position: fixed;

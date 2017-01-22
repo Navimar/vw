@@ -3,8 +3,11 @@ const world = require('./world');
 const meta = require('./rule');
 const direction = require('./util');
 const fs = require('fs');
+var SHA256 = require("crypto-js/sha256");
 
 let dtLoop = Date.now();
+let arrTest = [];
+let testFail = false;
 
 exports.main = function main(io) {
     onStart();
@@ -12,18 +15,19 @@ exports.main = function main(io) {
 };
 
 let makeTest = () => {
+    arrTest = [];
     function test(val, ok, text) {
         if (text == undefined) {
             text = "";
         }
         if (val === ok) {
-            console.log("OK " + text);
+            arrTest.push("OK " + text);
         } else {
-            console.log("ERROR!!! " + val + ", expected " + ok + " " + text);
-            flTest = false;
+            arrTest.push("ERROR!!! " + val + ", expected " + ok + " " + text);
+            testFail = true;
         }
     }
-    let flTest = true;
+
     world.initWorld("objArrInPoint");
     world.createObj(meta.test, 5, 5);
     world.createObj(meta.highgrass, 5, 5);
@@ -51,19 +55,41 @@ let makeTest = () => {
 
     world.initWorld("apply");
     let p = world.addPlayer();
-    apply(direction.right,p);
-    test(world.objArrInInv(p),false,"empty not get in inv");
+    apply(direction.right, p);
+    test(world.objArrInInv(p), false, "empty not get in inv");
 
-    return flTest;
+    // world.initWorld("moveTo");
+    // let w = world.createObj(meta.wolf, -5, 0);
+    // wrapper(w).moveTo(0, 0);
+    // test(w.x, -4, "wolf goes right");
+    // world.initWorld("wolf");
+    // world.addPlayer();
+    // w = world.createObj(meta.wolf, -4, 0);
+    // w.tp.onTurn(w.data, wrapper(w));
+    // test(w.x, -3, "wolf goes right");
+    // world.initWorld();
+    // world.addPlayer();
+    // w = world.createObj(meta.wolf, 4, 0);
+    // w.tp.onTurn(w.data, wrapper(w));
+    // test(w.x, 3, "wolf goes left");
+    // world.initWorld();
+    // world.addPlayer();
+    // w = world.createObj(meta.wolf, 0, 4);
+    // w.tp.onTurn(w.data, wrapper(w));
+    // test(w.y, 3, "wolf goes up");
+    // world.initWorld();
+    // world.addPlayer();
+    // w = world.createObj(meta.wolf, 0, -4);
+    // w.tp.onTurn(w.data, wrapper(w));
+    // test(w.y, -3, "wolf goes down");
 };
 
 
 function onStart() {
-    if (makeTest()) {
-        world.initWorld();
-        world.createWorld();
-        loop();
-    }
+    makeTest();
+    world.initWorld();
+    world.createWorld();
+    loop();
 }
 
 function loop() {
@@ -275,8 +301,19 @@ function onOrder(socket, val) {
 }
 
 function onLogin(val, socket) {
-    world.addPlayer(val, socket);
-    return ("success!");
+    // let key = SHA256(val);
+    let key = val;
+    let fl = true;
+    world.player.forEach((item, i, arr) => {
+        if (item.key == key) {
+            item.socket = socket;
+            fl = false;
+        }
+    });
+    if (fl) {
+        world.addPlayer(key, socket);
+    }
+    return (key);
 }
 
 function out(dtStartLoop) {
@@ -331,15 +368,19 @@ function out(dtStartLoop) {
         send.time = world.time;
         // send.dirx = p.dirx;
         // send.diry = p.diry;
-        p.socket.emit('updateState', send);
+        if (testFail) {
+            p.socket.emit('testFail', arrTest);
+        } else {
+            p.socket.emit('updateState', send);
+        }
     }
 }
 
 function inputFromClients(io) {
     io.on('connection', function (socket) {
         world.connected++;
-        socket.on('login', function (val) {
-            socket.emit('login', onLogin(val, socket));
+        socket.on('login', function (pass) {
+            socket.emit('login', onLogin(pass, socket));
         });
         socket.on('ping', function (val) {
             socket.emit('ping');
@@ -348,7 +389,7 @@ function inputFromClients(io) {
             onOrder(socket, val);
         });
         socket.on('ntd-load', function (val) {
-            fs.readFile('data.txt', 'utf8', function (err,data) {
+            fs.readFile('data.txt', 'utf8', function (err, data) {
                 if (err) {
                     return console.log(err);
                 }
