@@ -51,7 +51,7 @@ function add() {
         let text = addInput.val();
         let id = nextId();
         addInput.val("");
-        selected().selected="";
+        selected().selected = "";
         model.push({text, id, selected: "selected"});
     }
     render();
@@ -85,6 +85,9 @@ $('#duetime').change(function () {
 
 $('#startdate').change(function () {
     selected().startdate = $('#startdate').val();
+    if (Date.parse(selected().startdate) > Date.parse(selected().duedate)||selected().duedate==undefined||selected().duedate=="") {
+        selected().duedate = $('#startdate').val();
+    }
 });
 
 $('#starttime').change(function () {
@@ -123,12 +126,12 @@ function render() {
         let aDate = Date.parse(a.duedate);
         let bDate = Date.parse(b.duedate);
         if (!_.isFinite(aDate)) {
-            aDate = a.id+9999999999999;
-            a.unsorted = "unsorted";
+            aDate = a.id + 9999999999999;
+            a.unsorted = "undated";
         }
         if (!_.isFinite(bDate)) {
-            b.unsorted = "unsorted";
-            bDate = b.id+9999999999999;
+            b.unsorted = "undated";
+            bDate = b.id + 9999999999999;
         }
         if (_.isFinite(aTime)) {
             // console.log(aTime);
@@ -164,20 +167,26 @@ function render() {
         $('#starttime').val('');
     }
     if (selected().startdate != undefined) {
-        $('#stardate').val(selected().startdate);
+        $('#startdate').val(selected().startdate);
     } else {
         $('#startdate').val('');
     }
     $tasklist.html('');
     let d = new Date();
-    d = d.getHours() * 3600000 + d.getMinutes() * 60000;
+    let b = d.getHours() * 3600000 + d.getMinutes() * 60000;
+    let c = Date.parse(d);
     model.forEach((item, i, arr) => {
         let start = "";
         if (item.starttime != undefined) {
             let a = item.starttime.split(':');
             a = a[0] * 3600000 + a[1] * 60000;
-            console.log(a + " " + d);
-            if (a > d) {
+            if (a > b) {
+                start = " stop";
+            }
+        }
+        if (item.startdate != undefined) {
+            let a = Date.parse(item.startdate);
+            if (a > c) {
                 start = " stop";
             }
         }

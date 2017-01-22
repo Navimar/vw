@@ -79,7 +79,9 @@ body {
     margin: 0;
     font-size: x-large;
 }
-
+.undated{
+    background: #2e004b;
+}
 .btnClear {
     color: white;
     margin-bottom: 0;
