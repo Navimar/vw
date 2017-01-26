@@ -85,9 +85,13 @@ $('#duetime').change(function () {
 
 $('#startdate').change(function () {
     selected().startdate = $('#startdate').val();
-    if (Date.parse(selected().startdate) > Date.parse(selected().duedate)||selected().duedate==undefined||selected().duedate=="") {
+    if (Date.parse(selected().startdate) > Date.parse(selected().duedate) || selected().duedate == undefined || selected().duedate == "") {
         selected().duedate = $('#startdate').val();
     }
+});
+
+$('#text').change(function () {
+    selected().text = $('#text').val();
 });
 
 $('#starttime').change(function () {
@@ -171,6 +175,7 @@ function render() {
     } else {
         $('#startdate').val('');
     }
+    $('#text').val(selected().text);
     $tasklist.html('');
     let d = new Date();
     let b = d.getHours() * 3600000 + d.getMinutes() * 60000;
@@ -216,6 +221,7 @@ function inputServer() {
     });
     socket.on('login', (val) => {
         socket.emit('ntd-load', "hi");
+        console.log(val);
     });
     socket.on('model', (val) => {
         onServer(val);

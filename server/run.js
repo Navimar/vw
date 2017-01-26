@@ -389,6 +389,7 @@ function inputFromClients(io) {
             onOrder(socket, val);
         });
         socket.on('ntd-load', function (val) {
+            // let filename = _.ecscape(val);
             fs.readFile('data.txt', 'utf8', function (err, data) {
                 if (err) {
                     return console.log(err);
