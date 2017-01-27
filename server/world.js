@@ -258,17 +258,17 @@ world.transform = (obj, tp) => {
 
 world.createWorld = () => {
     let wid = 200;
-    for (let a = 0; a < 250; a++) {
-        world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
-    }
-    for (let a = 0; a < 30000; a++) {
-        world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
-        world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
-    }
-    for (let a = 0; a < 5000; a++) {
-        world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));
-
-    }
+    // for (let a = 0; a < 250; a++) {
+    //     world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
+    // }
+    // for (let a = 0; a < 30000; a++) {
+    //     world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
+    //     world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
+    // }
+    // for (let a = 0; a < 5000; a++) {
+    //     world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));
+    //
+    // }
 };
 
 world.objArrInPoint = (x, y) => {
