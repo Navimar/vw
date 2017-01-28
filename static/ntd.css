@@ -5,9 +5,11 @@
     left: 33%;
     margin-top: 0;
 }
-#tasklist{
+
+#tasklist {
     padding-top: 50px;
 }
+
 .task {
     text-transform: lowercase;
     font-family: arial, consolas;
@@ -15,17 +17,20 @@
 
 .selected {
     margin-left: -3px;
-    margin-right:-3px;
+    margin-right: -3px;
     border-left: #df0008 solid 3px;
     border-right: #df0008 solid 3px;
 }
-.unsorted{
+
+.unsorted {
     background: #333;
 
 }
-.stop{
+
+.stop {
     background: darkslategrey;
 }
+
 body {
     padding: 0;
     /*background: black url(img/space.jpg) 100% 100%;*/
@@ -53,14 +58,17 @@ body {
 .text {
 
 }
-#online{
+
+#online {
     position: fixed;
-    top:0;
-    right:0;
+    top: 0;
+    right: 0;
 }
-.off{
+
+.off {
     color: red;
 }
+
 #btnDone {
     padding: 0;
     margin: 0;
@@ -86,9 +94,11 @@ body {
     margin: 0;
     font-size: x-large;
 }
-.undated{
+
+.undated {
     background: #2e004b;
 }
+
 .btnClear {
     color: white;
     margin-bottom: 0;
