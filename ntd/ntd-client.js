@@ -94,6 +94,10 @@ $('#text').change(function () {
     selected().text = $('#text').val();
 });
 
+$('#duration').change(function () {
+    selected().duration = $('#duration').val();
+});
+
 $('#starttime').change(function () {
     selected().starttime = $('#starttime').val();
 });
@@ -129,13 +133,15 @@ function render() {
         let bTime = Date.parse(b.duedate + " " + b.duetime);
         let aDate = Date.parse(a.duedate);
         let bDate = Date.parse(b.duedate);
+        let aDuration = a.duration;
+        let bDuration = b.duration;
         if (!_.isFinite(aDate)) {
-            aDate = a.id + 9999999999999;
+            aDate = 9999999999999;
             a.unsorted = "undated";
         }
         if (!_.isFinite(bDate)) {
             b.unsorted = "undated";
-            bDate = b.id + 9999999999999;
+            bDate = 9999999999999;
         }
         if (_.isFinite(aTime)) {
             // console.log(aTime);
@@ -147,8 +153,16 @@ function render() {
         }
 
         if (aDate == bDate) {
-            a.unsorted = "unsorted";
-            b.unsorted = "unsorted";
+            if (_.isFinite(aDuration)) {
+                aDate = aDuration;
+            }
+            if (_.isFinite(bDuration)) {
+                bDate = bDuration;
+            }
+            if (aDate == bDate) {
+                a.unsorted = "unsorted";
+                b.unsorted = "unsorted";
+            }
         }
 
         return aDate - bDate;
@@ -176,6 +190,11 @@ function render() {
         $('#startdate').val('');
     }
     $('#text').val(selected().text);
+    if (selected().duration != undefined) {
+        $('#duration').val(selected().duration);
+    } else {
+        $('#duration').val('');
+    }
     $tasklist.html('');
     let d = new Date();
     let b = d.getHours() * 3600000 + d.getMinutes() * 60000;
@@ -198,7 +217,13 @@ function render() {
         $tasklist.append("<div id='" + item.id + "'class='task " + item.unsorted + " " + item.selected + start + "'>" + item.text + "</div>");
         item.unsorted = "";
     });
-    // task.removeClass("selected");
+    if(socket.connected) {
+        $('#online').text("Online");
+        $('#online').removeClass("off");
+    }else{
+        $('#online').text("Offline");
+        $('#online').addClass("off");
+    }
     addInput.focus();
 }
 
@@ -225,6 +250,9 @@ function inputServer() {
     });
     socket.on('model', (val) => {
         onServer(val);
+    });
+    socket.on('disconnect', () => {
+        console.log("disconnected!");
     });
 
 }
