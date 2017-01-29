@@ -1,6 +1,12 @@
 const socket = io();
 const constSpeed = 0.0013;
-const pass= "password";
+const login={};
+login.pass = prompt("Write your password!","demo");
+if(login.pass==""||login.pass==undefined){
+    login.pass="demo";
+}
+login.name="game";
+
 
 let model = {};
 
@@ -61,7 +67,6 @@ function onStart() {
 
 function inputServer() {
     socket.on('connect', function () {
-        let login = pass;
         socket.emit('login', login);
     });
     socket.on('updateState', function (val) {

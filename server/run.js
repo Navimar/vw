@@ -300,20 +300,28 @@ function onOrder(socket, val) {
     }
 }
 
-function onLogin(val, socket) {
-    // let key = SHA256(val);
-    let key = val;
+function onLogin(val, socket, name) {
+    let key = SHA256(val);
+    // let key = val;
+    // console.log(name);
+    // console.log(key);
     let fl = true;
-    world.player.forEach((item, i, arr) => {
-        if (item.key == key) {
+    for (let item of world.player){
+        // console.log("p");
+        // console.log(item.key);
+        // console.log("k");
+        // console.log(key);
+        if (JSON.stringify(item.key) === JSON.stringify(key)) {
             item.socket = socket;
+            item.name = name;
             fl = false;
+            return ("succecs loged in " + item.name);
         }
-    });
-    if (fl) {
-        world.addPlayer(key, socket);
     }
-    return (key);
+    if (fl) {
+        world.addPlayer(key, socket, name);
+        return ("new player!");
+    }
 }
 
 function out(dtStartLoop) {
@@ -379,29 +387,35 @@ function out(dtStartLoop) {
 function inputFromClients(io) {
     io.on('connection', function (socket) {
         world.connected++;
-        socket.on('login', function (pass) {
-            socket.emit('login', onLogin(pass, socket));
+        socket.on('login', function (val) {
+            socket.emit('login', onLogin(val.pass, socket, val.name));
         });
-        socket.on('ping', function (val) {
+        socket.on('ping', function () {
             socket.emit('ping');
         });
         socket.on('order', function (val) {
             onOrder(socket, val);
         });
-        socket.on('ntd-load', function (val) {
-            // let filename = _.ecscape(val);
-            fs.readFile('data.txt', 'utf8', function (err, data) {
-                if (err) {
-                    return console.log(err);
+        socket.on('ntd-load', function () {
+            for (let p of world.player) {
+                if (p.socket == socket) {
+                    fs.readFile("ntddata/"+p.key+".txt", 'utf8', function (err, data) {
+                        if (err) {
+                            return console.log("load error "+err);
+                        }
+                        socket.emit('model', data);
+                    });
                 }
-                socket.emit('model', data);
-            });
+            }
         });
-
         socket.on('ntd-save', function (val) {
-            fs.writeFile('data.txt', JSON.stringify(val), function (err) {
-                if (err) return console.log(err);
-            });
+            for (let p of world.player) {
+                if (p.socket == socket) {
+                    fs.writeFile("ntddata/"+p.key+".txt", val, function (err) {
+                        if (err) return console.log("save error " +err);
+                    });
+                }
+            }
         });
         socket.on('disconnect', function () {
             world.connected--;

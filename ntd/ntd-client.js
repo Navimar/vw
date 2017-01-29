@@ -1,4 +1,10 @@
 const socket = io();
+const login = {};
+login.pass = prompt("Write your password!","demo");
+if(login.pass==""||login.pass==undefined){
+    login.pass="demo";
+}
+    login.name = "ntd";
 const addInput = $('#add');
 const task = $('.task');
 let cnId = 0;
@@ -63,7 +69,8 @@ function selected() {
             return model[m];
         }
     }
-    return model[0];
+    // return model[0];
+    return {};
 }
 
 $('#btnDone').click((e) => {
@@ -217,10 +224,10 @@ function render() {
         $tasklist.append("<div id='" + item.id + "'class='task " + item.unsorted + " " + item.selected + start + "'>" + item.text + "</div>");
         item.unsorted = "";
     });
-    if(socket.connected) {
+    if (socket.connected) {
         $('#online').text("Online");
         $('#online').removeClass("off");
-    }else{
+    } else {
         $('#online').text("Offline");
         $('#online').addClass("off");
     }
@@ -228,24 +235,26 @@ function render() {
 }
 
 function onServer(val) {
-    model = JSON.parse(val);
-    for (let m of model) {
-        if (m.id > cnId) cnId = m.id;
+    if (val !== undefined) {
+        model = JSON.parse(val);
+        for (let m of model) {
+            if (m.id > cnId) cnId = m.id;
+        }
     }
     render();
 }
 
 
 function send() {
-    socket.emit("ntd-save", model);
+    socket.emit("ntd-save", JSON.stringify(model));
 }
 function inputServer() {
     socket.on('connect', function () {
         console.log("connect");
-        socket.emit('login', "hi");
+        socket.emit('login', login);
     });
     socket.on('login', (val) => {
-        socket.emit('ntd-load', "hi");
+        socket.emit('ntd-load', val);
         console.log(val);
     });
     socket.on('model', (val) => {

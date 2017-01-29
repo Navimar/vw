@@ -1,0 +1,1 @@
+[{"text":"слон","id":1,"selected":"","unsorted":""},{"text":"и бегемот","id":2,"selected":"selected"}]
