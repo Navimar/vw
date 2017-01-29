@@ -24,8 +24,11 @@ app.get('/log', function (req, res){
 
 run.main(io);
 
-let port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
-let ip = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
+// let port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
+// let ip = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
+let port =80;
+ let ip = '85.143.202.9';
+
 http.listen(port, ip, function () {
     console.log('listening...');
 });
