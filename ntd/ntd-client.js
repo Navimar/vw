@@ -58,7 +58,7 @@ function add() {
         let id = nextId();
         addInput.val("");
         selected().selected = "";
-        model.push({text, id, selected: "selected"});
+        model.push({text, id, selected: "selected", duration:0});
     }
     render();
 }
@@ -161,10 +161,10 @@ function render() {
 
         if (aDate == bDate) {
             if (_.isFinite(aDuration)) {
-                aDate = aDuration;
+                aDate = bDuration;
             }
             if (_.isFinite(bDuration)) {
-                bDate = bDuration;
+                bDate = aDuration;
             }
             if (aDate == bDate) {
                 a.unsorted = "unsorted";

@@ -1,1 +1,1 @@
-[{"text":"демо аккаунт","id":1,"selected":"","unsorted":""},{"text":"можно баловаться","id":2,"selected":"","unsorted":""},{"text":"охохохо","id":3,"selected":"selected"}]
+[{"text":"демо аккаунт","id":1,"selected":"selected","unsorted":""},{"text":"можно баловаться","id":2,"selected":"","unsorted":""},{"text":"охохохо","id":3,"selected":"","unsorted":""}]
