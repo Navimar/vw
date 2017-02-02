@@ -3,19 +3,23 @@ const world = require('./world');
 const meta = require('./rule');
 const direction = require('./util');
 const fs = require('fs');
-var SHA256 = require("crypto-js/sha256");
+const SHA256 = require("crypto-js/sha256");
+const TelegramBot = require('telebot');
 
 let dtLoop = Date.now();
 let arrTest = [];
 let testFail = false;
+let token = "shdfoihsdif";
 
-exports.main = function main(io) {
+exports.main = function main(io, ip, port) {
     onStart();
     inputFromClients(io);
+    botStart(ip, port);
 };
 
 let makeTest = () => {
-    arrTest = [];
+    let arrTest = [];
+
     function test(val, ok, text) {
         if (text == undefined) {
             text = "";
@@ -306,7 +310,7 @@ function onLogin(val, socket, name) {
     // console.log(name);
     // console.log(key);
     let fl = true;
-    for (let item of world.player){
+    for (let item of world.player) {
         // console.log("p");
         // console.log(item.key);
         // console.log("k");
@@ -314,72 +318,74 @@ function onLogin(val, socket, name) {
         if (JSON.stringify(item.key) === JSON.stringify(key)) {
             item.socket = socket;
             item.name = name;
+            item.key = null;
             fl = false;
             return ("succecs loged in " + item.name);
         }
     }
     if (fl) {
-        world.addPlayer(key, socket, name);
-        return ("new player!");
+        return ("authentication error");
     }
 }
 
 function out(dtStartLoop) {
     let send = {};
     for (let p of world.player) {
-        send.holst = [];
-        send.obj = [];
-        send.wound = [];
-        for (let x = 0; x < 9; x++) {
-            send.holst[x] = [];
-            send.wound.push(p.wound[x]);
-            for (let y = 0; y < 9; y++) {
-                send.holst[x][y] = [];
-                let key = p.x + x - 4 + " ";
-                key += p.y + y - 4;
-                if (world.map.has(key)) {
-                    for (let r of world.map.get(key)) {
-                        let img =
-                            _.isFunction(r.tp.img) ?
-                                r.tp.img(r.data)
-                                :
-                                r.tp.img;
-                        send.obj.push({x: x, y: y, img, id: r.id});
+        if (p.socket != null) {
+            send.holst = [];
+            send.obj = [];
+            send.wound = [];
+            for (let x = 0; x < 9; x++) {
+                send.holst[x] = [];
+                send.wound.push(p.wound[x]);
+                for (let y = 0; y < 9; y++) {
+                    send.holst[x][y] = [];
+                    let key = p.x + x - 4 + " ";
+                    key += p.y + y - 4;
+                    if (world.map.has(key)) {
+                        for (let r of world.map.get(key)) {
+                            let img =
+                                _.isFunction(r.tp.img) ?
+                                    r.tp.img(r.data)
+                                    :
+                                    r.tp.img;
+                            send.obj.push({x: x, y: y, img, id: r.id});
+                        }
+                    } else {
+                        // send.holst[x][y] = ["grass"];
                     }
-                } else {
-                    // send.holst[x][y] = ["grass"];
                 }
             }
-        }
-        send.inv = [];
-        if (world.map.has(p.id)) {
-            for (let i of world.map.get(p.id)) {
-                let img =
-                    _.isFunction(i.tp.img) ?
-                        i.tp.img(i.data)
-                        :
-                        i.tp.img;
-                send.inv.push({img, id: i.id});
+            send.inv = [];
+            if (world.map.has(p.id)) {
+                for (let i of world.map.get(p.id)) {
+                    let img =
+                        _.isFunction(i.tp.img) ?
+                            i.tp.img(i.data)
+                            :
+                            i.tp.img;
+                    send.inv.push({img, id: i.id});
+                }
             }
-        }
-        send.px = p.x;
-        send.py = p.y;
-        send.dirx = p.dirx;
-        send.diry = p.diry;
-        send.hand = p.hand;
-        send.message = p.message;
-        send.delay = Date.now() - dtStartLoop;
-        send.cnMass = world.cnMass;
-        send.cnActive = world.cnActive;
-        send.error = world.error;
-        send.connected = world.connected;
-        send.time = world.time;
-        // send.dirx = p.dirx;
-        // send.diry = p.diry;
-        if (testFail) {
-            p.socket.emit('testFail', arrTest);
-        } else {
-            p.socket.emit('updateState', send);
+            send.px = p.x;
+            send.py = p.y;
+            send.dirx = p.dirx;
+            send.diry = p.diry;
+            send.hand = p.hand;
+            send.message = p.message;
+            send.delay = Date.now() - dtStartLoop;
+            send.cnMass = world.cnMass;
+            send.cnActive = world.cnActive;
+            send.error = world.error;
+            send.connected = world.connected;
+            send.time = world.time;
+            // send.dirx = p.dirx;
+            // send.diry = p.diry;
+            if (testFail) {
+                p.socket.emit('testFail', arrTest);
+            } else {
+                p.socket.emit('updateState', send);
+            }
         }
     }
 }
@@ -399,9 +405,9 @@ function inputFromClients(io) {
         socket.on('ntd-load', function () {
             for (let p of world.player) {
                 if (p.socket == socket) {
-                    fs.readFile("ntddata/"+p.key+".txt", 'utf8', function (err, data) {
+                    fs.readFile("ntddata/" + SHA256(p.chatId) + ".txt", 'utf8', function (err, data) {
                         if (err) {
-                            return console.log("load error "+err);
+                            return console.log("load error " + err);
                         }
                         socket.emit('model', data);
                     });
@@ -411,8 +417,8 @@ function inputFromClients(io) {
         socket.on('ntd-save', function (val) {
             for (let p of world.player) {
                 if (p.socket == socket) {
-                    fs.writeFile("ntddata/"+p.key+".txt", val, function (err) {
-                        if (err) return console.log("save error " +err);
+                    fs.writeFile("ntddata/" + SHA256(p.chatId) + ".txt", val, function (err) {
+                        if (err) return console.log("save error " + err);
                     });
                 }
             }
@@ -421,4 +427,60 @@ function inputFromClients(io) {
             world.connected--;
         });
     });
+}
+
+function botStart(ip, port) {
+// Create a bot that uses 'polling' to fetch new updates
+    let bot = new TelegramBot('305461626:AAHILtuggxorS3ZDKFmWr-S0lVuSTvIT-8Y');
+
+    // bot.on('text', msg => {
+    //     let fromId = msg.from.id;
+    //     let firstName = msg.from.first_name;
+    //     let reply = msg.message_id;
+    //     return bot.sendMessage(fromId, `Welcome, ${ firstName }!`, { reply });
+    // });
+
+    bot.on('/login', msg => {
+        token = GenerateToken();
+        let fl = true;
+        for (let item of world.player) {
+            if (item.chatId == msg.from.id) {
+                item.key = SHA256(token);
+                fl = false;
+                console.log("old player");
+            }
+        }
+        if (fl) world.addPlayer(SHA256(token), null, "name", msg.from.id);
+        return bot.sendMessage(msg.from.id, ip + ":" + port + "/ntd.html?key=" + token);
+    });
+
+    bot.on('/now', msg => {
+        fs.readFile("ntddata/" + key + ".txt", 'utf8', function (err, data) {
+            if (err) {
+                return console.log("load error " + err);
+            }
+            return bot.sendMessage(msg.from.id, data);
+        });
+    });
+
+    bot.connect();
+};
+
+
+function GenerateToken() {
+    // set the length of the string
+    var stringLength = 35;
+
+    // list containing characters for the random string
+    var stringArray = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'];
+
+
+    let rndString = "";
+
+    // build a string with random characters
+    for (var i = 1; i < stringLength; i++) {
+        var rndNum = Math.ceil(Math.random() * stringArray.length) - 1;
+        rndString = rndString + stringArray[rndNum];
+    }
+    return rndString;
 }

@@ -1,11 +1,11 @@
 const socket = io();
 const constSpeed = 0.0013;
-const login={};
-login.pass = prompt("Write your password!","demo");
-if(login.pass==""||login.pass==undefined){
-    login.pass="demo";
+const login = {};
+login.pass = findGetParameter("key"); //||  prompt("Write your password!", "demo");
+if (login.pass == "" || login.pass == undefined) {
+    login.pass = "demo";
 }
-login.name="game";
+login.name = "game";
 
 
 let model = {};
@@ -219,11 +219,6 @@ function onStep(timeDiff) {
         }
         o.sx = m.x;
         o.sy = m.y;
-        if (model.keyup) {
-            // if(model.order.cn==model.lastorder){
-            //
-            // }
-        }
     }
     model.stamp -= timeDiff * constSpeed;
     if (model.stamp < 0) {
@@ -429,9 +424,9 @@ function onKeyup(key) {
 // }
 
 function onTestFail(val) {
-    let $body =$('body');
-   $body.html('');
-    val.forEach((item,i,arr)=>{
+    let $body = $('body');
+    $body.html('');
+    val.forEach((item, i, arr) => {
         $body.append(item);
         $body.append("<br>");
     });

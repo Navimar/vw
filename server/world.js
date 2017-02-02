@@ -41,11 +41,12 @@ function remove(k, obj) {
 }
 
 
-world.addPlayer = (key, socket, name) => {
+world.addPlayer = (key, socket, name, chatId) => {
     let p = {
         socket,
         name,
         key,
+        chatId,
         id: makeid()
     };
     p.x = 0;

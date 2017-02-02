@@ -20,14 +20,14 @@ app.get('*', function (req, res) {
 });
 
 app.get('/log', function (req, res){
-    var text = fs.readFileSync(process.env.OPENSHIFT_LOG_DIR+'nodejs.log', 'utf8');
+    const text = fs.readFileSync(process.env.OPENSHIFT_LOG_DIR+'nodejs.log', 'utf8');
     res.status(200).send(text);
 });
 
-run.main(io);
+const port = config.port;
+const ip = config.ip;
 
-let port = config.port;
-let ip = config.ip;
+run.main(io,ip,port);
 
 http.listen(port, ip, function () {
     console.log('listening on '+ip);

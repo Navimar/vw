@@ -82,10 +82,12 @@ body {
 }
 
 #leftblock {
+    overflow: scroll;
     font-size: x-large;
     color: whitesmoke;
     position: fixed;
     font-family: arial;
+    height: 100%;
 }
 
 #leftblock input {
@@ -93,6 +95,13 @@ body {
     padding: 0;
     margin: 0;
     font-size: x-large;
+}
+textarea{
+    height: 200px;
+    width: 200px;
+    padding: 0;
+    margin: 0;
+    font-size: large;
 }
 
 .undated {

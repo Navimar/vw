@@ -1,10 +1,10 @@
 const socket = io();
 const login = {};
-login.pass = prompt("Write your password!","demo");
-if(login.pass==""||login.pass==undefined){
-    login.pass="demo";
+login.pass = login.pass = findGetParameter("key"); //prompt("Write your password!", "demo");
+if (login.pass == "" || login.pass == undefined) {
+    login.pass = "demo";
 }
-    login.name = "ntd";
+login.name = "ntd";
 const addInput = $('#add');
 const task = $('.task');
 let cnId = 0;
@@ -23,7 +23,6 @@ function onKeydown(key) {
             break;
     }
 }
-
 
 function flipArrRight(arr, i) {
     let f = arr.slice(0, ++i),
@@ -54,11 +53,22 @@ function nextId() {
 }
 function add() {
     if (addInput.val() !== "") {
+        let date = new Date;
+        let month = date.getMonth() + 1;
+        if (month < 10) month = "0" + month;
+        let day = date.getDate();
+        if (day < 10) day = "0" + day;
         let text = addInput.val();
         let id = nextId();
         addInput.val("");
         selected().selected = "";
-        model.push({text, id, selected: "selected", duration:0});
+        model.push({
+            text,
+            id,
+            selected: "selected",
+            duration: 0,
+            duedate: date.getFullYear() + "-" + month + "-" + day
+        });
     }
     render();
 }
@@ -136,43 +146,48 @@ $(document).ready(function () {
 function render() {
     send();
     model.sort((a, b) => {
-        let aTime = Date.parse(a.duedate + " " + a.duetime);
-        let bTime = Date.parse(b.duedate + " " + b.duetime);
-        let aDate = Date.parse(a.duedate);
-        let bDate = Date.parse(b.duedate);
-        let aDuration = a.duration;
-        let bDuration = b.duration;
-        if (!_.isFinite(aDate)) {
-            aDate = 9999999999999;
-            a.unsorted = "undated";
+        const aTime = Date.parse(a.duedate + " " + a.duetime);
+        const bTime = Date.parse(b.duedate + " " + b.duetime);
+        let aRate = 9999999999999;
+        let bRate = 9999999999999;
+        if (_.isFinite(Date.parse(a.duedate))) {
+            aRate = Date.parse(a.duedate);
         }
-        if (!_.isFinite(bDate)) {
-            b.unsorted = "undated";
-            bDate = 9999999999999;
-        }
-        if (_.isFinite(aTime)) {
-            // console.log(aTime);
-            aDate = aTime;
-        }
-        if (_.isFinite(bTime)) {
-            // console.log(bTime);
-            bDate = bTime;
+        if (_.isFinite(Date.parse(b.duedate))) {
+            bRate = Date.parse(b.duedate);
         }
 
-        if (aDate == bDate) {
-            if (_.isFinite(aDuration)) {
-                aDate = bDuration;
+        if (aRate == bRate) {
+            if (_.isFinite(aTime)) {
+                aRate = aTime;
             }
-            if (_.isFinite(bDuration)) {
-                bDate = aDuration;
-            }
-            if (aDate == bDate) {
-                a.unsorted = "unsorted";
-                b.unsorted = "unsorted";
+            if (_.isFinite(bTime)) {
+                bRate = bTime;
             }
         }
-
-        return aDate - bDate;
+            // let aDuration = a.duration;
+        // let bDuration = b.duration;
+        //
+        // if (aDate == bDate) {
+        //     if (_.isFinite(aDuration)) {
+        //         aDate = bDuration;
+        //     }
+        //     if (_.isFinite(bDuration)) {
+        //         bDate = aDuration;
+        //     }
+        //
+        // }
+        if (aRate == bRate) {
+            a.unsorted = "unsorted";
+            b.unsorted = "unsorted";
+            aRate = a.text.length;
+            bRate = b.text.length;
+        }
+        if (aRate == bRate) {
+            aRate = a.id;
+            bRate = b.id;
+        }
+        return aRate - bRate;
     });
     let $tasklist = $('#tasklist');
     console.log(selected());
@@ -250,7 +265,7 @@ function send() {
 }
 function inputServer() {
     socket.on('connect', function () {
-        console.log("connect");
+        console.log("connect "+login.pass);
         socket.emit('login', login);
     });
     socket.on('login', (val) => {
