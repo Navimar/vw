@@ -447,7 +447,7 @@ function botStart(ip, port) {
             if (item.chatId == msg.from.id) {
                 item.key = SHA256(token);
                 fl = false;
-                console.log("old player");
+                // console.log("old player");
             }
         }
         if (fl) world.addPlayer(SHA256(token), null, "name", msg.from.id);
