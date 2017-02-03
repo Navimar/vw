@@ -3,8 +3,8 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var run = require('./server/run.js');
-const config = require('./server/config.js');
 
+const config = require('./server/config.js');
 
 app.use(express.static(__dirname + '/img'));
 app.use(express.static(__dirname + '/scripts'));
