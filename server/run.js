@@ -431,7 +431,7 @@ function inputFromClients(io) {
 
 function botStart(ip, port) {
 // Create a bot that uses 'polling' to fetch new updates
-    let bot = new TelegramBot('305461626:AAHILtuggxorS3ZDKFmWr-S0lVuSTvIT-8Y');
+    let bot = new TelegramBot('320938705:AAGpcdMe9oIhFYuu11MjU4djJnj1maijkpQ');
 
     // bot.on('text', msg => {
     //     let fromId = msg.from.id;
