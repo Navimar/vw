@@ -3,7 +3,7 @@ const world = require('./world');
 const meta = require('./rule');
 const direction = require('./util');
 const fs = require('fs');
-const SHA256 = require("crypto-js/sha256");
+const sha = require("sha256");
 const TelegramBot = require('telebot');
 
 let dtLoop = Date.now();
@@ -305,9 +305,7 @@ function onOrder(socket, val) {
 }
 
 function onLogin(val, socket, name) {
-    let key = SHA256(val);
-    // let key = val;
-    // console.log(name);
+    let key = sha(val);
     // console.log(key);
     let fl = true;
     for (let item of world.player) {
@@ -315,7 +313,7 @@ function onLogin(val, socket, name) {
         // console.log(item.key);
         // console.log("k");
         // console.log(key);
-        if (JSON.stringify(item.key) === JSON.stringify(key)) {
+        if (item.key === key) {
             item.socket = socket;
             item.name = name;
             item.key = null;
@@ -405,10 +403,12 @@ function inputFromClients(io) {
         socket.on('ntd-load', function () {
             for (let p of world.player) {
                 if (p.socket == socket) {
-                    fs.readFile("ntddata/" + SHA256(p.chatId) + ".txt", 'utf8', function (err, data) {
+                    fs.readFile("ntddata/" + sha(p.chatId+"") + ".txt", 'utf8', function (err, data) {
                         if (err) {
                             return console.log("load error " + err);
                         }
+                        // console.log(p.chatId);
+                        // console.log(sha(p.chatId+""));
                         socket.emit('model', data);
                     });
                 }
@@ -417,7 +417,7 @@ function inputFromClients(io) {
         socket.on('ntd-save', function (val) {
             for (let p of world.player) {
                 if (p.socket == socket) {
-                    fs.writeFile("ntddata/" + SHA256(p.chatId) + ".txt", val, function (err) {
+                    fs.writeFile("ntddata/" + sha(p.chatId+"") + ".txt", val, function (err) {
                         if (err) return console.log("save error " + err);
                     });
                 }
@@ -445,12 +445,12 @@ function botStart(ip, port) {
         let fl = true;
         for (let item of world.player) {
             if (item.chatId == msg.from.id) {
-                item.key = SHA256(token);
+                item.key = sha(token);
                 fl = false;
                 // console.log("old player");
             }
         }
-        if (fl) world.addPlayer(SHA256(token), null, "name", msg.from.id);
+        if (fl) world.addPlayer(sha(token), null, "name", msg.from.id);
         return bot.sendMessage(msg.from.id, ip + ":" + port + "/ntd.html?key=" + token);
     });
 
