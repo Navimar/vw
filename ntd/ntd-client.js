@@ -71,6 +71,8 @@ function add() {
         });
     }
     render();
+    // if (!socket.connected) {
+    // }
 }
 
 function selected() {
@@ -276,7 +278,10 @@ function inputServer() {
         onServer(val);
     });
     socket.on('disconnect', () => {
-        console.log("disconnected!");
+        $('#online').text("Offline");
+        $('#online').addClass("off");
+            alert('disconnected!');
+        // console.log("disconnected!");
     });
 
 }

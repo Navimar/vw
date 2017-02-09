@@ -415,12 +415,18 @@ function inputFromClients(io) {
             }
         });
         socket.on('ntd-save', function (val) {
+            let fl=true;
             for (let p of world.player) {
                 if (p.socket == socket) {
                     fs.writeFile("ntddata/" + sha(p.chatId+"") + ".txt", val, function (err) {
                         if (err) return console.log("save error " + err);
                     });
+                    fl=false;
                 }
+            }
+            if(fl){
+                socket.disconnect('unauthorized');
+                world.connected--;
             }
         });
         socket.on('disconnect', function () {
@@ -455,7 +461,7 @@ function botStart(ip, port) {
     });
 
     bot.on('/now', msg => {
-        fs.readFile("ntddata/" + key + ".txt", 'utf8', function (err, data) {
+        fs.readFile("ntddata/" + sha(msg.from.id+"") + ".txt", 'utf8', function (err, data) {
             if (err) {
                 return console.log("load error " + err);
             }
