@@ -11,6 +11,8 @@
 }
 
 .task {
+    padding-left: 10px;
+    padding-right: 10px;
     overflow:hidden;
     text-transform: lowercase;
     font-family: arial, consolas;
@@ -37,7 +39,7 @@ body {
     padding: 0;
     /*background: black url(img/space.jpg) 100% 100%;*/
     background: black;
-    font-size: -webkit-xxx-large;
+    font-size: xx-large;
     color: whitesmoke;
     margin: 0;
 }
