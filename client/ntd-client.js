@@ -142,7 +142,7 @@ addInput.keypress((e) => {
 
 $(document).ready(function () {
     inputServer();
-    addInput.focus();
+    // addInput.focus();
 });
 
 function render() {
@@ -248,7 +248,7 @@ function render() {
         $('#online').text("Offline");
         $('#online').addClass("off");
     }
-    addInput.focus();
+    // addInput.focus();
 }
 
 function onServer(val) {

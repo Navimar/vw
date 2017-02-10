@@ -11,6 +11,7 @@
 }
 
 .task {
+    overflow:hidden;
     text-transform: lowercase;
     font-family: arial, consolas;
 }
@@ -83,6 +84,7 @@ body {
 }
 
 #leftblock {
+    background: black;
     width: 100%;
     bottom: 0;
     overflow: scroll;

@@ -118,7 +118,7 @@ let makeTest = () => {
         bot.sendMessage(30626617, text);
         // throw 'testFall';
     }else{
-        bot.sendMessage(30626617, "Server has started");
+        bot.sendMessage(30626617, "Server has been started");
     }
 };
 
@@ -497,7 +497,7 @@ function botStart(ip, port) {
     });
 
     bot.on('/help', msg => {
-        return bot.sendMessage(msg.from.id, msg.from.id + " /login to login\n/ntd to login in ntd");
+        return bot.sendMessage(msg.from.id, "/login to login\n/ntd to login in ntd");
     });
 
     bot.on('/now', msg => {
