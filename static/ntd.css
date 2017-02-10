@@ -1,5 +1,5 @@
 #main {
-    width: 33%;
+    /* width: 33%; */
     margin: auto;
     text-align: center;
     left: 33%;
@@ -16,10 +16,11 @@
 }
 
 .selected {
-    margin-left: -3px;
-    margin-right: -3px;
-    border-left: #df0008 solid 3px;
-    border-right: #df0008 solid 3px;
+:
+border-right: #df0008
+solid 10px;
+    border-right: 10px solid red;
+    border-left: 10px solid red;
 }
 
 .unsorted {
@@ -35,7 +36,7 @@ body {
     padding: 0;
     /*background: black url(img/space.jpg) 100% 100%;*/
     background: black;
-    font-size: x-large;
+    font-size: -webkit-xxx-large;
     color: whitesmoke;
     margin: 0;
 }
@@ -48,7 +49,7 @@ body {
     text-transform: lowercase;
     text-align: center;
     height: 30px;
-    font-size: x-large;
+    font-size: -webkit-xxx-large;
     color: whitesmoke;
     border: none;
     width: 33%;
@@ -82,12 +83,16 @@ body {
 }
 
 #leftblock {
+    width: 100%;
+    bottom: 0;
     overflow: scroll;
     font-size: x-large;
     color: whitesmoke;
     position: fixed;
     font-family: arial;
-    height: 100%;
+}
+#leftblock div{
+    display:inline-block
 }
 
 #leftblock input {

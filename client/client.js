@@ -32,11 +32,11 @@ function onStart() {
     model.wound = [];
     model.inv = [];
     // model.hand = "hand";
-    for (let x = -1; x < 10; x++) {
+    for (let x = 0; x < 9; x++) {
         model.wound.push("bottle");
         model.holst[x] = [];
-        for (let y = -1; y < 10; y++) {
-            model.holst[x][y] = ["water"];
+        for (let y = 0; y < 9; y++) {
+            model.holst[x][y] = "grass";
         }
     }
     model.obj = [];
@@ -72,10 +72,10 @@ function inputServer() {
     socket.on('updateState', function (val) {
         onServer(val);
     });
-    socket.on('testFail', (val) => {
-        onTestFail(val);
-        socket.emit('end');
-    });
+    // socket.on('testFail', (val) => {
+        // onTestFail(val);
+        // socket.emit('end');
+    // });
     socket.on('login', (val) => {
         onLogin(val);
         step(new Date().getTime());
@@ -111,15 +111,15 @@ function step(lastTime) {
 }
 
 function onServer(val) {
-    for (let x = 0; x < 9; x++) {
-        let r = model.holst[x][0];
-        model.holst[x][-1] = r;
-    }
-    for (let x = 0; x < 9; x++) {
-        for (let y = 0; y < 9; y++) {
-            model.holst[x][y] = "grass";
-        }
-    }
+    // for (let x = 0; x < 9; x++) {
+    //     let r = model.holst[x][0];
+    //     model.holst[x][-1] = r;
+    // // }
+    // for (let x = 0; x < 9; x++) {
+    //     for (let y = 0; y < 9; y++) {
+    //         model.holst[x][y] = "grass";
+    //     }
+    // }
     model.dirx = val.dirx;
     model.diry = val.diry;
     model.wound = val.wound;
@@ -143,11 +143,7 @@ function onServer(val) {
             }
         }
         if (ok) {
-            // if (!v.terrain) {
             model.obj.push(v);
-            // } else {
-            //     model.holst[v.x][v.y] = v.img;
-            // }
         }
     }
     for (let n in model.obj) {
@@ -157,11 +153,16 @@ function onServer(val) {
                 ok = false;
             }
         }
-        if (ok) {
-            model.obj[n].outrange = true;
+        if (ok && model.obj[n].outrange > 0) {
+            model.obj[n].outrange++;
+        }
+        if (ok && !model.obj[n].outrange) {
+            model.obj[n].outrange = 1;
             model.obj[n].x -= model.dirx;
             model.obj[n].y -= model.diry;
-            // model.obj.splice(n, 1);
+        }
+        if (ok && model.obj[n].outrange > 600) {
+            model.obj.splice(n, 1);
         }
     }
     if (model.px != val.px || model.py != val.py) {
@@ -169,7 +170,6 @@ function onServer(val) {
     }
     model.px = val.px;
     model.py = val.py;
-
 
     if (model.targetx == val.px && model.targety == val.py) {
         if (model.order.name == "move")
@@ -210,13 +210,14 @@ function onStep(timeDiff) {
         //     }
         // console.log(o.name);
         // }
-        let m;
-        if (o.outrange) {
-            // m = move(o.sx, o.sy, o.x - model.dirx, o.y - model.diry, constSpeed, timeDiff);
-            m = move(o.sx, o.sy, o.x, o.y, constSpeed, timeDiff);
+        let r = range(o.sx, o.sy, o.x, o.y);
+        if (r < 1) {
+            r = 1;
         } else {
-            m = move(o.sx, o.sy, o.x, o.y, constSpeed, timeDiff);
+            r = 2;
+            // console.log(r);
         }
+        let m = move(o.sx, o.sy, o.x, o.y, r * constSpeed, timeDiff);
         o.sx = m.x;
         o.sy = m.y;
     }
@@ -244,9 +245,12 @@ function out() {
     socket.emit("order", send);
 }
 
+function range(fx, fy, tx, ty) {
+    return Math.sqrt(Math.pow(fx - tx, 2) + Math.pow(fy - ty, 2));
+}
 
 function vector(fx, fy, tx, ty, s) {
-    const v = Math.sqrt(Math.pow(fx - tx, 2) + Math.pow(fy - ty, 2));
+    const v = range(fx, fy, tx, ty);
     if (v < 0.01) return {x: 0, y: 0};
     return {x: (tx - fx) * (s / v), y: (ty - fy) * (s / v)};
 }
@@ -270,8 +274,8 @@ function render(model) {
     }
 
     for (let o of model.obj) {
-        // drawImg(o.img, o.sx, o.sy);
-        drawImg(o.img, o.x, o.y);
+        drawImg(o.img, o.sx, o.sy);
+        // drawImg(o.img, o.x, o.y);
     }
 
     for (let a = 0; a < 9; a++) {
@@ -423,11 +427,11 @@ function onKeyup(key) {
 //     );
 // }
 
-function onTestFail(val) {
-    let $body = $('body');
-    $body.html('');
-    val.forEach((item, i, arr) => {
-        $body.append(item);
-        $body.append("<br>");
-    });
-}
+// function onTestFail(val) {
+//     let $body = $('body');
+//     $body.html('');
+//     val.forEach((item, i, arr) => {
+//         $body.append(item);
+//         $body.append("<br>");
+//     });
+// }

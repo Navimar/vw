@@ -7,9 +7,9 @@ const sha = require("sha256");
 const TelegramBot = require('telebot');
 
 let dtLoop = Date.now();
-let arrTest = [];
 let testFail = false;
-let token = "shdfoihsdif";
+let token = GenerateToken();
+let bot = new TelegramBot('320938705:AAGpcdMe9oIhFYuu11MjU4djJnj1maijkpQ');
 
 exports.main = function main(io, ip, port) {
     onStart();
@@ -25,20 +25,20 @@ let makeTest = () => {
             text = "";
         }
         if (val === ok) {
-            arrTest.push("OK " + text);
+            arrTest.push({status: "OK", text});
         } else {
-            arrTest.push("ERROR!!! " + val + ", expected " + ok + " " + text);
+            arrTest.push({status: "ERROR!!!", text: text+": "+ val + ", expected " + ok});
             testFail = true;
         }
     }
 
-    world.initWorld("objArrInPoint");
+    world.init("objArrInPoint");
     world.createObj(meta.test, 5, 5);
     world.createObj(meta.highgrass, 5, 5);
     test(world.objArrInPoint(5, 5)[0].tp, meta.test, "");
     test(world.objArrInPoint(5, 5)[1].tp, meta.highgrass, "");
 
-    world.initWorld("findInPoint");
+    world.init("findInPoint");
     world.createObj(meta.test, 0, 0);
     test(world.findInPoint(meta.test, 0, 0).tp.img, "angel", "find in 0 0");
     world.createObj(meta.test, -5, -5);
@@ -46,53 +46,86 @@ let makeTest = () => {
     world.addPlayer();
     test(world.findInPoint(meta.player, 0, 0).x, 0, "find player");
 
-    world.initWorld("find");
+    world.init("find");
     world.createObj(meta.test, 0, 0);
     test(world.find(meta.test, 2, 2).x, 0, "find at 0 0");
     world.addPlayer();
-    test(world.find(meta.player, 2, 2).x, 0, "find Player");
+    test(world.find(meta.player, 2, 2).y, 0, "find Player");
+    test(world.find(meta.player, 3, 0).y, 0, "finding Player in 0 0 from 3 0");
+    test(world.find(meta.player, 4, 0).y, 0, "finding Player in 0 0 from 4 0");
+    test(world.find(meta.player, 5, 0), false, "finding Player in 0 0 from 5 0");
+    test(world.find(meta.player, -3, 0).y, 0, "finding Player in 0 0 from -3 0");
+    test(world.find(meta.player, 0, -3).y, 0, "finding Player in 0 0 from 0 -3");
+    test(world.find(meta.player, -4, 0).y, 0, "finding Player in 0 0 from -4 0");
+    test(world.find(meta.player, 0, -4).y, 0, "finding Player in 0 0 from 0 -4");
     world.createObj(meta.test, 5, 5);
     test(world.find(meta.test, 4, 4).y, 5);
     test(world.find(meta.test, 3, 7).y, 5);
     test(world.find(meta.test, 10, 10), false);
     test(world.find(meta.test, 5, 5).y, 5, "find same point");
+    world.init();
+    test(world.find(meta.test, 2, 2), false, "find nobody");
 
-    world.initWorld("apply");
+    world.init("apply");
     let p = world.addPlayer();
     apply(direction.right, p);
     test(world.objArrInInv(p), false, "empty not get in inv");
 
-    // world.initWorld("moveTo");
-    // let w = world.createObj(meta.wolf, -5, 0);
-    // wrapper(w).moveTo(0, 0);
-    // test(w.x, -4, "wolf goes right");
-    // world.initWorld("wolf");
-    // world.addPlayer();
-    // w = world.createObj(meta.wolf, -4, 0);
-    // w.tp.onTurn(w.data, wrapper(w));
-    // test(w.x, -3, "wolf goes right");
-    // world.initWorld();
-    // world.addPlayer();
-    // w = world.createObj(meta.wolf, 4, 0);
-    // w.tp.onTurn(w.data, wrapper(w));
-    // test(w.x, 3, "wolf goes left");
-    // world.initWorld();
-    // world.addPlayer();
-    // w = world.createObj(meta.wolf, 0, 4);
-    // w.tp.onTurn(w.data, wrapper(w));
-    // test(w.y, 3, "wolf goes up");
-    // world.initWorld();
-    // world.addPlayer();
-    // w = world.createObj(meta.wolf, 0, -4);
-    // w.tp.onTurn(w.data, wrapper(w));
-    // test(w.y, -3, "wolf goes down");
-};
+    world.init("moveTo");
+    let w = world.createObj(meta.wolf, -5, 0);
+    wrapper(w).moveTo(0, 0);
+    test(w.x, -4, "wolf moveTo right");
+    world.init("moveTo");
+    w = world.createObj(meta.wolf, 5, 0);
+    wrapper(w).moveTo(0, 0);
+    test(w.x, 4, "wolf moveTo left");
+    world.init("moveTo");
+    w = world.createObj(meta.wolf, 0, -5);
+    wrapper(w).moveTo(0, 0);
+    test(w.y, -4, "wolf moveTo up");
+    world.init("moveTo");
+    w = world.createObj(meta.wolf, 0, 5);
+    wrapper(w).moveTo(0, 0);
+    test(w.y, 4, "wolf moveTo down");
+    world.init("wolf");
+    world.addPlayer();
+    w = world.createObj(meta.wolf, -4, 0);
+    w.tp.onTurn(w.data, wrapper(w));
+    test(w.x, -3, "wolf goes right");
+    world.init();
+    world.addPlayer();
+    w = world.createObj(meta.wolf, 4, 0);
+    w.tp.onTurn(w.data, wrapper(w));
+    test(w.x, 3, "wolf goes left");
+    world.init();
+    world.addPlayer();
+    w = world.createObj(meta.wolf, 0, 4);
+    w.tp.onTurn(w.data, wrapper(w));
+    test(w.y, 3, "wolf goes up");
+    world.init();
+    world.addPlayer();
+    w = world.createObj(meta.wolf, 0, -4);
+    w.tp.onTurn(w.data, wrapper(w));
+    test(w.y, -3, "wolf goes down");
 
+    if (testFail) {
+        let text ="";
+        for (let a of arrTest) {
+            if (a.status == "ERROR!!!") {
+                text=text+a.text+"\n";
+            }
+        }
+        bot.sendMessage(30626617, text);
+        // throw 'testFall';
+    }else{
+        bot.sendMessage(30626617, "Server has started");
+    }
+};
 
 function onStart() {
     makeTest();
-    world.initWorld();
-    world.createWorld();
+    world.init();
+    world.start();
     loop();
 }
 
@@ -185,7 +218,7 @@ function wrapper(me) {
 
             let xWant = Math.abs(me.x - x);
             let yWant = Math.abs(me.y - y);
-            if (_.random(xWant) > _.random(yWant)) {
+            if (xWant > yWant) {
                 goX();
             } else {
                 goY();
@@ -379,11 +412,7 @@ function out(dtStartLoop) {
             send.time = world.time;
             // send.dirx = p.dirx;
             // send.diry = p.diry;
-            if (testFail) {
-                p.socket.emit('testFail', arrTest);
-            } else {
-                p.socket.emit('updateState', send);
-            }
+            p.socket.emit('updateState', send);
         }
     }
 }
@@ -403,7 +432,7 @@ function inputFromClients(io) {
         socket.on('ntd-load', function () {
             for (let p of world.player) {
                 if (p.socket == socket) {
-                    fs.readFile("ntddata/" + sha(p.chatId+"") + ".txt", 'utf8', function (err, data) {
+                    fs.readFile("ntddata/" + sha(p.chatId + "") + ".txt", 'utf8', function (err, data) {
                         if (err) {
                             return console.log("load error " + err);
                         }
@@ -415,18 +444,17 @@ function inputFromClients(io) {
             }
         });
         socket.on('ntd-save', function (val) {
-            let fl=true;
+            let fl = true;
             for (let p of world.player) {
                 if (p.socket == socket) {
-                    fs.writeFile("ntddata/" + sha(p.chatId+"") + ".txt", val, function (err) {
+                    fs.writeFile("ntddata/" + sha(p.chatId + "") + ".txt", val, function (err) {
                         if (err) return console.log("save error " + err);
                     });
-                    fl=false;
+                    fl = false;
                 }
             }
-            if(fl){
+            if (fl) {
                 socket.disconnect('unauthorized');
-                world.connected--;
             }
         });
         socket.on('disconnect', function () {
@@ -437,7 +465,6 @@ function inputFromClients(io) {
 
 function botStart(ip, port) {
 // Create a bot that uses 'polling' to fetch new updates
-    let bot = new TelegramBot('320938705:AAGpcdMe9oIhFYuu11MjU4djJnj1maijkpQ');
 
     // bot.on('text', msg => {
     //     let fromId = msg.from.id;
@@ -446,7 +473,7 @@ function botStart(ip, port) {
     //     return bot.sendMessage(fromId, `Welcome, ${ firstName }!`, { reply });
     // });
 
-    bot.on('/login', msg => {
+    function login(msg) {
         token = GenerateToken();
         let fl = true;
         for (let item of world.player) {
@@ -457,11 +484,24 @@ function botStart(ip, port) {
             }
         }
         if (fl) world.addPlayer(sha(token), null, "name", msg.from.id);
+    }
+
+    bot.on('/login', msg => {
+        login(msg);
+        return bot.sendMessage(msg.from.id, ip + ":" + port + "/?key=" + token);
+    });
+
+    bot.on('/ntd', msg => {
+        login(msg);
         return bot.sendMessage(msg.from.id, ip + ":" + port + "/ntd.html?key=" + token);
     });
 
+    bot.on('/help', msg => {
+        return bot.sendMessage(msg.from.id, msg.from.id + " /login to login\n/ntd to login in ntd");
+    });
+
     bot.on('/now', msg => {
-        fs.readFile("ntddata/" + sha(msg.from.id+"") + ".txt", 'utf8', function (err, data) {
+        fs.readFile("ntddata/" + sha(msg.from.id + "") + ".txt", 'utf8', function (err, data) {
             if (err) {
                 return console.log("load error " + err);
             }

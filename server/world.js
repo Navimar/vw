@@ -5,7 +5,7 @@ const meta = require('./rule.js');
 
 let world = {};
 
-world.initWorld = function () {
+world.init = function () {
     world.player = [];
     world.time = 0;
     world.connected = 0;
@@ -91,14 +91,14 @@ function addtologic(obj, t) {
     obj.nextTurn = t;
 }
 
-function cancelTurn(obj) {
-    let objArr = world.logic.get(obj.nextTurn);
-    for (let o in objArr) {
-        if (objArr[o] === obj) {
-            objArr.splice(o, 1);
-        }
-    }
-}
+// function cancelTurn(obj) {
+//     let objArr = world.logic.get(obj.nextTurn);
+//     for (let o in objArr) {
+//         if (objArr[o] === obj) {
+//             objArr.splice(o, 1);
+//         }
+//     }
+// }
 
 
 world.put = (obj, carrier) => {
@@ -229,7 +229,7 @@ world.addWound = (player, wound) => {
     }
 };
 
-module.exports.removeWound = function removeWound(player, wound) {
+world.removeWound = (player, wound)=> {
     let ok = true;
     for (let x in player.wound) {
         if (player.wound[x] == wound && ok) {
@@ -262,19 +262,19 @@ world.transform = (obj, tp) => {
     }
 };
 
-world.createWorld = () => {
-    let wid = 200;
-    // for (let a = 0; a < 250; a++) {
-    //     world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
-    // }
-    // for (let a = 0; a < 30000; a++) {
-    //     world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
-    //     world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
-    // }
-    // for (let a = 0; a < 5000; a++) {
-    //     world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));
-    //
-    // }
+world.start = () => {
+    let wid = 20;
+    for (let a = 0; a < 25; a++) {
+        world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
+    }
+    for (let a = 0; a < 300; a++) {
+        world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
+        world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
+    }
+    for (let a = 0; a < 50; a++) {
+        world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));
+
+    }
 };
 
 world.objArrInPoint = (x, y) => {
@@ -310,8 +310,8 @@ world.findInPoint = (tp, x, y) => {
 };
 world.find = (tp, x, y) => {
     function findInSircle(a) {
-        for (let xx = x - a; xx < x + a; xx++) {
-            for (let yy = y - a; yy < y + a; yy++) {
+        for (let xx = x - a; xx <= x + a; xx++) {
+            for (let yy = y - a; yy <= y + a; yy++) {
                 // if (Math.abs(xx - x + yy - y) == a) {
                 let f = world.findInPoint(tp, xx, yy);
                 if (f) return f;
@@ -322,7 +322,7 @@ world.find = (tp, x, y) => {
     }
 
 
-    for (let a = 0; a < 4; a++) {
+    for (let a = 0; a < 5; a++) {
         let f = findInSircle(a);
         if (f) return f;
     }

@@ -30,9 +30,12 @@ meta.wolf = {
     isSolid: true,
     onTurn: (data, wd) => {
         let t = wd.find(meta.player);
-        wd.moveTo(t.x, t.y);
+        if(t) {
+            wd.moveTo(t.x, t.y);
+        }
+        // wd.moveTo(0,0);
         // wd.move(direction.right);
-        wd.nextTurn(13);
+        wd.nextTurn(16);
     },
 };
 
