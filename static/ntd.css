@@ -8,6 +8,7 @@
 
 #tasklist {
     padding-top: 50px;
+    padding-bottom: 500px;
 }
 
 .task {
@@ -52,7 +53,7 @@ body {
     text-transform: lowercase;
     text-align: center;
     height: 30px;
-    font-size: -webkit-xxx-large;
+    font-size: xx-large;
     color: whitesmoke;
     border: none;
     width: 33%;
@@ -64,6 +65,7 @@ body {
 }
 
 #online {
+    background: black;
     position: fixed;
     top: 0;
     right: 0;
