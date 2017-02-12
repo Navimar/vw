@@ -66,7 +66,7 @@ function add() {
             text,
             id,
             selected: "selected",
-            duration: 0,
+            reward: 0,
             duedate: date.getFullYear() + "-" + month + "-" + day
         });
     }
@@ -113,8 +113,8 @@ $('#text').change(function () {
     selected().text = $('#text').val();
 });
 
-$('#duration').change(function () {
-    selected().duration = $('#duration').val();
+$('#reward').change(function () {
+    selected().reward = $('#reward').val();
 });
 
 $('#starttime').change(function () {
@@ -162,23 +162,23 @@ function render() {
         if (aRate == bRate) {
             if (_.isFinite(aTime)) {
                 aRate = aTime;
+            } else {
+                aRate += 9999999999;
             }
             if (_.isFinite(bTime)) {
                 bRate = bTime;
+            } else {
+                bRate += 9999999999;
             }
         }
-            // let aDuration = a.duration;
-        // let bDuration = b.duration;
-        //
-        // if (aDate == bDate) {
-        //     if (_.isFinite(aDuration)) {
-        //         aDate = bDuration;
-        //     }
-        //     if (_.isFinite(bDuration)) {
-        //         bDate = aDuration;
-        //     }
-        //
-        // }
+        if (aRate == bRate) {
+            if (_.isFinite(a.reward)) {
+                aRate = -a.reward;
+            }
+            if (_.isFinite(a.reward)) {
+                bRate = -b.reward;
+            }
+        }
         if (aRate == bRate) {
             a.unsorted = "unsorted";
             b.unsorted = "unsorted";
@@ -214,10 +214,10 @@ function render() {
         $('#startdate').val('');
     }
     $('#text').val(selected().text);
-    if (selected().duration != undefined) {
-        $('#duration').val(selected().duration);
+    if (selected().reward != undefined) {
+        $('#reward').val(selected().reward);
     } else {
-        $('#duration').val('');
+        $('#reward').val('');
     }
     $tasklist.html('');
     let d = new Date();
