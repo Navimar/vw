@@ -174,8 +174,9 @@ function render() {
         if (aRate == bRate) {
             if (_.isFinite(a.reward)) {
                 aRate = -a.reward;
+                console.log(-a.reward);
             }
-            if (_.isFinite(a.reward)) {
+            if (_.isFinite(b.reward)) {
                 bRate = -b.reward;
             }
         }
