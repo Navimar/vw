@@ -27,7 +27,7 @@ let makeTest = () => {
         if (val === ok) {
             arrTest.push({status: "OK", text});
         } else {
-            arrTest.push({status: "ERROR!!!", text: text+": "+ val + ", expected " + ok});
+            arrTest.push({status: "ERROR!!!", text: text + ": " + val + ", expected " + ok});
             testFail = true;
         }
     }
@@ -109,15 +109,15 @@ let makeTest = () => {
     test(w.y, -3, "wolf goes down");
 
     if (testFail) {
-        let text ="";
+        let text = "";
         for (let a of arrTest) {
             if (a.status == "ERROR!!!") {
-                text=text+a.text+"\n";
+                text = text + a.text + "\n";
             }
         }
         bot.sendMessage(30626617, text);
         // throw 'testFall';
-    }else{
+    } else {
         bot.sendMessage(30626617, "Server has been started");
     }
 };
@@ -500,14 +500,33 @@ function botStart(ip, port) {
         return bot.sendMessage(msg.from.id, "/login to login\n/ntd to login in ntd");
     });
 
-    bot.on('/now', msg => {
-        fs.readFile("ntddata/" + sha(msg.from.id + "") + ".txt", 'utf8', function (err, data) {
-            if (err) {
-                return console.log("load error " + err);
+    bot.on('/friend', msg => {
+        const words = msg.text.split(' ');
+        if (words[1] == undefined) {
+            return bot.sendMessage(msg.from.id, "You should type a username after '/friend'");
+        } else {
+            let l = words[1].charAt(0);
+            if (l != "@") {
+                return bot.sendMessage(msg.from.id, "The first symbol of username should be @");
+            } else {
+                // let id = idFromName(words[1]);
+                // let p = players.get(id);
+                let p = players.get(msg.from.id);
+                p.group.push(words[1]);
+                return bot.sendMessage(msg.from.id, words[1] + " ");
             }
-            return bot.sendMessage(msg.from.id, data);
-        });
+        }
     });
+
+    //
+    // bot.on('/now', msg => {
+    //     fs.readFile("ntddata/" + sha(msg.from.id + "") + ".txt", 'utf8', function (err, data) {
+    //         if (err) {
+    //             return console.log("load error " + err);
+    //         }
+    //         return bot.sendMessage(msg.from.id, data);
+    //     });
+    // });
 
     bot.connect();
 };
