@@ -108,8 +108,8 @@ body {
     font-size: x-large;
 }
 textarea{
-    height: 200px;
-    width: 200px;
+    /*height: 200px;*/
+    width: 350px;
     padding: 0;
     margin: 0;
     font-size: large;
