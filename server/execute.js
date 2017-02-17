@@ -180,7 +180,7 @@ exe.onLogin = (val) => {
             if (item.key === key) {
                 item.socket = socket;
                 item.name = name;
-                item.key = null;
+                // item.key = null;
                 fl = false;
                 return ("succecs loged in " + item.name);
             }
