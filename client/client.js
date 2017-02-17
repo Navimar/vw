@@ -68,13 +68,14 @@ function onStart() {
 function inputServer() {
     socket.on('connect', function () {
         socket.emit('login', login);
+        console.log('connected');
     });
     socket.on('updateState', function (val) {
         onServer(val);
     });
     // socket.on('testFail', (val) => {
-        // onTestFail(val);
-        // socket.emit('end');
+    //     onTestFail(val);
+    //     socket.emit('end');
     // });
     socket.on('login', (val) => {
         onLogin(val);

@@ -229,7 +229,7 @@ world.addWound = (player, wound) => {
     }
 };
 
-world.removeWound = (player, wound)=> {
+world.removeWound = (player, wound) => {
     let ok = true;
     for (let x in player.wound) {
         if (player.wound[x] == wound && ok) {

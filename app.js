@@ -19,10 +19,10 @@ app.get('*', function (req, res) {
     res.status(404).send("nothing there");
 });
 
-app.get('/log', function (req, res) {
-    const text = fs.readFileSync(process.env.OPENSHIFT_LOG_DIR + 'nodejs.log', 'utf8');
-    res.status(200).send(text);
-});
+// app.get('/log', function (req, res) {
+//     const text = fs.readFileSync(process.env.OPENSHIFT_LOG_DIR + 'nodejs.log', 'utf8');
+//     res.status(200).send(text);
+// });
 
 const port = config.port;
 const ip = config.ip;
