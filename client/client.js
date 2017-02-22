@@ -1,11 +1,12 @@
 const socket = io();
 const constSpeed = 0.0013;
 const login = {};
-login.pass = findGetParameter("key"); //||  prompt("Write your password!", "demo");
+login.pass = findGetParameter("key");
+login.id = findGetParameter("id");
 if (login.pass == "" || login.pass == undefined) {
     login.pass = "demo";
 }
-login.name = "game";
+// login.name = "game";
 
 
 let model = {};

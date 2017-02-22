@@ -12,13 +12,12 @@ input.tick = () => {
         let dtNow = Date.now();
         if (dtNow >= dtLoop + 100) {
             dtLoop = dtNow;
-            event.tick();
+            event.tick({event:'tick'});
         }
     }, 0);
 };
 
 input.socket = (io) => {
-
     function makeEvent(socket, eventName, message) {
         let val = {};
         val.socket = socket;
@@ -28,7 +27,7 @@ input.socket = (io) => {
     }
 
     io.on('connection', function (socket) {
-        makeEvent('connection');
+        makeEvent(socket,'connection');
 
         socket.on('disconnect', function () {
             makeEvent(socket, 'disconnect');

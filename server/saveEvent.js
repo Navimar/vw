@@ -1,62 +1,93 @@
 /**
  * Created by igor on 14/02/2017.
  */
+const fs = require('fs');
+
 
 const exe = require('./execute');
+const user = require('./user');
+const send = require('./send');
+const config = require('./config');
+
 
 const event = {};
+let token;
 module.exports = event;
 
 
-event.tick = () => {
-    saveEvent('loop');
+event.tick = (val) => {
+    saveEvent(val);
     exe.onLoop();
-    exe.out();
+    send.web();
 };
 
 event.bot = (val) => {
-    if (saveEvent('bot', val)) {
-        switch (val.event) {
-            case '/login':
-                exe.onLoginBot(val.msg);
-                break;
-            case '/ntd':
-                exe.onNtdBot(val.msg);
-                break;
-        }
+    switch (val.event) {
+        case '/login':
+            token = user.setKey(val.msg.from.id);
+            send.bot(val.msg.from.id, config.ip + ":" + config.port + "/?id=" + val.msg.from.id + "&key=" + token);
+            break;
+        case '/ntd':
+            val.id = val.msg.from.id;
+            saveEvent(val);
+            token = user.setKey(val.msg.from.id);
+            send.bot(val.msg.from.id, config.ip + ":" + config.port + "/ntd.html?id=" + val.msg.from.id + "&key=" + token);
+            break;
     }
 };
 
 event.emit = (val) => {
-    if (saveEvent('emit', val)) {
-        switch (val.event) {
-            case 'connection':
-                exe.connection();
-                break;
-            case 'disconnect':
-                exe.disconnect();
-                break;
-            case 'login':
-                exe.onLogin(val);
-                break;
-            case 'ntd-load':
-                exe.onNtdLoad(val);
-                break;
-            case 'ntd-save':
-                exe.onNtdSave(val);
-                break;
-        }
+    switch (val.event) {
+        case 'connection':
+            saveEvent(val);
+            exe.connection();
+            break;
+        case 'disconnect':
+            saveEvent(val);
+            exe.disconnect();
+            break;
+        case 'login':
+            user.login(val.msg.id, val.socket, val.msg.pass);
+            break;
+        case 'ntd-load':
+            for (let u of user.list) {
+                if (u.socket == val.socket) {
+                    console.log('emit');
+                    console.log(u.ntd);
+                    val.socket.emit('model', JSON.stringify(u.ntd));
+                }
+            }
+            break;
+        case 'ntd-save':
+            val.id = user.bySocket(val.socket).id;
+            if (val.id) {
+                saveEvent(val);
+                exe.onNtdSave(val.id,val.msg);
+            } else {
+                val.socket.disconnect('unauthorized');
+            }
+            break;
     }
 };
 
-function saveEvent() {
-    return true;
+function saveEvent(val) {
+    // val.date = Date.now();
+    const data = {
+        id: val.id,
+        event: val.event,
+        msg: val.msg,
+        // socket:val.socket,
+        date: Date.now()
+    };
+    fs.appendFile('data/log.txt', JSON.stringify(data) + "\n", function (err) {
+        if (err !== null) {
+            console.log(err);
+            throw 'log writing error';
+        }
+    });
 }
 
-// const lineReader = require('readline').createInterface({
-//     input: require('fs').createReadStream('file.in')
-// });
-//
-// lineReader.on('line', function (line) {
-//     console.log('Line from file:', line);
-// });
+out = (dtStartLoop) => {
+
+};
+

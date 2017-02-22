@@ -2,11 +2,8 @@
  * Created by igor on 16/02/2017.
  */
 const _ = require('underscore');
-const sha = require("sha256");
-const fs = require('fs');
 
-const config = require('./config');
-const bot = require('./bot');
+const user = require('./user');
 const world = require('./world');
 const util = require('./util');
 const direction = util.dir;
@@ -156,7 +153,7 @@ exe.onLoop = () => {
     world.time++;
     return dtStartLoop;
 };
-exe.onOrder = (socket, val)=> {
+exe.onOrder = (socket, val) => {
     for (let p of world.player) {
         if (p.socket == socket) {
             p.order = val.order;
@@ -165,124 +162,56 @@ exe.onOrder = (socket, val)=> {
         }
     }
 }
-exe.onLogin = (val) => {
-    val.socket.emit('login', l(val.msg.pass, val.socket, val.msg.name));
 
-    function l(val, socket, name) {
-        let key = sha(val);
-        // console.log(key);
-        let fl = true;
-        for (let item of world.player) {
-            // console.log("p");
-            // console.log(item.key);
-            // console.log("k");
-            // console.log(key);
-            if (item.key === key) {
-                item.socket = socket;
-                item.name = name;
-                // item.key = null;
-                fl = false;
-                return ("succecs loged in " + item.name);
-            }
-        }
-        if (fl) {
-            return ("authentication error");
-        }
-    }
-};
-exe.out = (dtStartLoop) => {
-    let send = {};
-    for (let p of world.player) {
-        if (p.socket != null) {
-            send.holst = [];
-            send.obj = [];
-            send.wound = [];
-            for (let x = 0; x < 9; x++) {
-                send.holst[x] = [];
-                send.wound.push(p.wound[x]);
-                for (let y = 0; y < 9; y++) {
-                    send.holst[x][y] = [];
-                    let key = p.x + x - 4 + " ";
-                    key += p.y + y - 4;
-                    if (world.map.has(key)) {
-                        for (let r of world.map.get(key)) {
-                            let img =
-                                _.isFunction(r.tp.img) ?
-                                    r.tp.img(r.data)
-                                    :
-                                    r.tp.img;
-                            send.obj.push({x: x, y: y, img, id: r.id});
-                        }
-                    } else {
-                        // send.holst[x][y] = ["grass"];
-                    }
-                }
-            }
-            send.inv = [];
-            if (world.map.has(p.id)) {
-                for (let i of world.map.get(p.id)) {
-                    let img =
-                        _.isFunction(i.tp.img) ?
-                            i.tp.img(i.data)
-                            :
-                            i.tp.img;
-                    send.inv.push({img, id: i.id});
-                }
-            }
-            send.px = p.x;
-            send.py = p.y;
-            send.dirx = p.dirx;
-            send.diry = p.diry;
-            send.hand = p.hand;
-            send.message = p.message;
-            send.delay = Date.now() - dtStartLoop;
-            send.cnMass = world.cnMass;
-            send.cnActive = world.cnActive;
-            send.error = world.error;
-            send.connected = world.connected;
-            send.time = world.time;
-            // send.dirx = p.dirx;
-            // send.diry = p.diry;
-            p.socket.emit('updateState', send);
-        }
-    }
-};
 exe.onLoginBot = (msg) => {
-    login(msg);
-    bot.sendMessage(msg.from.id, config.ip + ":" + config.port + "/?key=" + token);
 };
 exe.onNtdBot = (msg) => {
     login(msg);
     bot.sendMessage(msg.from.id, config.ip + ":" + config.port + "/ntd.html?key=" + token);
 };
-exe.onNtdLoad = (val) => {
-    for (let p of world.player) {
-        if (p.socket == val.socket) {
-            fs.readFile("ntddata/" + sha(p.chatId + "") + ".txt", 'utf8', function (err, data) {
-                if (err) {
-                    return console.log("load error " + err);
+
+exe.onNtdSave = (id, data) => {
+    let u = user.byId(id);
+    // console.log(u);
+    if (data.delete) {
+        // console.log('splice:');
+        // console.log(data);
+        for (let t in u.ntd) {
+            if (u.ntd[t].id == data.id) {
+                u.ntd.splice(t, 1);
+            }
+        }
+    } else {
+        if (data.update) {  //
+            console.log('upd:');
+            console.log(data);
+            for (let t in u.ntd) {
+                if (u.ntd[t].id == data.id) {
+                    u.ntd[t] = data;
                 }
-                // console.log(p.chatId);
-                // console.log(sha(p.chatId+""));
-                val.socket.emit('model', data);
-            });
+            }
+        }
+        else {
+            u.ntd.push(data);
         }
     }
-};
-exe.onNtdSave = (val) => {
-    let fl = true;
-    for (let p of world.player) {
-        if (p.socket == val.socket) {
-            fs.writeFile("ntddata/" + sha(p.chatId + "") + ".txt", val.msg, function (err) {
-                if (err) return console.log("save error " + err);
-            });
-            fl = false;
-        }
-    }
-    if (fl) {
-        val.socket.disconnect('unauthorized');
-    }
-};
+
+// }
+//
+// let fl = true;
+// for (let p of world.player) {
+//     if (p.socket == val.socket) {
+//         fs.writeFile("ntddata/" + sha(p.chatId + "") + ".txt", val.msg, function (err) {
+//             if (err) return console.log("save error " + err);
+//         });
+//         fl = false;
+//     }
+// }
+// if (fl) {
+//     val.socket.disconnect('unauthorized');
+// }
+}
+;
 exe.apply = (dir, p) => {
     let tool = world.map.get(p.id);
     if (tool == undefined) {
@@ -335,33 +264,5 @@ exe.disconnect = () => {
 
 module.exports = exe;
 
-function login(msg) {
-    token = GenerateToken();
-    let fl = true;
-    for (let item of world.player) {
-        if (item.chatId == msg.from.id) {
-            item.key = sha(token);
-            fl = false;
-            // console.log("old player");
-        }
-    }
-    if (fl) world.addPlayer(sha(token), null, "name", msg.from.id);
-}
-function GenerateToken(stringLength) {
-    // set the length of the string
-    if (stringLength == undefined) {
-        stringLength = 35;
-    }
-    // list containing characters for the random string
-    let stringArray = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'];
 
 
-    let rndString = "";
-
-    // build a string with random characters
-    for (let i = 1; i < stringLength; i++) {
-        let rndNum = Math.ceil(Math.random() * stringArray.length) - 1;
-        rndString = rndString + stringArray[rndNum];
-    }
-    return rndString;
-}

@@ -62,13 +62,15 @@ function add() {
         let id = nextId();
         addInput.val("");
         selected().selected = "";
-        model.push({
+        let newTask = {
             text,
             id,
-            selected: "selected",
             reward: 0,
             duedate: date.getFullYear() + "-" + month + "-" + day
-        });
+        };
+        send(newTask);
+        newTask.selected = "selected";
+        model.push(newTask);
     }
     render();
     // if (!socket.connected) {
@@ -88,6 +90,8 @@ function selected() {
 $('#btnDone').click((e) => {
     for (let m in model) {
         if (model[m].selected == "selected") {
+            model[m].delete = true;
+            socket.emit("ntd-save", model[m]);
             model.splice(m, 1);
         }
     }
@@ -96,10 +100,14 @@ $('#btnDone').click((e) => {
 
 $('#duedate').change(function () {
     selected().duedate = $('#duedate').val();
+    selected().update = true;
+    send(selected());
 });
 
 $('#duetime').change(function () {
     selected().duetime = $('#duetime').val();
+    selected().update = true;
+    send(selected());
 });
 
 $('#startdate').change(function () {
@@ -107,18 +115,26 @@ $('#startdate').change(function () {
     if (Date.parse(selected().startdate) > Date.parse(selected().duedate) || selected().duedate == undefined || selected().duedate == "") {
         selected().duedate = $('#startdate').val();
     }
+    selected().update = true;
+    send(selected());
 });
 
 $('#text').change(function () {
     selected().text = $('#text').val();
+    selected().update = true;
+    send(selected());
 });
 
 $('#reward').change(function () {
     selected().reward = $('#reward').val();
+    selected().update = true;
+    send(selected());
 });
 
 $('#starttime').change(function () {
     selected().starttime = $('#starttime').val();
+    selected().update = true;
+    send(selected());
 });
 
 $('body').on("click", ".task", function () {
@@ -146,7 +162,6 @@ $(document).ready(function () {
 });
 
 function render() {
-    send();
     model.sort((a, b) => {
         const aTime = Date.parse(a.duedate + " " + a.duetime);
         const bTime = Date.parse(b.duedate + " " + b.duetime);
@@ -220,6 +235,7 @@ function render() {
     } else {
         $('#reward').val('');
     }
+    let task = selected();
     $tasklist.html('');
     let d = new Date();
     let b = d.getHours() * 3600000 + d.getMinutes() * 60000;
@@ -255,6 +271,7 @@ function render() {
 function onServer(val) {
     if (val !== undefined) {
         model = JSON.parse(val);
+        // model = val;
         for (let m of model) {
             if (m.id > cnId) cnId = m.id;
         }
@@ -263,12 +280,17 @@ function onServer(val) {
 }
 
 
-function send() {
-    socket.emit("ntd-save", JSON.stringify(model));
+function send(data) {
+    for (let m in model) {
+        if (model[m].selected == "selected") {
+            data = model[m];
+        }
+    }
+    socket.emit("ntd-save", data);
 }
 function inputServer() {
     socket.on('connect', function () {
-        console.log("connect "+login.pass);
+        console.log("connect " + login.pass);
         socket.emit('login', login);
     });
     socket.on('login', (val) => {
@@ -276,12 +298,13 @@ function inputServer() {
         console.log(val);
     });
     socket.on('model', (val) => {
+        console.log('loaded ' + val);
         onServer(val);
     });
     socket.on('disconnect', () => {
         $('#online').text("Offline");
         $('#online').addClass("off");
-            alert('disconnected!');
+        // alert('disconnected!');
         // console.log("disconnected!");
     });
 
