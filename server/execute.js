@@ -183,8 +183,8 @@ exe.onNtdSave = (id, data) => {
         }
     } else {
         if (data.update) {  //
-            console.log('upd:');
-            console.log(data);
+            // console.log('upd:');
+            // console.log(data);
             for (let t in u.ntd) {
                 if (u.ntd[t].id == data.id) {
                     u.ntd[t] = data;

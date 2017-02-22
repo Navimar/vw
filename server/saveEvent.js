@@ -12,6 +12,7 @@ const config = require('./config');
 
 const event = {};
 let token;
+let tick=0;
 module.exports = event;
 
 
@@ -52,8 +53,8 @@ event.emit = (val) => {
         case 'ntd-load':
             for (let u of user.list) {
                 if (u.socket == val.socket) {
-                    console.log('emit');
-                    console.log(u.ntd);
+                    // console.log('emit');
+                    // console.log(u.ntd);
                     val.socket.emit('model', JSON.stringify(u.ntd));
                 }
             }
@@ -62,7 +63,7 @@ event.emit = (val) => {
             val.id = user.bySocket(val.socket).id;
             if (val.id) {
                 saveEvent(val);
-                exe.onNtdSave(val.id,val.msg);
+                exe.onNtdSave(val.id, val.msg);
             } else {
                 val.socket.disconnect('unauthorized');
             }
@@ -71,20 +72,29 @@ event.emit = (val) => {
 };
 
 function saveEvent(val) {
-    // val.date = Date.now();
-    const data = {
-        id: val.id,
-        event: val.event,
-        msg: val.msg,
-        // socket:val.socket,
-        date: Date.now()
-    };
-    fs.appendFile('data/log.txt', JSON.stringify(data) + "\n", function (err) {
-        if (err !== null) {
-            console.log(err);
-            throw 'log writing error';
+    if (val.event != 'tick') {
+        // val.date = Date.now();
+        const data = {
+            id: val.id,
+            event: val.event,
+            msg: val.msg,
+            // socket:val.socket,
+            date: Date.now()
+        };
+        if (tick > 0) {
+            data.tick = tick;
+            tick = 0;
         }
-    });
+        fs.appendFile('data/log.txt', JSON.stringify(data) + "\n", function (err) {
+            if (err !== null) {
+                console.log(err);
+                throw 'log writing error';
+            }
+        });
+
+    } else {
+        tick++;
+    }
 }
 
 out = (dtStartLoop) => {
