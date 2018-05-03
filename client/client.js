@@ -25,10 +25,9 @@ let model = {};
 window.onload = function () {
     //inputMouse();
     inputServer();
-    onStart();
 };
 
-function onStart() {
+function initModel() {
     model.holst = [];
     model.wound = [];
     model.inv = [];
@@ -47,6 +46,10 @@ function onStart() {
     model.selected = 0;
     model.order = {};
 }
+
+let test = () => {
+
+};
 //
 // function inputMouse() {
 //     function updOrder(e) {
@@ -80,7 +83,6 @@ function inputServer() {
     // });
     socket.on('login', (val) => {
         onLogin(val);
-        step(new Date().getTime());
     });
     socket.on('ping', (val) => {
         let ping = -(model.date - new Date().getTime());
@@ -89,8 +91,10 @@ function inputServer() {
 }
 
 function onLogin(val) {
-    model.name = val;
-    console.log('login ' + model.name);
+    console.log('login ' + val);
+    test();
+    initModel();
+    step(new Date().getTime());
 }
 
 window.requestAnimFrame = (function (callback) {
@@ -331,6 +335,7 @@ function render(model) {
     // if (model.hand != "hand") drawSize(model.hand.img, 4.25, 4.25,0.6,0.6);
     if (model.message != model.lastmessage) message(model.message);
 }
+
 function onKeydown(key) {
     if (!_.isFinite(model.targetx) || !_.isFinite(model.targety)) {
         model.targetx = model.px;

@@ -11,6 +11,7 @@ const bot = require('./bot');
 module.exports = () => {
     let testFail = false;
     let arrTest = [];
+
     function test(val, ok, text) {
         if (text == undefined) {
             text = "";
@@ -18,11 +19,12 @@ module.exports = () => {
         if (val === ok) {
             arrTest.push({status: "OK", text});
         } else {
-            arrTest.push({status: "ERROR!!!", text: text + ": " + val + ", expected " + ok});
+            arrTest.push({status: "ERROR!!!", text: text + ". value: " + val + ", expected: " + ok});
             testFail = true;
         }
     }
 
+    test(true, false,"Tests are working, they could be false");
     world.init("objArrInPoint");
     world.createObj(meta.test, 5, 5);
     world.createObj(meta.highgrass, 5, 5);
@@ -106,6 +108,7 @@ module.exports = () => {
                 text = text + a.text + "\n";
             }
         }
+        bot.sendMessage(30626617, "Server has been started. ");
         bot.sendMessage(30626617, text);
         // throw 'testFall';
     } else {
