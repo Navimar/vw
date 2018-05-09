@@ -3,12 +3,16 @@
  */
 const input = require('./input');
 const test = require('./test');
-const read = require('./loadData');
+const read = require('./read');
+
+const event = require('./event');
+
 
 exports.main = function main(io) {
-    read();
+    test();
+    // read();
     input.socket(io);
     input.bot();
     input.tick();
-    test();
+    event.init();
 };

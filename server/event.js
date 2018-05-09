@@ -6,27 +6,35 @@ const fs = require('fs');
 
 const exe = require('./execute');
 const user = require('./user');
+
 const send = require('./send');
-const config = require('./config');
 
 
 const event = {};
 let token;
-let tick=0;
+let tick = 0;
 module.exports = event;
 
+event.init = () => {
+    let val = {
+        event: 'init',
+    };
+    saveEvent(val);
+    exe.onInit(val);
+    send.web();
+};
 
 event.tick = (val) => {
     saveEvent(val);
     exe.onLoop();
-    send.web();
 };
 
 event.bot = (val) => {
     switch (val.event) {
         case '/login':
-            token = user.setKey(val.msg.from.id);
-            send.bot(val.msg.from.id, config.ip + ":" + config.port + "/?id=" + val.msg.from.id + "&key=" + token);
+            let id = val.msg.from.id;
+            send.login(id);
+
             break;
         case '/ntd':
             val.id = val.msg.from.id;

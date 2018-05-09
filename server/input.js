@@ -1,5 +1,5 @@
 // const _ = require('underscore');
-const event = require('./saveEvent');
+const event = require('./event');
 const bot = require('./bot');
 
 const input = {};

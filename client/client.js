@@ -92,6 +92,7 @@ function inputServer() {
 
 function onLogin(val) {
     console.log('login ' + val);
+    alert('login ' + val);
     test();
     initModel();
     step(new Date().getTime());

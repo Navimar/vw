@@ -4,6 +4,9 @@
 const user = require('./user');
 const bot = require('./bot');
 
+const config = require('./config');
+
+
 const send = {};
 
 send.web = () => {
@@ -67,4 +70,9 @@ send.web = () => {
 send.bot = (id,text) =>{
     bot.sendMessage(id, text);
 };
+send.login = (id) => {
+    let token = user.setKey(id);
+    send.bot(id, config.ip + ":" + config.port + "/?id=" + id + "&key=" + token);
+};
+
 module.exports = send;

@@ -8,6 +8,9 @@ const world = require('./world');
 const util = require('./util');
 const direction = util.dir;
 
+const send = require('./send');
+
+
 const exe = {};
 
 let token = null;
@@ -56,6 +59,10 @@ exe.wrapper = (me) => {
         },
         find: (target) => world.find(target, me.x, me.y),
     };
+};
+exe.onInit = () => {
+    world.init();
+    world.start();
 };
 exe.onLoop = () => {
     let dtStartLoop = Date.now();
@@ -123,6 +130,7 @@ exe.onLoop = () => {
                     p.order.val = 0;
                     break;
             }
+
             function moveLocal(dir) {
                 p.tire = 10;
                 world.move(p, dir);
@@ -161,14 +169,17 @@ exe.onOrder = (socket, val) => {
             p.targety = val.targety;
         }
     }
-}
+};
 
-exe.onLoginBot = (msg) => {
-};
-exe.onNtdBot = (msg) => {
-    login(msg);
-    bot.sendMessage(msg.from.id, config.ip + ":" + config.port + "/ntd.html?key=" + token);
-};
+// exe.onLoginBot = (val) => {
+//     token = user.setKey(val.msg.from.id);
+//     send.bot(val.msg.from.id, config.ip + ":" + config.port + "/?id=" + val.msg.from.id + "&key=" + token);
+// };
+//
+// exe.onNtdBot = (msg) => {
+//     login(msg);
+//     bot.sendMessage(msg.from.id, config.ip + ":" + config.port + "/ntd.html?key=" + token);
+// };
 
 exe.onNtdSave = (id, data) => {
     let u = user.byId(id);
@@ -222,6 +233,7 @@ exe.apply = (dir, p) => {
             handTool();
         }
     }
+
     function handTool() {
         tool = {};
         tool.tp = {

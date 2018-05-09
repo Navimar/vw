@@ -7,6 +7,7 @@ const meta = require('./rule');
 const direction = require('./util');
 const exe = require('./execute');
 const bot = require('./bot');
+const send = require('./send');
 
 module.exports = () => {
     let testFail = false;
@@ -100,6 +101,9 @@ module.exports = () => {
     w = world.createObj(meta.wolf, 0, -4);
     w.tp.onTurn(w.data, exe.wrapper(w));
     test(w.y, -3, "wolf goes down");
+
+    send.bot(30626617,"send.bot is working");
+    send.login(30626617);
 
     if (testFail) {
         let text = "";
