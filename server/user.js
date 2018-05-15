@@ -3,7 +3,7 @@
  */
 const sha = require("sha256");
 
-const config = require('./config');
+// const config = require('./config');
 const user = {};
 
 user.list = new Map;
@@ -61,6 +61,13 @@ user.byId = (id) =>{
     }
     return false;
 };
+
+user.makeFriend = (who, whom) =>{
+    who.add
+};
+
+
+
 function GenerateToken(stringLength) {
     // set the length of the string
     if (stringLength == undefined) {

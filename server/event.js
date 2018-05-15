@@ -27,6 +27,7 @@ event.init = () => {
 event.tick = (val) => {
     saveEvent(val);
     exe.onLoop();
+    send.web();
 };
 
 event.bot = (val) => {

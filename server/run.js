@@ -3,7 +3,7 @@
  */
 const input = require('./input');
 const test = require('./test');
-const read = require('./read');
+const read = require('./load');
 
 const event = require('./event');
 

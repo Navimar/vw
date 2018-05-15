@@ -10,6 +10,7 @@ if (login.pass == "" || login.pass == undefined) {
 
 
 let model = {};
+let status = {server: 0};
 
 // function Pt(x, y) {
 //     if (!_.isFinite(x)) throw "x invalid";
@@ -24,31 +25,16 @@ let model = {};
 
 window.onload = function () {
     //inputMouse();
-    inputServer();
+    // inputServer();
+    test();
 };
 
-function initModel() {
-    model.holst = [];
-    model.wound = [];
-    model.inv = [];
-    // model.hand = "hand";
-    for (let x = 0; x < 9; x++) {
-        model.wound.push("bottle");
-        model.holst[x] = [];
-        for (let y = 0; y < 9; y++) {
-            model.holst[x][y] = "grass";
-        }
-    }
-    model.obj = [];
-    model.stamp = 1;
-    model.trx = 0;
-    model.try = 0;
-    model.selected = 0;
-    model.order = {};
-}
-
 let test = () => {
-
+    let val = 'test';
+    console.log('login ' + val);
+    alert('login ' + val);
+    initModel();
+    step(new Date().getTime());
 };
 //
 // function inputMouse() {
@@ -93,9 +79,28 @@ function inputServer() {
 function onLogin(val) {
     console.log('login ' + val);
     alert('login ' + val);
-    test();
     initModel();
     step(new Date().getTime());
+}
+
+function initModel() {
+    model.holst = [];
+    model.wound = [];
+    model.inv = [];
+    for (let x = 0; x < 9; x++) {
+        model.wound.push("bottle");
+        model.holst[x] = [];
+        for (let y = 0; y < 9; y++) {
+            model.holst[x][y] = "grass";
+        }
+    }
+    model.holst[3][2]="tree";
+    model.obj = [];
+    model.stamp = 1;
+    model.trx = 0;
+    model.try = 0;
+    model.selected = 0;
+    model.order = {};
 }
 
 window.requestAnimFrame = (function (callback) {
@@ -118,15 +123,16 @@ function step(lastTime) {
 }
 
 function onServer(val) {
+    status.server = 0;
     // for (let x = 0; x < 9; x++) {
     //     let r = model.holst[x][0];
     //     model.holst[x][-1] = r;
     // // }
-    // for (let x = 0; x < 9; x++) {
-    //     for (let y = 0; y < 9; y++) {
-    //         model.holst[x][y] = "grass";
-    //     }
-    // }
+    for (let x = 0; x < 9; x++) {
+        for (let y = 0; y < 9; y++) {
+            model.holst[x][y] = "grass";
+        }
+    }
     model.dirx = val.dirx;
     model.diry = val.diry;
     model.wound = val.wound;
@@ -187,6 +193,7 @@ function onServer(val) {
 }
 
 function onStep(timeDiff) {
+    status.server++;
     model.dtStartLoop = Date.now();
     for (let o of model.obj) {
         // console.log(o.sx);
@@ -269,72 +276,72 @@ function move(fx, fy, tx, ty, speed, timeDiff) {
 
 function render(model) {
     resize();
-    $("#ping").html("Пинг: " + model.ping + "</br>Расчет: " + model.delay + "</br> Ходит: " + model.cnActive + "</br> x: " + model.px + "</br> y: " + model.py + "</br> Игроков: " + model.connected + "</br> Err: " + model.error + "</br> Клиент: " + (Date.now() - model.dtStartLoop + "</br> Время: " + model.time));
+    $("#ping").html("status.server: " + status.server + "</br> Пинг: " + model.ping + "</br>Расчет: " + model.delay + "</br> Ходит: " + model.cnActive + "</br> x: " + model.px + "</br> y: " + model.py + "</br> Игроков: " + model.connected + "</br> Err: " + model.error + "</br> Клиент: " + (Date.now() - model.dtStartLoop + "</br> Время: " + model.time));
     for (let y = -1; y < 10; y++) {
         for (let x = -1; x < 10; x++) {
-            drawImg("grass", x + model.trx, y + model.try);
-            // drawImg("grass", x, y);
+            // drawImg("grass", x + model.trx, y + model.try);
+            drawImg("grass", x, y);
             // for (let h of model.holst[x][y]) {
-            // drawImg(model.holst[x][y], x + model.trx, y + model.try);
+            //     drawImg(model.holst[x][y], x + model.trx, y + model.try);
             // }
         }
     }
-
-    for (let o of model.obj) {
-        drawImg(o.img, o.sx, o.sy);
-        // drawImg(o.img, o.x, o.y);
-    }
-
-    for (let a = 0; a < 9; a++) {
-        drawImg("black", 9, a);
-        drawImg("black", 10, a);
-        drawImg("black", -1, a);
-        drawImg("black", -2, a);
-        drawImg("black", a, 9);
-        drawImg("black", a, 10);
-        drawImg("black", a, -1);
-        drawImg("black", a, -2);
-    }
-    for (let l = 0; l < 9; l++) {
-        drawImg(model.wound[l], 9, l);
-    }
-    drawImg("hand", -1, 0);
-    let itma = 1;
-    for (let i of model.inv) {
-        drawImg(i.img, -1, itma);
-        itma++;
-    }
-    for (let bag = itma; bag < 9; bag++) {
-        drawImg("slot", -1, bag);
-    }
-    drawImg("select", -1, model.selected);
-
-
-    for (let o of model.obj) {
-        // drawImg("from", o.x, o.y);
-    }
-
-    let ex = 0;
-    let ey = 0;
-    switch (model.order.val) {
-        case "up":
-            ey -= 1;
-            break;
-        case "right":
-            ex += 1;
-            break;
-        case "left":
-            ex -= 1;
-            break;
-        case "down":
-            ey += 1;
-            break;
-        default:
-            break;
-    }
-    drawImg("from", 4 + ex, 4 + ey);
-    // if (model.hand != "hand") drawSize(model.hand.img, 4.25, 4.25,0.6,0.6);
-    if (model.message != model.lastmessage) message(model.message);
+    //
+    // for (let o of model.obj) {
+    //     drawImg(o.img, o.sx, o.sy);
+    //     // drawImg(o.img, o.x, o.y);
+    // }
+    //
+    // for (let a = 0; a < 9; a++) {
+    //     drawImg("black", 9, a);
+    //     drawImg("black", 10, a);
+    //     drawImg("black", -1, a);
+    //     drawImg("black", -2, a);
+    //     drawImg("black", a, 9);
+    //     drawImg("black", a, 10);
+    //     drawImg("black", a, -1);
+    //     drawImg("black", a, -2);
+    // }
+    // for (let l = 0; l < 9; l++) {
+    //     drawImg(model.wound[l], 9, l);
+    // }
+    // drawImg("hand", -1, 0);
+    // let itma = 1;
+    // for (let i of model.inv) {
+    //     drawImg(i.img, -1, itma);
+    //     itma++;
+    // }
+    // for (let bag = itma; bag < 9; bag++) {
+    //     drawImg("slot", -1, bag);
+    // }
+    // drawImg("select", -1, model.selected);
+    //
+    //
+    // for (let o of model.obj) {
+    //     // drawImg("from", o.x, o.y);
+    // }
+    //
+    // let ex = 0;
+    // let ey = 0;
+    // switch (model.order.val) {
+    //     case "up":
+    //         ey -= 1;
+    //         break;
+    //     case "right":
+    //         ex += 1;
+    //         break;
+    //     case "left":
+    //         ex -= 1;
+    //         break;
+    //     case "down":
+    //         ey += 1;
+    //         break;
+    //     default:
+    //         break;
+    // }
+    // drawImg("from", 4 + ex, 4 + ey);
+    // // if (model.hand != "hand") drawSize(model.hand.img, 4.25, 4.25,0.6,0.6);
+    // if (model.message != model.lastmessage) message(model.message);
 }
 
 function onKeydown(key) {

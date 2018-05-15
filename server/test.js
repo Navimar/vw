@@ -8,6 +8,7 @@ const direction = require('./util');
 const exe = require('./execute');
 const bot = require('./bot');
 const send = require('./send');
+const user = require('./user');
 
 module.exports = () => {
     let testFail = false;
@@ -25,7 +26,7 @@ module.exports = () => {
         }
     }
 
-    test(true, false,"Tests are working, they could be false");
+    test(true, false, "Tests are working, they could be false");
     world.init("objArrInPoint");
     world.createObj(meta.test, 5, 5);
     world.createObj(meta.highgrass, 5, 5);
@@ -102,7 +103,13 @@ module.exports = () => {
     w.tp.onTurn(w.data, exe.wrapper(w));
     test(w.y, -3, "wolf goes down");
 
-    send.bot(30626617,"send.bot is working");
+    user.setKey(1);
+    test(user.byId(1).id, 1, "userById");
+    user.setKey(2);
+    user.makeFriend(user.byId(1), user.byId(2));
+    test(user.isFriend(user.byId(1), user.byId(2)), true, "isFriend");
+
+    send.bot(30626617, "send.bot is working");
     send.login(30626617);
 
     if (testFail) {
