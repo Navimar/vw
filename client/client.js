@@ -26,7 +26,7 @@ let status = {server: 0};
 window.onload = function () {
     //inputMouse();
     test();
-    sleep(1000);
+    // sleep(1000);
     inputServer();
 };
 
@@ -129,11 +129,11 @@ function onServer(val) {
     //     let r = model.holst[x][0];
     //     model.holst[x][-1] = r;
     // // }
-    for (let x = 0; x < 9; x++) {
-        for (let y = 0; y < 9; y++) {
-            model.holst[x][y] = "grass";
-        }
-    }
+    // for (let x = 0; x < 9; x++) {
+    //     for (let y = 0; y < 9; y++) {
+    //         model.holst[x][y] = "grass";
+    //     }
+    // }
     model.dirx = val.dirx;
     model.diry = val.diry;
     model.wound = val.wound;
@@ -146,39 +146,40 @@ function onServer(val) {
     model.error = val.error;
     model.time = val.time;
     model.cnActive = val.cnActive;
-    for (let v of val.obj) {
-        let ok = true;
-        for (let m of model.obj) {
-            if (m.id == v.id) {
-                m.x = v.x;
-                m.y = v.y;
-                m.img = v.img;
-                ok = false;
-            }
-        }
-        if (ok) {
-            model.obj.push(v);
-        }
-    }
-    for (let n in model.obj) {
-        let ok = true;
-        for (let v of val.obj) {
-            if (model.obj[n].id == v.id) {
-                ok = false;
-            }
-        }
-        if (ok && model.obj[n].outrange > 0) {
-            model.obj[n].outrange++;
-        }
-        if (ok && !model.obj[n].outrange) {
-            model.obj[n].outrange = 1;
-            model.obj[n].x -= model.dirx;
-            model.obj[n].y -= model.diry;
-        }
-        if (ok && model.obj[n].outrange > 600) {
-            model.obj.splice(n, 1);
-        }
-    }
+    model.obj=val.obj;
+    // for (let v of val.obj) {
+    //     let ok = true;
+    //     for (let m of model.obj) {
+    //         if (m.id == v.id) {
+    //             m.x = v.x;
+    //             m.y = v.y;
+    //             m.img = v.img;
+    //             ok = false;
+    //         }
+    //     }
+    //     if (ok) {
+    //         model.obj.push(v);
+    //     }
+    // }
+    // for (let n in model.obj) {
+    //     let ok = true;
+    //     for (let v of val.obj) {
+    //         if (model.obj[n].id == v.id) {
+    //             ok = false;
+    //         }
+    //     }
+    //     if (ok && model.obj[n].outrange > 0) {
+    //         model.obj[n].outrange++;
+    //     }
+    //     if (ok && !model.obj[n].outrange) {
+    //         model.obj[n].outrange = 1;
+    //         model.obj[n].x -= model.dirx;
+    //         model.obj[n].y -= model.diry;
+    //     }
+    //     if (ok && model.obj[n].outrange > 600) {
+    //         model.obj.splice(n, 1);
+    //     }
+    // }
     if (model.px != val.px || model.py != val.py) {
         model.stamp = 1;
     }
@@ -235,6 +236,8 @@ function onStep(timeDiff) {
         // let m = move(o.sx, o.sy, o.x, o.y, r * constSpeed, timeDiff);
         // o.sx = m.x;
         // o.sy = m.y;
+        o.sx=o.x;
+        o.sy=o.y;
     }
     model.stamp -= timeDiff * constSpeed;
     if (model.stamp < 0) {

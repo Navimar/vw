@@ -23,7 +23,12 @@ user.setKey = (id) => {
         }
     }
     if (fl) {
-        user.list.push({key: sha(token), id, friends: []});
+        user.list.push({
+            key: sha(token),
+            id,
+            friends: [],
+            hero:{x:0,y:0,img:"hero"}
+        });
     }
     return token;
 };

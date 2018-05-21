@@ -264,6 +264,7 @@ world.transform = (obj, tp) => {
 
 world.start = () => {
     let wid = 20;
+    world.createObj(meta.tree, 2, 2);
     for (let a = 0; a < 25; a++) {
         world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
     }

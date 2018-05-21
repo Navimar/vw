@@ -1,9 +1,10 @@
 /**
  * Created by igor on 18/02/2017.
  */
+const _ = require('underscore');
 const user = require('./user');
 const bot = require('./bot');
-
+const world = require('./world');
 const config = require('./config');
 
 
@@ -13,32 +14,30 @@ send.web = () => {
     for (let theUser of user.list) {
         if (theUser.socket != null) {
             let data = {
-                holst:[],
-                obj:[],
-                wound:[],
+                holst: [],
+                obj: [],
+                wound: [],
+                inv:[]
             };
-            // for (let x = 0; x < 9; x++) {
+            for (let x = 0; x < 9; x++) {
             //     data.holst[x] = [];
-            //     // data.wound.push(theUser.wound[x]);
-            //     for (let y = 0; y < 9; y++) {
+            //     data.wound.push(theUser.wound[x]);
+                for (let y = 0; y < 9; y++) {
             //         data.holst[x][y] = [];
-            //         let key = theUser.x + x - 4 + " ";
-            //         key += theUser.y + y - 4;
-            //         if (world.map.has(key)) {
-            //             for (let r of world.map.get(key)) {
-            //                 let img =
-            //                     _.isFunction(r.tp.img) ?
-            //                         r.tp.img(r.data)
-            //                         :
-            //                         r.tp.img;
-            //                 data.obj.push({x: x, y: y, img, id: r.id});
-            //             }
-            //         } else {
-            //             // send.holst[x][y] = ["grass"];
-            //         }
-            //     }
-            // }
-            data.inv = [];
+                    let key = theUser.hero.x + x - 4 + " ";
+                    key += theUser.hero.y + y - 4;
+                    if (world.map.has(key)) {
+                        for (let r of world.map.get(key)) {
+                            let img =
+                                _.isFunction(r.tp.img) ?
+                                    r.tp.img(r.data)
+                                    :
+                                    r.tp.img;
+                            data.obj.push({x: x, y: y, img, id: r.id});
+                        }
+                    }
+                }
+            }
             // if (world.map.has(theUser.id)) {
             //     for (let i of world.map.get(theUser.id)) {
             //         let img =
@@ -63,11 +62,12 @@ send.web = () => {
             // data.time = world.time;
             // // send.dirx = p.dirx;
             // // send.diry = p.diry;
+            data.obj.push({x: 4, y: 4, img:"hero", id: 1});
             theUser.socket.emit('updateState', data);
         }
     }
 };
-send.bot = (id,text) =>{
+send.bot = (id, text) => {
     bot.sendMessage(id, text);
 };
 send.login = (id) => {
