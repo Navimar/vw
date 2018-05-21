@@ -23,13 +23,14 @@ user.setKey = (id) => {
         }
     }
     if (fl) {
-        user.list.push({key: sha(token), id, ntd: []});
+        user.list.push({key: sha(token), id, friends: []});
     }
     return token;
 };
 
 user.login = (id, socket, pass) => {
     socket.emit('login', onLogin());
+
     function onLogin() {
         let key = sha(pass);
         for (let u of user.list) {
@@ -51,7 +52,7 @@ user.bySocket = (socket) => {
     return false;
 };
 
-user.byId = (id) =>{
+user.byId = (id) => {
     // console.log('byId '+id);
     for (let u of user.list) {
         if (u.id == id) {
@@ -62,10 +63,12 @@ user.byId = (id) =>{
     return false;
 };
 
-user.makeFriend = (who, whom) =>{
-    who.add
+user.makeFriend = (who, whom) => {
+    who.friends.push(whom);
 };
-
+user.isFriend = () => {
+    return true;
+};
 
 
 function GenerateToken(stringLength) {

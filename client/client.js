@@ -25,14 +25,15 @@ let status = {server: 0};
 
 window.onload = function () {
     //inputMouse();
-    // inputServer();
     test();
+    sleep(1000);
+    inputServer();
 };
 
 let test = () => {
-    let val = 'test';
-    console.log('login ' + val);
-    alert('login ' + val);
+    // let val = 'test';
+    // console.log('login ' + val);
+    // alert('login ' + val);
     initModel();
     step(new Date().getTime());
 };
@@ -89,13 +90,13 @@ function initModel() {
     model.inv = [];
     for (let x = 0; x < 9; x++) {
         model.wound.push("bottle");
+        model.inv.push({img:"angel"});
         model.holst[x] = [];
         for (let y = 0; y < 9; y++) {
             model.holst[x][y] = "grass";
         }
     }
-    model.holst[3][2]="tree";
-    model.obj = [];
+    model.obj = [{x:1,y:1,sx:5,sy:5,img:"test"}];
     model.stamp = 1;
     model.trx = 0;
     model.try = 0;
@@ -231,9 +232,9 @@ function onStep(timeDiff) {
             r = 2;
             // console.log(r);
         }
-        let m = move(o.sx, o.sy, o.x, o.y, r * constSpeed, timeDiff);
-        o.sx = m.x;
-        o.sy = m.y;
+        // let m = move(o.sx, o.sy, o.x, o.y, r * constSpeed, timeDiff);
+        // o.sx = m.x;
+        // o.sy = m.y;
     }
     model.stamp -= timeDiff * constSpeed;
     if (model.stamp < 0) {
@@ -286,31 +287,29 @@ function render(model) {
             // }
         }
     }
-    //
-    // for (let o of model.obj) {
-    //     drawImg(o.img, o.sx, o.sy);
-    //     // drawImg(o.img, o.x, o.y);
-    // }
-    //
-    // for (let a = 0; a < 9; a++) {
-    //     drawImg("black", 9, a);
-    //     drawImg("black", 10, a);
-    //     drawImg("black", -1, a);
-    //     drawImg("black", -2, a);
-    //     drawImg("black", a, 9);
-    //     drawImg("black", a, 10);
-    //     drawImg("black", a, -1);
-    //     drawImg("black", a, -2);
-    // }
-    // for (let l = 0; l < 9; l++) {
-    //     drawImg(model.wound[l], 9, l);
-    // }
-    // drawImg("hand", -1, 0);
-    // let itma = 1;
-    // for (let i of model.inv) {
-    //     drawImg(i.img, -1, itma);
-    //     itma++;
-    // }
+    for (let o of model.obj) {
+        drawImg(o.img, o.sx, o.sy);
+        // drawImg(o.img, o.x, o.y);
+    }
+    for (let a = 0; a < 9; a++) {
+        drawImg("black", 9, a);
+        drawImg("black", 10, a);
+        drawImg("black", -1, a);
+        drawImg("black", -2, a);
+        drawImg("black", a, 9);
+        drawImg("black", a, 10);
+        drawImg("black", a, -1);
+        drawImg("black", a, -2);
+    }
+    for (let l = 0; l < 9; l++) {
+        drawImg(model.wound[l], 9, l);
+    }
+    drawImg("hand", -1, 0);
+    let itma = 1;
+    for (let i of model.inv) {
+        drawImg(i.img, -1, itma);
+        itma++;
+    }
     // for (let bag = itma; bag < 9; bag++) {
     //     drawImg("slot", -1, bag);
     // }
