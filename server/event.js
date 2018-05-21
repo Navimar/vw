@@ -35,14 +35,13 @@ event.bot = (val) => {
         case '/login':
             let id = val.msg.from.id;
             send.login(id);
-
             break;
-        case '/ntd':
-            val.id = val.msg.from.id;
-            saveEvent(val);
-            token = user.setKey(val.msg.from.id);
-            send.bot(val.msg.from.id, config.ip + ":" + config.port + "/ntd.html?id=" + val.msg.from.id + "&key=" + token);
-            break;
+        // case '/ntd':
+        //     val.id = val.msg.from.id;
+        //     saveEvent(val);
+        //     token = user.setKey(val.msg.from.id);
+        //     send.bot(val.msg.from.id, config.ip + ":" + config.port + "/ntd.html?id=" + val.msg.from.id + "&key=" + token);
+        //     break;
     }
 };
 
@@ -59,24 +58,24 @@ event.emit = (val) => {
         case 'login':
             user.login(val.msg.id, val.socket, val.msg.pass);
             break;
-        case 'ntd-load':
-            for (let u of user.list) {
-                if (u.socket == val.socket) {
-                    // console.log('emit');
-                    // console.log(u.ntd);
-                    val.socket.emit('model', JSON.stringify(u.ntd));
-                }
-            }
-            break;
-        case 'ntd-save':
-            val.id = user.bySocket(val.socket).id;
-            if (val.id) {
-                saveEvent(val);
-                exe.onNtdSave(val.id, val.msg);
-            } else {
-                val.socket.disconnect('unauthorized');
-            }
-            break;
+        // case 'ntd-load':
+        //     for (let u of user.list) {
+        //         if (u.socket == val.socket) {
+        //             // console.log('emit');
+        //             // console.log(u.ntd);
+        //             val.socket.emit('model', JSON.stringify(u.ntd));
+        //         }
+        //     }
+        //     break;
+        // case 'ntd-save':
+        //     val.id = user.bySocket(val.socket).id;
+        //     if (val.id) {
+        //         saveEvent(val);
+        //         exe.onNtdSave(val.id, val.msg);
+        //     } else {
+        //         val.socket.disconnect('unauthorized');
+        //     }
+        //     break;
     }
 };
 
@@ -106,7 +105,7 @@ function saveEvent(val) {
     }
 }
 
-out = (dtStartLoop) => {
-
-};
+// out = (dtStartLoop) => {
+//
+// };
 

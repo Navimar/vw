@@ -323,25 +323,25 @@ function render(model) {
     //     // drawImg("from", o.x, o.y);
     // }
     //
-    // let ex = 0;
-    // let ey = 0;
-    // switch (model.order.val) {
-    //     case "up":
-    //         ey -= 1;
-    //         break;
-    //     case "right":
-    //         ex += 1;
-    //         break;
-    //     case "left":
-    //         ex -= 1;
-    //         break;
-    //     case "down":
-    //         ey += 1;
-    //         break;
-    //     default:
-    //         break;
-    // }
-    // drawImg("from", 4 + ex, 4 + ey);
+    let ex = 0;
+    let ey = 0;
+    switch (model.order.val) {
+        case "up":
+            ey -= 1;
+            break;
+        case "right":
+            ex += 1;
+            break;
+        case "left":
+            ex -= 1;
+            break;
+        case "down":
+            ey += 1;
+            break;
+        default:
+            break;
+    }
+    drawImg("from", 4 + ex, 4 + ey);
     // // if (model.hand != "hand") drawSize(model.hand.img, 4.25, 4.25,0.6,0.6);
     // if (model.message != model.lastmessage) message(model.message);
 }
@@ -377,41 +377,41 @@ function onKeydown(key) {
             model.order.name = "move";
             model.order.val = "down";
             break;
-        case "useup":
-            model.targetx = model.px;
-            model.targety = model.py - 1;
-            model.order.name = "use";
-            model.order.val = "up";
-            model.order.n = model.selected;
-            break;
-        case "useright":
-            model.targety = model.py;
-            model.targetx = model.px + 1;
-            model.order.name = "use";
-            model.order.val = "right";
-            model.order.n = model.selected;
-            break;
-        case "useleft":
-            model.targety = model.py;
-            model.targetx = model.px - 1;
-            model.order.name = "use";
-            model.order.val = "left";
-            model.order.n = model.selected;
-            break;
-        case "usedown":
-            model.targetx = model.px;
-            model.targety = model.py + 1;
-            model.order.name = "use";
-            model.order.val = "down";
-            model.order.n = model.selected;
-            break;
-        case "usehere":
-            model.targetx = model.px;
-            model.targety = model.py;
-            model.order.name = "use";
-            model.order.val = "here";
-            model.order.n = model.selected;
-            break;
+        // case "useup":
+        //     model.targetx = model.px;
+        //     model.targety = model.py - 1;
+        //     model.order.name = "use";
+        //     model.order.val = "up";
+        //     model.order.n = model.selected;
+        //     break;
+        // case "useright":
+        //     model.targety = model.py;
+        //     model.targetx = model.px + 1;
+        //     model.order.name = "use";
+        //     model.order.val = "right";
+        //     model.order.n = model.selected;
+        //     break;
+        // case "useleft":
+        //     model.targety = model.py;
+        //     model.targetx = model.px - 1;
+        //     model.order.name = "use";
+        //     model.order.val = "left";
+        //     model.order.n = model.selected;
+        //     break;
+        // case "usedown":
+        //     model.targetx = model.px;
+        //     model.targety = model.py + 1;
+        //     model.order.name = "use";
+        //     model.order.val = "down";
+        //     model.order.n = model.selected;
+        //     break;
+        // case "usehere":
+        //     model.targetx = model.px;
+        //     model.targety = model.py;
+        //     model.order.name = "use";
+        //     model.order.val = "here";
+        //     model.order.n = model.selected;
+        //     break;
         case "2":
         case "3":
         case "4":
