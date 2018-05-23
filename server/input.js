@@ -12,7 +12,7 @@ input.tick = () => {
         let dtNow = Date.now();
         if (dtNow >= dtLoop + 100) {
             dtLoop = dtNow;
-            event.tick({event:'tick'});
+            event.tick({event: 'tick'});
         }
     }, 0);
 };
@@ -27,7 +27,7 @@ input.socket = (io) => {
     }
 
     io.on('connection', function (socket) {
-        makeEvent(socket,'connection');
+        makeEvent(socket, 'connection');
 
         socket.on('disconnect', function () {
             makeEvent(socket, 'disconnect');
@@ -66,13 +66,16 @@ input.bot = () => {
         const words = msg.text.split(' ');
         let val = {};
         val.event = words[0];
-        val.msg = msg;
-        event.bot(val);
+        // val.msg = msg;
+        val.words = words;
+        val.username = msg.from.username;
+        val.id = msg.from.id;
         // let fromId = msg.from.id;
         // // let firstName = msg.from.first_name;
         // // let reply = msg.message_id;
         // // return bot.sendMessage(fromId, `Welcome, ${ firstName }!`, { reply });
         // return bot.sendMessage(fromId, words[0]);
+        event.bot(val);
     });
     // bot.on('/help', msg => {
     //     return bot.sendMessage(msg.from.id, "/login to login\n/ntd to login in ntd");

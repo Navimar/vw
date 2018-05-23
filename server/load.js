@@ -21,13 +21,6 @@ module.exports = () => {
             case '/login':
                 exe.onLoginBot(val.msg);
                 break;
-            case '/ntd':
-                user.setKey(val.msg.from.id);
-                ///?????
-                break;
-            case 'ntd-load':
-                ///?????
-                break;
             case 'ntd-save':
                 // console.log('load '+val.id);
                 exe.onNtdSave(val.id, val.msg);

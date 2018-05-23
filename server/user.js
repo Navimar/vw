@@ -12,6 +12,15 @@ user.list = [];
 user.init = () => {
 };
 
+user.new = (username, id,) => {
+    user.list.push({
+        key: sha(GenerateToken()),
+        id,
+        username,
+        friends: [],
+        hero: {x: 0, y: 0, img: "hero"}
+    });
+};
 user.setKey = (id) => {
     const token = GenerateToken();
     let fl = true;
@@ -23,12 +32,8 @@ user.setKey = (id) => {
         }
     }
     if (fl) {
-        user.list.push({
-            key: sha(token),
-            id,
-            friends: [],
-            hero:{x:0,y:0,img:"hero"}
-        });
+        console.log(id);
+        throw ('setkey');
     }
     return token;
 };
@@ -58,10 +63,17 @@ user.bySocket = (socket) => {
 };
 
 user.byId = (id) => {
-    // console.log('byId '+id);
     for (let u of user.list) {
         if (u.id == id) {
-            // console.log(u.id);
+            return u;
+        }
+    }
+    return false;
+};
+
+user.byName = (username) => {
+    for (let u of user.list) {
+        if (u.username == username) {
             return u;
         }
     }
@@ -71,8 +83,13 @@ user.byId = (id) => {
 user.makeFriend = (who, whom) => {
     who.friends.push(whom);
 };
-user.isFriend = () => {
-    return true;
+user.isFriend = (me, person) => {
+    for (let p of me.friends) {
+        if (p == person) {
+            return true;
+        }
+    }
+    return false;
 };
 
 

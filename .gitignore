@@ -4,3 +4,4 @@
 /.idea/
 *.log
 /data.txt
+data/log.txt

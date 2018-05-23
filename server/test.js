@@ -7,6 +7,7 @@ const meta = require('./rule');
 const direction = require('./util');
 const exe = require('./execute');
 const bot = require('./bot');
+const event = require('./event');
 const send = require('./send');
 const user = require('./user');
 
@@ -103,14 +104,22 @@ module.exports = () => {
     w.tp.onTurn(w.data, exe.wrapper(w));
     test(w.y, -3, "wolf goes down");
 
-    user.setKey(1);
+
+    user.new("slon", 1);
     test(user.byId(1).id, 1, "userById");
-    user.setKey(2);
+    test(user.byName("slon").username, "slon", "userByName");
+    user.new("baton", 2);
+    user.new("makaron", 3);
     user.makeFriend(user.byId(1), user.byId(2));
     test(user.isFriend(user.byId(1), user.byId(2)), true, "isFriend");
+    test(user.isFriend(user.byId(1), user.byId(3)), false, "isNotFriend");
 
+    event.bot({event: "/start", id: 1, username: "ivan"});
+    event.bot({event: "/start", id: 30626617, username: "happycatfish"});
+    event.bot({event: "/friend", id: 30626617, words: ["/friend", "@ivan"]});
+    event.bot({event:"/check",id: 30626617,words: ["/check", "@ivan"]});
     send.bot(30626617, "send.bot is working");
-    send.login(30626617);
+    // send.login(30626617);
 
     if (testFail) {
         let text = "";
@@ -123,7 +132,7 @@ module.exports = () => {
         bot.sendMessage(30626617, text);
         // throw 'testFall';
     } else {
-        bot.sendMessage(30626617, "Server has been started");
+        bot.sendMessage(30626617, "Tests are not working");
     }
 };
 

@@ -71,6 +71,7 @@ send.bot = (id, text) => {
     bot.sendMessage(id, text);
 };
 send.login = (id) => {
+    console.log("hi");
     let token = user.setKey(id);
     send.bot(id, config.ip + ":" + config.port + "/?id=" + id + "&key=" + token);
 };

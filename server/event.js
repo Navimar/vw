@@ -32,9 +32,33 @@ event.tick = (val) => {
 
 event.bot = (val) => {
     switch (val.event) {
+        case '/start':
+            user.new(val.username, val.id);
+            send.bot(val.id, "Hello, you are registered now");
+            saveEvent(val);
+            break;
         case '/login':
-            let id = val.msg.from.id;
-            send.login(id);
+            send.login(val.id);
+            saveEvent(val);
+            break;
+        case '/friend':
+            let friend = user.byName(val.words[1].substr(1));
+            if (friend) {
+                send.bot(val.id, val.words[1] + " is your friend now");
+                user.makeFriend(user.byId(val.id), friend);
+            } else {
+                send.bot(val.id, "User with name " + val.words[1] + " is not registered");
+            }
+            saveEvent(val);
+            break;
+        case '/check':
+            // console.log(user.byId(val.id));
+            // console.log(user.byName(val.words[1].substr(1)));
+            if(user.isFriend(user.byId(val.id), user.byName(val.words[1].substr(1)))){
+                send.bot(val.id, "you marked "+val.words[1] + " as your friend");
+            }else{
+                send.bot(val.id, val.words[1] + " is nobody");
+            }
             break;
         // case '/ntd':
         //     val.id = val.msg.from.id;
@@ -82,11 +106,15 @@ event.emit = (val) => {
 function saveEvent(val) {
     if (val.event != 'tick') {
         // val.date = Date.now();
+        // const data = {
+        //     id: val.id,
+        //     event: val.event,
+        //     msg: val.msg,
+        //     // socket:val.socket,
+        //     date: Date.now()
+        // };
         const data = {
-            id: val.id,
-            event: val.event,
-            msg: val.msg,
-            // socket:val.socket,
+            val,
             date: Date.now()
         };
         if (tick > 0) {
