@@ -7,6 +7,10 @@ const input = {};
 let dtLoop = Date.now();
 // let token = GenerateToken();
 
+// input.init =()=>{
+//   event.init();
+// };
+
 input.tick = () => {
     setInterval(function () {
         let dtNow = Date.now();

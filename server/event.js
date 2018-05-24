@@ -6,59 +6,51 @@ const fs = require('fs');
 
 const exe = require('./execute');
 const user = require('./user');
-
 const send = require('./send');
 
-
 const event = {};
-let token;
+
 let tick = 0;
 module.exports = event;
 
-event.init = () => {
-    let val = {
-        event: 'init',
-    };
-    saveEvent(val);
-    exe.onInit(val);
-    send.web();
-};
+
+
+// event.init = () => {
+//     let val = {
+//         event: 'init',
+//     };
+//     saveEvent(val);
+//     exe.onInit();
+//     send.web();
+// };
 
 event.tick = (val) => {
     saveEvent(val);
-    exe.onLoop();
+    exe.onTick();
     send.web();
 };
 
 event.bot = (val) => {
     switch (val.event) {
         case '/start':
-            user.new(val.username, val.id);
+            exe.onBotStart(val);
             send.bot(val.id, "Hello, you are registered now");
             saveEvent(val);
             break;
         case '/login':
+            // exe.onBotLogin(val);
             send.login(val.id);
-            saveEvent(val);
+            // saveEvent(val);
             break;
         case '/friend':
-            let friend = user.byName(val.words[1].substr(1));
-            if (friend) {
-                send.bot(val.id, val.words[1] + " is your friend now");
-                user.makeFriend(user.byId(val.id), friend);
-            } else {
-                send.bot(val.id, "User with name " + val.words[1] + " is not registered");
-            }
+            let msg = exe.onBotFriend(val);
+            send.bot(val.id, msg);
             saveEvent(val);
             break;
         case '/check':
-            // console.log(user.byId(val.id));
-            // console.log(user.byName(val.words[1].substr(1)));
-            if(user.isFriend(user.byId(val.id), user.byName(val.words[1].substr(1)))){
-                send.bot(val.id, "you marked "+val.words[1] + " as your friend");
-            }else{
-                send.bot(val.id, val.words[1] + " is nobody");
-            }
+            exe.onBotCheck(val);
+
+
             break;
         // case '/ntd':
         //     val.id = val.msg.from.id;
@@ -121,7 +113,7 @@ function saveEvent(val) {
             data.tick = tick;
             tick = 0;
         }
-        fs.appendFile('data/log.txt', JSON.stringify(data) + "\n", function (err) {
+        fs.appendFile(event.path, JSON.stringify(data) + "\n", function (err) {
             if (err !== null) {
                 console.log(err);
                 throw 'log writing error';

@@ -64,9 +64,9 @@ exe.onInit = () => {
     world.init();
     world.start();
 };
-exe.onLoop = () => {
+exe.onTick = () => {
     let dtStartLoop = Date.now();
-    for (let p of world.player) {
+    for (let p of world.box.player) {
         if (p.tire <= 0) {
             switch (p.order.name) {
                 case "move":
@@ -146,7 +146,7 @@ exe.onLoop = () => {
     }
 
     let m = 0;
-    let go = world.logic.get(world.time);
+    let go = world.box.logic.get(world.box.time);
     if (go != undefined) {
         for (let me of go) {
             if (me.tp.onTurn) {
@@ -157,8 +157,8 @@ exe.onLoop = () => {
         }
     }
     world.cnActive = m;
-    world.logic.delete(world.time);
-    world.time++;
+    world.box.logic.delete(world.time);
+    world.box.time++;
     return dtStartLoop;
 };
 exe.onOrder = (socket, val) => {
@@ -224,7 +224,7 @@ exe.onNtdSave = (id, data) => {
 }
 ;
 exe.apply = (dir, p) => {
-    let tool = world.map.get(p.id);
+    let tool = world.box.map.get(p.id);
     if (tool == undefined) {
         handTool();
     } else {
@@ -251,7 +251,7 @@ exe.apply = (dir, p) => {
 
     let x = p.x + dir.x;
     let y = p.y + dir.y;
-    let o = world.map.get(x + " " + y);
+    let o = world.box.map.get(x + " " + y);
     if (o && o.length > 0) {
         o.sort((a, b) => {
             return b.tp.z - a.tp.z;
@@ -272,6 +272,28 @@ exe.connection = () => {
 };
 exe.disconnect = () => {
     world.connected--;
+};
+
+exe.onBotStart = (val) => {
+    user.new(val.username, val.id);
+};
+
+exe.onBotFriend = (val) => {
+    let friend = user.byName(val.words[1].substr(1));
+    if (friend) {
+        user.makeFriend(user.byId(val.id), friend);
+        return(val.words[1] + " is your friend now");
+    } else {
+        return("User with name " + val.words[1] + " is not registered");
+    }
+};
+
+exe.onBotCheck = (val) => {
+    if (user.isFriend(user.byId(val.id), user.byName(val.words[1].substr(1)))) {
+        send.bot(val.id, "you marked " + val.words[1] + " as your friend");
+    } else {
+        send.bot(val.id, val.words[1] + " is nobody");
+    }
 };
 
 module.exports = exe;

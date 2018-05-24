@@ -6,7 +6,7 @@ const sha = require("sha256");
 // const config = require('./config');
 const user = {};
 
-user.list = new Map;
+// user.list = new Map;
 user.list = [];
 
 user.init = () => {

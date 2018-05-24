@@ -2,6 +2,7 @@
  * Created by igor on 16/02/2017.
  */
 
+const fs = require('fs');
 const world = require('./world');
 const meta = require('./rule');
 const direction = require('./util');
@@ -10,6 +11,7 @@ const bot = require('./bot');
 const event = require('./event');
 const send = require('./send');
 const user = require('./user');
+const load = require('./load');
 
 module.exports = () => {
     let testFail = false;
@@ -26,6 +28,11 @@ module.exports = () => {
             testFail = true;
         }
     }
+
+    fs.unlink('data/testlog.txt', (err) => {
+        if (err) throw err;
+    });
+    event.path = "data/testlog.txt";
 
     test(true, false, "Tests are working, they could be false");
     world.init("objArrInPoint");
@@ -114,12 +121,19 @@ module.exports = () => {
     test(user.isFriend(user.byId(1), user.byId(2)), true, "isFriend");
     test(user.isFriend(user.byId(1), user.byId(3)), false, "isNotFriend");
 
-    event.bot({event: "/start", id: 1, username: "ivan"});
-    event.bot({event: "/start", id: 30626617, username: "happycatfish"});
-    event.bot({event: "/friend", id: 30626617, words: ["/friend", "@ivan"]});
-    event.bot({event:"/check",id: 30626617,words: ["/check", "@ivan"]});
-    send.bot(30626617, "send.bot is working");
+    event.bot({event: "/start", id: 10, username: "ivan"});
+    event.bot({event: "/start", id: 604944578
+        , username: "testovec"});
+    event.bot({event: "/friend", id: 604944578, words: ["/friend", "@ivan"]});
+    event.bot({event: "/check", id: 604944578, words: ["/check", "@ivan"]});
+    send.bot(604944578, "send.bot is working");
     // send.login(30626617);
+    clean();
+    load('data/testlog.txt');
+    // test(user.isFriend(user.byId(1), user.byId(2)), true, "isFriend");
+    // test(user.isFriend(user.byId(1), user.byId(3)), false, "isNotFriend");
+    clean();
+    event.path = 'data/log.txt';
 
     if (testFail) {
         let text = "";
@@ -134,5 +148,10 @@ module.exports = () => {
     } else {
         bot.sendMessage(30626617, "Tests are not working");
     }
+
 };
 
+let clean = () => {
+    user.list = [];
+    world.box = {};
+};

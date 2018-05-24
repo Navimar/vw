@@ -1,0 +1,3 @@
+{"val":{"event":"/start","id":10,"username":"ivan"},"date":1527150495832}
+{"val":{"event":"/start","id":604944578,"username":"testovec"},"date":1527150495832}
+{"val":{"event":"/friend","id":604944578,"words":["/friend","@ivan"]},"date":1527150495833}

@@ -4,19 +4,20 @@ const direction = util.dir;
 const meta = require('./rule.js');
 
 let world = {};
+world.box = {};
 
 world.init = function () {
-    world.player = [];
-    world.time = 0;
-    world.connected = 0;
-    world.map = new Map();
-    world.logic = new Map();
-    world.cnMass = 0;
-    world.cnId = 0;
-    world.cnError = 1;
-    world.test = true;
-    world.error = "everything is fine";
-    world.testfail = false;
+    world.box.player = [];
+    world.box.time = 0;
+    world.box.connected = 0;
+    world.box.map = new Map();
+    world.box.logic = new Map();
+    world.box.cnMass = 0;
+    world.box.cnId = 0;
+    world.box.cnError = 1;
+    // world.box.test = true;
+    // world.box.error = "everything is fine";
+    // world.box.testfail = false;
 };
 
 function removefromMap(obj) {
@@ -28,8 +29,8 @@ function removefromMap(obj) {
 }
 
 function remove(k, obj) {
-    if (world.map.has(k)) {
-        let m = world.map.get(k);
+    if (world.box.map.has(k)) {
+        let m = world.box.map.get(k);
         for (let i in m) {
             if (obj === m[i]) {
                 m.splice(i, 1);
@@ -67,13 +68,13 @@ world.addPlayer = (key, socket, name, chatId) => {
         p.wound[a] = "life";
     }
     addtoMap(p.x, p.y, p);
-    world.player.push(p);
+    world.box.player.push(p);
     return p;
 };
 
 world.pickUp = (objTaker, tp) => {
     let k = objTaker.x + " " + objTaker.y;
-    for (let o of world.map.get(k)) {
+    for (let o of world.box.map.get(k)) {
         if (o.tp === tp) {
             world.put(o, objTaker);
         }
@@ -81,12 +82,12 @@ world.pickUp = (objTaker, tp) => {
 };
 
 function addtologic(obj, t) {
-    if (world.logic.has(t)) {
-        let i = world.logic.get(t);
+    if (world.box.logic.has(t)) {
+        let i = world.box.logic.get(t);
         i.push(obj);
-        world.logic.set(t, i);
+        world.box.logic.set(t, i);
     } else {
-        world.logic.set(t, [obj]);
+        world.box.logic.set(t, [obj]);
     }
     obj.nextTurn = t;
 }
@@ -141,12 +142,12 @@ function addtoMap(x, y, obj) {
 }
 
 function addto(k, obj) {
-    if (world.map.has(k)) {
-        let i = world.map.get(k);
+    if (world.box.map.has(k)) {
+        let i = world.box.map.get(k);
         i.push(obj);
-        world.map.set(k, i);
+        world.box.map.set(k, i);
     } else {
-        world.map.set(k, [obj]);
+        world.box.map.set(k, [obj]);
     }
 }
 
@@ -206,9 +207,9 @@ world.move = function (obj, dir) {
         // }
 
         // if (world.map.has(x + " " + y)) {
-        if (!_.any(world.map.get(x + " " + y), (e) => {
-                return e.tp.isSolid;
-            })) {
+        if (!_.any(world.box.map.get(x + " " + y), (e) => {
+            return e.tp.isSolid;
+        })) {
             relocate(obj, x, y);
         }
         // }
@@ -279,8 +280,8 @@ world.start = () => {
 };
 
 world.objArrInPoint = (x, y) => {
-    if (world.map.has(x + " " + y)) {
-        let obj = world.map.get(x + " " + y);
+    if (world.box.map.has(x + " " + y)) {
+        let obj = world.box.map.get(x + " " + y);
         if (obj.length > 0) {
             return obj;
         }
@@ -289,8 +290,8 @@ world.objArrInPoint = (x, y) => {
 };
 
 world.objArrInInv = (obj) => {
-    if (world.map.has(obj.id)) {
-        let arr = world.map.get(obj.id);
+    if (world.box.map.has(obj.id)) {
+        let arr = world.box.map.get(obj.id);
         if (arr.length > 0) {
             return arr;
         }
