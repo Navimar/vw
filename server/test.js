@@ -30,7 +30,7 @@ module.exports = () => {
     }
 
     fs.unlink('data/testlog.txt', (err) => {
-        if (err) throw err;
+        // if (err) throw err;
     });
     event.path = "data/testlog.txt";
 
@@ -122,17 +122,16 @@ module.exports = () => {
     test(user.isFriend(user.byId(1), user.byId(3)), false, "isNotFriend");
 
     event.bot({event: "/start", id: 10, username: "ivan"});
-    event.bot({event: "/start", id: 604944578
-        , username: "testovec"});
+    event.bot({event: "/start", id: 604944578, username: "testovec"});
     event.bot({event: "/friend", id: 604944578, words: ["/friend", "@ivan"]});
     event.bot({event: "/check", id: 604944578, words: ["/check", "@ivan"]});
     send.bot(604944578, "send.bot is working");
     // send.login(30626617);
     clean();
-    load('data/testlog.txt');
+    // load('data/testlog.txt');
     // test(user.isFriend(user.byId(1), user.byId(2)), true, "isFriend");
     // test(user.isFriend(user.byId(1), user.byId(3)), false, "isNotFriend");
-    clean();
+    // clean();
     event.path = 'data/log.txt';
 
     if (testFail) {

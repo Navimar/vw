@@ -4,14 +4,20 @@
 const input = require('./input');
 const test = require('./test');
 const load = require('./load');
-
-const event = require('./event');
+const fs = require('fs');
+// const event = require('./event');
 
 
 exports.main = function main(io) {
     test();
-    load();
-    // input.init();
+    fs.access('data/log.txt', fs.constants.F_OK, (err) => {
+        // console.log(`${path} ${err ? 'does not exist' : 'exists'}`);
+        if (err) {
+            input.init();
+        } else {
+            load();
+        }
+    });
     input.socket(io);
     input.bot();
     input.tick();

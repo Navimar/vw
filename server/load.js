@@ -4,13 +4,16 @@
 // const exe = require('./execute');
 // const user = require('./user');
 const read = require('./read');
+const readline = require('readline');
+const fs = require('fs');
 
 module.exports = (path) => {
     if (!path) {
         path = 'data/log.txt'
     }
-    const lineReader = require('readline').createInterface({
-        input: require('fs').createReadStream(path)
+
+    const lineReader = readline.createInterface({
+        input: fs.createReadStream(path)
     });
     lineReader.on('line', function (line) {
         let val = JSON.parse(line);

@@ -15,14 +15,14 @@ module.exports = event;
 
 
 
-// event.init = () => {
-//     let val = {
-//         event: 'init',
-//     };
-//     saveEvent(val);
-//     exe.onInit();
-//     send.web();
-// };
+event.init = () => {
+    let val = {
+        event: 'init',
+    };
+    saveEvent(val);
+    exe.onInit();
+    // send.web();
+};
 
 event.tick = (val) => {
     saveEvent(val);
