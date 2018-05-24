@@ -282,18 +282,26 @@ exe.onBotFriend = (val) => {
     let friend = user.byName(val.words[1].substr(1));
     if (friend) {
         user.makeFriend(user.byId(val.id), friend);
-        return(val.words[1] + " is your friend now");
+        return (val.words[1] + " is your friend now");
     } else {
-        return("User with name " + val.words[1] + " is not registered");
+        return ("User with name " + val.words[1] + " is not registered");
     }
 };
 
 exe.onBotCheck = (val) => {
-    if (user.isFriend(user.byId(val.id), user.byName(val.words[1].substr(1)))) {
-        send.bot(val.id, "you marked " + val.words[1] + " as your friend");
-    } else {
+    let way = user.findway(user.byId(val.id), user.byName(val.words[1].substr(1)));
+    let txt = "";
+    if (!way) {
         send.bot(val.id, val.words[1] + " is nobody");
+    } else {
+        for (let w of way) {
+            for (let person of w) {
+                txt += "@"+person.username + " => ";
+            }
+        }
+        txt += val.words[1];
     }
+    send.bot(val.id, txt);
 };
 
 module.exports = exe;

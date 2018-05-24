@@ -24,7 +24,7 @@ module.exports = () => {
         if (val === ok) {
             arrTest.push({status: "OK", text});
         } else {
-            arrTest.push({status: "ERROR!!!", text: text + ". value: " + val + ", expected: " + ok});
+            arrTest.push({status: "ERROR!!!", text: text + ". value: " + JSON.stringify(val) + ", expected: " + JSON.stringify(ok)});
             testFail = true;
         }
     }
@@ -125,6 +125,18 @@ module.exports = () => {
     event.bot({event: "/start", id: 604944578, username: "testovec"});
     event.bot({event: "/friend", id: 604944578, words: ["/friend", "@ivan"]});
     event.bot({event: "/check", id: 604944578, words: ["/check", "@ivan"]});
+    clean();
+    user.new("me", 1);
+    user.new("friend2", 2);
+    user.new("friend3", 3);
+    user.new("friend4", 4);
+    user.makeFriend(user.byId(1), user.byId(2));
+    test(user.findway(user.byId(1), user.byId(2))[0][0], user.byId(1), "findway2");
+    user.makeFriend(user.byId(2), user.byId(3));
+    test(user.findway(user.byId(1), user.byId(3))[0][1], user.byId(2), "findway3");
+    user.makeFriend(user.byId(3), user.byId(4));
+    test(user.findway(user.byId(1), user.byId(4))[0][2], user.byId(3), "findway4");
+
     send.bot(604944578, "send.bot is working");
     // send.login(30626617);
     clean();

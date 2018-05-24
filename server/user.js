@@ -13,6 +13,7 @@ user.init = () => {
 };
 
 user.new = (username, id,) => {
+    username = username.toLowerCase();
     user.list.push({
         key: sha(GenerateToken()),
         id,
@@ -72,6 +73,7 @@ user.byId = (id) => {
 };
 
 user.byName = (username) => {
+    username = username.toLowerCase();
     for (let u of user.list) {
         if (u.username == username) {
             return u;
@@ -91,7 +93,33 @@ user.isFriend = (me, person) => {
     }
     return false;
 };
-
+user.findway = (from, to) => {
+    let ways = [];
+    if (user.isFriend(from, to)) {
+        ways.push([from]);
+    } else {
+        for (let friend of from.friends) {
+            // console.log(tofriend);
+            if (user.isFriend(friend, to)) {
+                ways.push([from, friend]);
+            }
+        }
+        if (!ways.length) {
+            for (let friend of from.friends) {
+                for (let friendfriend of friend.friends) {
+                    if (user.isFriend(from, friend, friendfriend)) {
+                        ways.push([from, friend, friendfriend]);
+                    }
+                }
+            }
+        }
+    }
+    if (!ways.length) {
+return false;
+    } else {
+        return ways;
+    }
+};
 
 function GenerateToken(stringLength) {
     // set the length of the string

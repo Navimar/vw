@@ -4,18 +4,29 @@
 // const exe = require('./execute');
 // const user = require('./user');
 const read = require('./read');
-const readline = require('readline');
-const fs = require('fs');
+// const readline = require('readline');
+const readlinesync = require('read-each-line-sync');
+// const fs = require('fs');
+
+// module.exports = (path) => {
+//     if (!path) {
+//         path = 'data/log.txt'
+//     }
+//
+//     const lineReader = readline.createInterface({
+//         input: fs.createReadStream(path)
+//     });
+//     lineReader.on('line', function (line) {
+//         let val = JSON.parse(line);
+//         read(val.val);
+//     });
+// };
 
 module.exports = (path) => {
     if (!path) {
         path = 'data/log.txt'
     }
-
-    const lineReader = readline.createInterface({
-        input: fs.createReadStream(path)
-    });
-    lineReader.on('line', function (line) {
+    readlinesync(path, function (line) {
         let val = JSON.parse(line);
         read(val.val);
     });
