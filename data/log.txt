@@ -1,5 +1,2 @@
-{"val":{"event":"init"},"date":1527177322200}{"val":{"event":"/start","words":["/start"],"username":"Happycatfish","id":30626617},"date":1527178239850,"tick":81}
-{"val":{"event":"/start","words":["/start"],"username":"testovec","id":604944578},"date":1527178256229,"tick":164}
-{"val":{"event":"/friend","words":["/friend","@happycatfish"],"username":"testovec","id":604944578},"date":1527178284268,"tick":279}
-{"val":{"event":"/friend","words":["/friend","@maxjaja"],"username":"Happycatfish","id":30626617},"date":1527178692459,"tick":4071}
-{"val":{"event":"/friend","words":["/friend","@testovec"],"username":"Happycatfish","id":30626617},"date":1527178716227,"tick":237}
+{"val":{"event":"init"},"date":1527256662171}
+{"val":{"event":"/start","words":["/start"],"username":"Happycatfish","id":30626617},"date":1527257195278,"tick":125}

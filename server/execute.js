@@ -66,7 +66,7 @@ exe.onInit = () => {
 };
 exe.onTick = () => {
     let dtStartLoop = Date.now();
-    for (let p of world.box.player) {
+    for (let p of world.player) {
         if (p.tire <= 0) {
             switch (p.order.name) {
                 case "move":
@@ -146,7 +146,7 @@ exe.onTick = () => {
     }
 
     let m = 0;
-    let go = world.box.logic.get(world.box.time);
+    let go = world.logic.get(world.time);
     if (go != undefined) {
         for (let me of go) {
             if (me.tp.onTurn) {
@@ -155,57 +155,55 @@ exe.onTick = () => {
             }
             m++;
         }
+    }else{
+        // console.log('nobody is moving '+world.box.time);
     }
     world.cnActive = m;
-    world.box.logic.delete(world.time);
-    world.box.time++;
+    world.logic.delete(world.time);
+    world.time++;
     return dtStartLoop;
 };
-exe.onOrder = (socket, val) => {
-    for (let p of world.player) {
-        if (p.socket == socket) {
-            p.order = val.order;
-            p.targetx = val.targetx;
-            p.targety = val.targety;
-        }
-    }
-};
-
-// exe.onLoginBot = (val) => {
-//     token = user.setKey(val.msg.from.id);
-//     send.bot(val.msg.from.id, config.ip + ":" + config.port + "/?id=" + val.msg.from.id + "&key=" + token);
+// exe.onOrder = (user, val) => {
+//     user.order = val.order;
+//     user.targetx = val.targetx;
+//     user.targety = val.targety;
 // };
+
+exe.onLoginBot = (val) => {
+    token = user.setKey(val.msg.from.id);
+    send.bot(val.msg.from.id, config.ip + ":" + config.port + "/?id=" + val.msg.from.id + "&key=" + token);
+};
 //
 // exe.onNtdBot = (msg) => {
 //     login(msg);
 //     bot.sendMessage(msg.from.id, config.ip + ":" + config.port + "/ntd.html?key=" + token);
 // };
 
-exe.onNtdSave = (id, data) => {
-    let u = user.byId(id);
-    // console.log(u);
-    if (data.delete) {
-        // console.log('splice:');
-        // console.log(data);
-        for (let t in u.ntd) {
-            if (u.ntd[t].id == data.id) {
-                u.ntd.splice(t, 1);
-            }
-        }
-    } else {
-        if (data.update) {  //
-            // console.log('upd:');
-            // console.log(data);
-            for (let t in u.ntd) {
-                if (u.ntd[t].id == data.id) {
-                    u.ntd[t] = data;
-                }
-            }
-        }
-        else {
-            u.ntd.push(data);
-        }
-    }
+// exe.onNtdSave = (id, data) => {
+//     let u = user.byId(id);
+//     // console.log(u);
+//     if (data.delete) {
+//         // console.log('splice:');
+//         // console.log(data);
+//         for (let t in u.ntd) {
+//             if (u.ntd[t].id == data.id) {
+//                 u.ntd.splice(t, 1);
+//             }
+//         }
+//     } else {
+//         if (data.update) {  //
+//             // console.log('upd:');
+//             // console.log(data);
+//             for (let t in u.ntd) {
+//                 if (u.ntd[t].id == data.id) {
+//                     u.ntd[t] = data;
+//                 }
+//             }
+//         }
+//         else {
+//             u.ntd.push(data);
+//         }
+//     }
 
 // }
 //
@@ -221,10 +219,10 @@ exe.onNtdSave = (id, data) => {
 // if (fl) {
 //     val.socket.disconnect('unauthorized');
 // }
-}
-;
+// }
+// ;
 exe.apply = (dir, p) => {
-    let tool = world.box.map.get(p.id);
+    let tool = world.map.get(p.id);
     if (tool == undefined) {
         handTool();
     } else {
@@ -251,7 +249,7 @@ exe.apply = (dir, p) => {
 
     let x = p.x + dir.x;
     let y = p.y + dir.y;
-    let o = world.box.map.get(x + " " + y);
+    let o = world.map.get(x + " " + y);
     if (o && o.length > 0) {
         o.sort((a, b) => {
             return b.tp.z - a.tp.z;
@@ -269,9 +267,12 @@ exe.apply = (dir, p) => {
 };
 exe.connection = () => {
     world.connected++;
+    // user.player = (world.addPlayer()
+    //show player
 };
 exe.disconnect = () => {
     world.connected--;
+    //hide player
 };
 
 exe.onBotStart = (val) => {
@@ -296,7 +297,7 @@ exe.onBotCheck = (val) => {
     } else {
         for (let w of way) {
             for (let person of w) {
-                txt += "@"+person.username + " => ";
+                txt += "@" + person.username + " => ";
             }
         }
         txt += val.words[1];

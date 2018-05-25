@@ -1,3 +1,1 @@
-{"val":{"event":"/start","id":10,"username":"ivan"},"date":1527178231641}
-{"val":{"event":"/start","id":604944578,"username":"testovec"},"date":1527178231642}
-{"val":{"event":"/friend","id":604944578,"words":["/friend","@ivan"]},"date":1527178231642}
+{"val":{"event":"/start","id":30626617,"username":"happycatfish"},"date":1527271412849}

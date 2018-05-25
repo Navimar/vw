@@ -2,12 +2,9 @@
  * Created by igor on 14/02/2017.
  */
 const fs = require('fs');
-
-
 const exe = require('./execute');
 const user = require('./user');
 const send = require('./send');
-
 const event = {};
 
 let tick = 0;
@@ -61,6 +58,10 @@ event.bot = (val) => {
     }
 };
 
+event.login = (u,socket,pass) => {
+    user.login(u, socket, pass);
+};
+
 event.emit = (val) => {
     switch (val.event) {
         case 'connection':
@@ -70,9 +71,6 @@ event.emit = (val) => {
         case 'disconnect':
             saveEvent(val);
             exe.disconnect();
-            break;
-        case 'login':
-            user.login(val.msg.id, val.socket, val.msg.pass);
             break;
         // case 'ntd-load':
         //     for (let u of user.list) {
@@ -113,6 +111,7 @@ function saveEvent(val) {
             data.tick = tick;
             tick = 0;
         }
+        // console.log(data);
         fs.appendFile(event.path, JSON.stringify(data) + "\n", function (err) {
             if (err !== null) {
                 console.log(err);

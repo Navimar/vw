@@ -12,6 +12,7 @@ const event = require('./event');
 const send = require('./send');
 const user = require('./user');
 const load = require('./load');
+const handle = require('./handle');
 
 module.exports = () => {
     let testFail = false;
@@ -72,7 +73,7 @@ module.exports = () => {
     world.init("apply");
     let p = world.addPlayer();
     exe.apply(direction.right, p);
-    test(world.objArrInInv(p), false, "empty not get in inv");
+    test(world.objArrInInv(p), false, "empty doesn't get in inv");
 
     world.init("moveTo");
     let w = world.createObj(meta.wolf, -5, 0);
@@ -111,6 +112,7 @@ module.exports = () => {
     w.tp.onTurn(w.data, exe.wrapper(w));
     test(w.y, -3, "wolf goes down");
 
+    user.list=[];
 
     user.new("slon", 1);
     test(user.byId(1).id, 1, "userById");
@@ -121,11 +123,11 @@ module.exports = () => {
     test(user.isFriend(user.byId(1), user.byId(2)), true, "isFriend");
     test(user.isFriend(user.byId(1), user.byId(3)), false, "isNotFriend");
 
-    event.bot({event: "/start", id: 10, username: "ivan"});
-    event.bot({event: "/start", id: 604944578, username: "testovec"});
-    event.bot({event: "/friend", id: 604944578, words: ["/friend", "@ivan"]});
-    event.bot({event: "/check", id: 604944578, words: ["/check", "@ivan"]});
-    clean();
+    // event.bot({event: "/start", id: 10, username: "ivan"});
+    // event.bot({event: "/start", id: 604944578, username: "testovec"});
+    // event.bot({event: "/friend", id: 604944578, words: ["/friend", "@ivan"]});
+    // event.bot({event: "/check", id: 604944578, words: ["/check", "@ivan"]});
+    user.list=[];
     user.new("me", 1);
     user.new("friend2", 2);
     user.new("friend3", 3);
@@ -138,12 +140,11 @@ module.exports = () => {
     test(user.findway(user.byId(1), user.byId(4))[0][2], user.byId(3), "findway4");
 
     send.bot(604944578, "send.bot is working");
-    // send.login(30626617);
-    clean();
-    // load('data/testlog.txt');
-    // test(user.isFriend(user.byId(1), user.byId(2)), true, "isFriend");
-    // test(user.isFriend(user.byId(1), user.byId(3)), false, "isNotFriend");
-    // clean();
+    user.list=[];
+    event.bot({event: "/start", id: 30626617, username: "happycatfish"});
+    send.login(30626617);
+
+
     event.path = 'data/log.txt';
 
     if (testFail) {
@@ -162,7 +163,7 @@ module.exports = () => {
 
 };
 
-let clean = () => {
-    user.list = [];
-    world.box = {};
-};
+// let clean = () => {
+//     user.list = [];
+//     world.box = {};
+// };

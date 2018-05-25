@@ -3,9 +3,9 @@ const constSpeed = 0.0013;
 const login = {};
 login.pass = findGetParameter("key");
 login.id = findGetParameter("id");
-if (login.pass == "" || login.pass == undefined) {
-    login.pass = "demo";
-}
+// if (login.pass == "" || login.pass == undefined) {
+//     login.pass = "demo";
+// }
 // login.name = "game";
 
 
@@ -90,13 +90,13 @@ function initModel() {
     model.inv = [];
     for (let x = 0; x < 9; x++) {
         model.wound.push("bottle");
-        model.inv.push({img:"angel"});
+        model.inv.push({img: "angel"});
         model.holst[x] = [];
         for (let y = 0; y < 9; y++) {
             model.holst[x][y] = "grass";
         }
     }
-    model.obj = [{x:1,y:1,sx:5,sy:5,img:"test"}];
+    model.obj = [{x: 1, y: 1, sx: 5, sy: 5, img: "test"}];
     model.stamp = 1;
     model.trx = 0;
     model.try = 0;
@@ -146,7 +146,7 @@ function onServer(val) {
     model.error = val.error;
     model.time = val.time;
     model.cnActive = val.cnActive;
-    model.obj=val.obj;
+    model.obj = val.obj;
     // for (let v of val.obj) {
     //     let ok = true;
     //     for (let m of model.obj) {
@@ -236,8 +236,8 @@ function onStep(timeDiff) {
         // let m = move(o.sx, o.sy, o.x, o.y, r * constSpeed, timeDiff);
         // o.sx = m.x;
         // o.sy = m.y;
-        o.sx=o.x;
-        o.sy=o.y;
+        o.sx = o.x;
+        o.sy = o.y;
     }
     model.stamp -= timeDiff * constSpeed;
     if (model.stamp < 0) {

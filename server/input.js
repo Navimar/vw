@@ -1,6 +1,7 @@
 // const _ = require('underscore');
 const event = require('./event');
 const bot = require('./bot');
+const handle = require('./handle');
 
 const input = {};
 
@@ -22,40 +23,32 @@ input.tick = () => {
 };
 
 input.socket = (io) => {
-    function makeEvent(socket, eventName, message) {
-        let val = {};
-        val.socket = socket;
-        val.event = eventName;
-        val.msg = message;
-        event.emit(val);
-    }
 
     io.on('connection', function (socket) {
-        makeEvent(socket, 'connection');
+        handle.socket(socket, 'connection');
 
         socket.on('disconnect', function () {
-            makeEvent(socket, 'disconnect');
+            handle.socket(socket, 'disconnect');
         });
 
         socket.on('order', function (msg) {
-            // onOrder(socket, val);
-            makeEvent(socket, 'order', msg);
+            handle.socket(socket, 'order', msg);
 
         });
 
         socket.on('login', function (msg) {
-            makeEvent(socket, 'login', msg);
+            handle.socket(socket, 'login', msg);
 
         });
 
-        socket.on('ntd-load', function () {
-            makeEvent(socket, 'ntd-load');
-        });
+        // socket.on('ntd-load', function () {
+        //     handle.socket(socket, 'ntd-load');
+        // });
 
-        socket.on('ntd-save', function (msg) {
-            makeEvent(socket, 'ntd-save', msg);
-
-        });
+        // socket.on('ntd-save', function (msg) {
+        //     handle.socket(socket, 'ntd-save', msg);
+        //
+        // });
         socket.on('ping', function () {
             // console.log('ping');
             socket.emit('ping');

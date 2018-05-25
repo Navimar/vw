@@ -4,6 +4,7 @@
 const sha = require("sha256");
 
 // const config = require('./config');
+const world = require('./world');
 const user = {};
 
 // user.list = new Map;
@@ -19,49 +20,85 @@ user.new = (username, id,) => {
         id,
         username,
         friends: [],
-        hero: {x: 0, y: 0, img: "hero"}
+        // hero: {x: 0, y: 0, img: "hero"}
     });
 };
+// user.setKey = (id) => {
+//     const token = GenerateToken();
+//     let fl = true;
+//     for (let u of user.list) {
+//         if (u.id == id) {
+//             u.key = sha(token);
+//             fl = false;
+//             break;
+//         }
+//     }
+//     if (fl) {
+//         console.log(id);
+//         throw ('setkey');
+//     }
+//     return token;
+// };
+
 user.setKey = (id) => {
     const token = GenerateToken();
-    let fl = true;
-    for (let u of user.list) {
-        if (u.id == id) {
-            u.key = sha(token);
-            fl = false;
-            break;
-        }
-    }
-    if (fl) {
-        console.log(id);
-        throw ('setkey');
+    let u = user.byId(id);
+    if (u) {
+        u.key = sha(token);
+    } else {
+        throw 'can not setKey'
     }
     return token;
 };
 
-user.login = (id, socket, pass) => {
+// user.login = (id, socket, pass) => {
+//     socket.emit('login', onLogin());
+//
+//     function onLogin() {
+//         let key = sha(pass);
+//         for (let u of user.list) {
+//             if (key === u.key) {
+//                 u.socket = socket;
+//                 return ("succecs loged in " + id);
+//             }
+//         }
+//         return ("authentication error");
+//     }
+// };
+
+
+user.login = (user, socket, pass) => {
     socket.emit('login', onLogin());
 
     function onLogin() {
         let key = sha(pass);
-        for (let u of user.list) {
-            if (key === u.key) {
-                u.socket = socket;
-                return ("succecs loged in " + id);
+        if (user.key === key) {
+            let f = true;
+            for (let p of world.player) {
+                if (user.id === p.id) {
+                    p.socket = socket;
+                    f = false;
+                    break;
+                }
             }
+            if (f) {
+                world.addPlayer(socket, user.id);
+            }
+            return ("succecs loged in " + user.id);
         }
         return ("authentication error");
     }
 };
 
-user.bySocket = (socket) => {
-    for (let u of user.list) {
-        if (socket === u.socket) {
-            return u;
-        }
-    }
-    return false;
-};
+
+// user.bySocket = (socket) => {
+//     for (let u of user.list) {
+//         if (socket === u.socket) {
+//             return u;
+//         }
+//     }
+//     return false;
+// };
 
 user.byId = (id) => {
     for (let u of user.list) {
@@ -115,7 +152,7 @@ user.findway = (from, to) => {
         }
     }
     if (!ways.length) {
-return false;
+        return false;
     } else {
         return ways;
     }

@@ -4,17 +4,16 @@ const direction = util.dir;
 const meta = require('./rule.js');
 
 let world = {};
-world.box = {};
 
 world.init = function () {
-    world.box.player = [];
-    world.box.time = 0;
-    world.box.connected = 0;
-    world.box.map = new Map();
-    world.box.logic = new Map();
-    world.box.cnMass = 0;
-    world.box.cnId = 0;
-    world.box.cnError = 1;
+    world.player = [];
+    world.time = 0;
+    world.connected = 0;
+    world.map = new Map();
+    world.logic = new Map();
+    world.cnMass = 0;
+    world.cnId = 0;
+    world.cnError = 1;
     // world.box.test = true;
     // world.box.error = "everything is fine";
     // world.box.testfail = false;
@@ -29,8 +28,8 @@ function removefromMap(obj) {
 }
 
 function remove(k, obj) {
-    if (world.box.map.has(k)) {
-        let m = world.box.map.get(k);
+    if (world.map.has(k)) {
+        let m = world.map.get(k);
         for (let i in m) {
             if (obj === m[i]) {
                 m.splice(i, 1);
@@ -42,14 +41,38 @@ function remove(k, obj) {
 }
 
 
-world.addPlayer = (key, socket, name, chatId) => {
-    let p = {
-        socket,
-        name,
-        key,
-        chatId,
-        id: makeid()
-    };
+// world.addPlayer = (key, socket, name, chatId) => {
+//     let p = {
+//         socket,
+//         name,
+//         key,
+//         chatId,
+//         id: makeid()
+//     };
+//     p.x = 0;
+//     p.y = 0;
+//     p.solid = true;
+//     p.dirx = 0;
+//     p.diry = 0;
+//     p.order = "stop";
+//     p.order.n = 0;
+//     p.img = "hero";
+//     p.satiety = 1000;
+//     p.wound = [];
+//     p.tire = 0;
+//     p.tool = {typ: "hand"};
+//     p.slct = 0;
+//     p.tp = meta.player;
+//     for (let a = 0; a < 9; a++) {
+//         p.wound[a] = "life";
+//     }
+//     addtoMap(p.x, p.y, p);
+//     world.box.player.push(p);
+//     return p;
+// };
+
+world.addPlayer = (socket, id) => {
+    let p = {socket, id,};
     p.x = 0;
     p.y = 0;
     p.solid = true;
@@ -68,13 +91,13 @@ world.addPlayer = (key, socket, name, chatId) => {
         p.wound[a] = "life";
     }
     addtoMap(p.x, p.y, p);
-    world.box.player.push(p);
+    world.player.push(p);
     return p;
 };
 
 world.pickUp = (objTaker, tp) => {
     let k = objTaker.x + " " + objTaker.y;
-    for (let o of world.box.map.get(k)) {
+    for (let o of world.map.get(k)) {
         if (o.tp === tp) {
             world.put(o, objTaker);
         }
@@ -82,12 +105,12 @@ world.pickUp = (objTaker, tp) => {
 };
 
 function addtologic(obj, t) {
-    if (world.box.logic.has(t)) {
-        let i = world.box.logic.get(t);
+    if (world.logic.has(t)) {
+        let i = world.logic.get(t);
         i.push(obj);
-        world.box.logic.set(t, i);
+        world.logic.set(t, i);
     } else {
-        world.box.logic.set(t, [obj]);
+        world.logic.set(t, [obj]);
     }
     obj.nextTurn = t;
 }
@@ -142,12 +165,12 @@ function addtoMap(x, y, obj) {
 }
 
 function addto(k, obj) {
-    if (world.box.map.has(k)) {
-        let i = world.box.map.get(k);
+    if (world.map.has(k)) {
+        let i = world.map.get(k);
         i.push(obj);
-        world.box.map.set(k, i);
+        world.map.set(k, i);
     } else {
-        world.box.map.set(k, [obj]);
+        world.map.set(k, [obj]);
     }
 }
 
@@ -207,7 +230,7 @@ world.move = function (obj, dir) {
         // }
 
         // if (world.map.has(x + " " + y)) {
-        if (!_.any(world.box.map.get(x + " " + y), (e) => {
+        if (!_.any(world.map.get(x + " " + y), (e) => {
             return e.tp.isSolid;
         })) {
             relocate(obj, x, y);
@@ -280,8 +303,8 @@ world.start = () => {
 };
 
 world.objArrInPoint = (x, y) => {
-    if (world.box.map.has(x + " " + y)) {
-        let obj = world.box.map.get(x + " " + y);
+    if (world.map.has(x + " " + y)) {
+        let obj = world.map.get(x + " " + y);
         if (obj.length > 0) {
             return obj;
         }
@@ -290,8 +313,8 @@ world.objArrInPoint = (x, y) => {
 };
 
 world.objArrInInv = (obj) => {
-    if (world.box.map.has(obj.id)) {
-        let arr = world.box.map.get(obj.id);
+    if (world.map.has(obj.id)) {
+        let arr = world.map.get(obj.id);
         if (arr.length > 0) {
             return arr;
         }
