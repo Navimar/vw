@@ -81,7 +81,7 @@ world.addPlayer = (socket, id) => {
     p.order = "stop";
     p.order.n = 0;
     p.img = "hero";
-    p.satiety = 1000;
+    p.satiety = 100;
     p.wound = [];
     p.tire = 0;
     p.tool = {typ: "hand"};
@@ -94,7 +94,14 @@ world.addPlayer = (socket, id) => {
     world.player.push(p);
     return p;
 };
-
+world.playerBySocket = (socket) => {
+    for (let p of world.player){
+        if(p.socket==socket){
+            return p
+        }
+    }
+    return false;
+};
 world.pickUp = (objTaker, tp) => {
     let k = objTaker.x + " " + objTaker.y;
     for (let o of world.map.get(k)) {
@@ -249,7 +256,7 @@ world.addWound = (player, wound) => {
         }
     }
     if (ok) {
-        player.message = ("Вы погибли");
+        // player.message = ("Вы погибли");
     }
 };
 
@@ -287,19 +294,20 @@ world.transform = (obj, tp) => {
 };
 
 world.start = () => {
-    let wid = 20;
-    world.createObj(meta.test, 2, 2);
-    for (let a = 0; a < 25; a++) {
-        world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
+    let wid = 200;
+    // world.createObj(meta.test, 2, 2);
+    // for (let a = 0; a < 25; a++) {
+    //     world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
+    // }
+    for (let a = 0; a < 30000; a++) {
+        // world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
+        // world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
+        world.createObj(meta.plant, _.random(-wid, wid), _.random(-wid, wid));
     }
-    for (let a = 0; a < 300; a++) {
-        world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
-        world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
-    }
-    for (let a = 0; a < 50; a++) {
-        world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));
-
-    }
+    // for (let a = 0; a < 50; a++) {
+    //     world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));
+    //
+    // }
 };
 
 world.objArrInPoint = (x, y) => {

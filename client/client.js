@@ -25,17 +25,17 @@ let status = {server: 0};
 
 window.onload = function () {
     //inputMouse();
+
     test();
     // sleep(1000);
+    initModel();
+    step(new Date().getTime());
     inputServer();
 };
 
 let test = () => {
-    // let val = 'test';
-    // console.log('login ' + val);
-    // alert('login ' + val);
     initModel();
-    step(new Date().getTime());
+
 };
 //
 // function inputMouse() {
@@ -186,7 +186,7 @@ function onServer(val) {
     model.px = val.px;
     model.py = val.py;
 
-    if (model.targetx == val.px && model.targety == val.py) {
+    if (model.targetx == model.px && model.targety == model.py) {
         if (model.order.name == "move")
             model.order.name = "stop";
         model.order.val = 0;
@@ -224,7 +224,7 @@ function onStep(timeDiff) {
         //         default:
         //             break;
         //     }
-        // console.log(o.name);
+        // // console.log(o.name);
         // }
         let r = range(o.sx, o.sy, o.x, o.y);
         if (r < 1) {
@@ -259,7 +259,8 @@ function onStep(timeDiff) {
 function out() {
     model.date = new Date().getTime();
     socket.emit("ping");
-    let send = {order: model.order, targetx: model.targetx, targety: model.targety};
+    // let send= {order: model.order, targetx: model.targetx, targety: model.targety};
+    let send = model.order;
     socket.emit("order", send);
 }
 
@@ -290,6 +291,7 @@ function render(model) {
             // }
         }
     }
+    renderTarget();
     for (let o of model.obj) {
         drawImg(o.img, o.sx, o.sy);
         // drawImg(o.img, o.x, o.y);
@@ -313,9 +315,19 @@ function render(model) {
         drawImg(i.img, -1, itma);
         itma++;
     }
-    // for (let bag = itma; bag < 9; bag++) {
-    //     drawImg("slot", -1, bag);
-    // }
+    for (let bag = itma; bag < 9; bag++) {
+        drawImg("slot", -1, bag);
+    }
+    let y = 0;
+    for (let o of model.obj) {
+        if (o.x === 4 && o.y === 4) {
+            if (o.img !== 'hero') {
+                drawImg(o.img, -2, y);
+                y++;
+            }
+        }
+    }
+
     // drawImg("select", -1, model.selected);
     //
     //
@@ -323,6 +335,13 @@ function render(model) {
     //     // drawImg("from", o.x, o.y);
     // }
     //
+
+
+    // // if (model.hand != "hand") drawSize(model.hand.img, 4.25, 4.25,0.6,0.6);
+    // if (model.message != model.lastmessage) message(model.message);
+}
+
+let renderTarget = () => {
     let ex = 0;
     let ey = 0;
     switch (model.order.val) {
@@ -342,9 +361,7 @@ function render(model) {
             break;
     }
     drawImg("from", 4 + ex, 4 + ey);
-    // // if (model.hand != "hand") drawSize(model.hand.img, 4.25, 4.25,0.6,0.6);
-    // if (model.message != model.lastmessage) message(model.message);
-}
+};
 
 function onKeydown(key) {
     if (!_.isFinite(model.targetx) || !_.isFinite(model.targety)) {

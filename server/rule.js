@@ -30,7 +30,7 @@ meta.wolf = {
     isSolid: true,
     onTurn: (data, wd) => {
         let t = wd.find(meta.player);
-        if(t) {
+        if (t) {
             wd.moveTo(t.x, t.y);
         }
         // wd.moveTo(0,0);
@@ -56,7 +56,6 @@ meta.tree = {
     z: 20,
     img: "tree",
     isSolid: true,
-
 };
 
 meta.box = {
@@ -72,7 +71,7 @@ meta.box = {
 meta.jelly = {
     z: 5,
     img: "jelly",
-    onCreate(data){
+    onCreate(data) {
         data.new = true;
     },
     onTurn: (data, wd) => {
@@ -100,7 +99,7 @@ meta.aphid = {
         else return "aphid";
     },
     isSolid: true,
-    onCreate(data){
+    onCreate(data) {
         data.satiety = 70;
         data.sat = false;
     },
@@ -134,4 +133,23 @@ meta.aphid = {
     }
 };
 
+meta.plant = {
+    z: 15,
+    img: 'fruit',
+    isSolid: false,
+    onCreate(data) {
+        data.new = true;
+    },
+    onTurn: (data, wd) => {
+        if (data.new) {
+            data.new = false;
+            wd.nextTurn(3500);
+        } else {
+            wd.transform(wd.me, meta.orange);
+        }
+    },
+};
+meta.orange = {
+    img: 'orange',
+};
 module.exports = meta;

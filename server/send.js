@@ -18,8 +18,9 @@ send.web = () => {
             inv: []
         };
         for (let x = 0; x < 9; x++) {
-            //     data.holst[x] = [];
-            //     data.wound.push(theUser.wound[x]);
+                // data.holst[x] = [];
+                data.wound.push(p.wound[x]);
+                // console.log(p.wound[x]);
             for (let y = 0; y < 9; y++) {
                 //         data.holst[x][y] = [];
                 let key = p.x + x - 4 + " ";
@@ -37,18 +38,18 @@ send.web = () => {
             }
         }
 
-        //     // if (world.map.has(theUser.id)) {
-        //     //     for (let i of world.map.get(theUser.id)) {
-        //     //         let img =
-        //     //             _.isFunction(i.tp.img) ?
-        //     //                 i.tp.img(i.data)
-        //     //                 :
-        //     //                 i.tp.img;
-        //     //         data.inv.push({img, id: i.id});
-        //     //     }
-        //     // }
-        //     // data.px = theUser.x;
-        //     // data.py = theUser.y;
+            if (world.map.has(p.id)) {
+                for (let i of world.map.get(p.id)) {
+                    let img =
+                        _.isFunction(i.tp.img) ?
+                            i.tp.img(i.data)
+                            :
+                            i.tp.img;
+                    data.inv.push({img, id: i.id});
+                }
+            }
+            data.px = p.x;
+            data.py = p.y;
         //     // data.dirx = theUser.dirx;
         //     // data.diry = theUser.diry;
         //     // data.hand = theUser.hand;

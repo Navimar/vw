@@ -68,6 +68,7 @@ exe.onTick = () => {
     let dtStartLoop = Date.now();
     for (let p of world.player) {
         if (p.tire <= 0) {
+            // console.log()
             switch (p.order.name) {
                 case "move":
                     if (p.order.val == "up") {
@@ -139,9 +140,11 @@ exe.onTick = () => {
             p.tire -= 1;
         }
         p.satiety--;
+        // console.log(p.satiety);
         if (p.satiety <= 0) {
             p.satiety = 1000;
             world.addWound(p, "hungry");
+            // console.log(p.wound[0]);
         }
     }
 

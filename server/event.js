@@ -11,7 +11,6 @@ let tick = 0;
 module.exports = event;
 
 
-
 event.init = () => {
     let val = {
         event: 'init',
@@ -58,8 +57,12 @@ event.bot = (val) => {
     }
 };
 
-event.login = (u,socket,pass) => {
+event.login = (u, socket, pass) => {
     user.login(u, socket, pass);
+};
+
+event.order = (p, order) => {
+    p.order = order;
 };
 
 event.emit = (val) => {

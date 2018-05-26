@@ -111,6 +111,16 @@ module.exports = () => {
     w = world.createObj(meta.wolf, 0, -4);
     w.tp.onTurn(w.data, exe.wrapper(w));
     test(w.y, -3, "wolf goes down");
+    world.init();
+    p =  world.addPlayer();
+    world.addWound(p,'hungry');
+    test(p.wound[0],'hungry','worldAddWound');
+    world.init();
+    p =  world.addPlayer();
+    for(let i =0;i<500;i++){
+        exe.onTick();
+    }
+    test(p.wound[3],'hungry','hungry after time');
 
     user.list=[];
 

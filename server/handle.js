@@ -1,6 +1,7 @@
 const event = require('./event');
 const user = require('./user');
 const exe = require('./execute');
+const world = require('./world');
 
 let handle = {};
 
@@ -11,11 +12,12 @@ handle.socket = (socket, eventName, msg) => {
         event.login(u, socket, msg.pass);
     }
     if (eventName == 'connection') {
-       // let u = user.bySocket(socket);
-       // exe.connection(u);
+        // let u = user.bySocket(socket);
+        // exe.connection(u);
     }
     if (eventName == 'order') {
-
+        let p = world.playerBySocket(socket);
+        event.order(p, {name: msg.name, val: msg.val})
     }
 
     // let val = {};
