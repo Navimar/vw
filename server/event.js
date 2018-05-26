@@ -62,7 +62,9 @@ event.login = (u, socket, pass) => {
 };
 
 event.order = (p, order) => {
-    p.order = order;
+    if (order.name = "move") {
+        p.order = order;
+    }
 };
 
 event.emit = (val) => {

@@ -296,13 +296,20 @@ world.transform = (obj, tp) => {
 world.start = () => {
     let wid = 200;
     // world.createObj(meta.test, 2, 2);
-    // for (let a = 0; a < 25; a++) {
-    //     world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
-    // }
-    for (let a = 0; a < 30000; a++) {
+    for (let a = 0; a < 10000; a++) {
+        // world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
+    world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
+
+    }
+    for (let a = 0; a < 50000; a++) {
         // world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
-        // world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
         world.createObj(meta.plant, _.random(-wid, wid), _.random(-wid, wid));
+    }
+    for (let a = 0; a < 200000; a++) {
+        world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
+        // world.createObj(meta.kaka, _.random(-wid, wid), _.random(-wid, wid));
+        // world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
+        world.createObj(meta.orange, _.random(-wid, wid), _.random(-wid, wid));
     }
     // for (let a = 0; a < 50; a++) {
     //     world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));

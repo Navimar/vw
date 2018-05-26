@@ -93,35 +93,11 @@ exe.onTick = () => {
                     }
                     break;
                 case "use":
-                    if (p.order.val == "up") {
-                        apply(direction.up, p);
-                        p.tire = 7;
-                        p.dirx = 0;
-                        p.diry = 0;
-                    }
-                    if (p.order.val == "right") {
-                        apply(direction.right, p);
-                        p.tire = 7;
-                        p.dirx = 0;
-                        p.diry = 0;
-                    }
-                    if (p.order.val == "left") {
-                        apply(direction.left, p);
-                        p.tire = 7;
-                        p.dirx = 0;
-                        p.diry = 0;
-                    }
-                    if (p.order.val == "down") {
-                        apply(direction.down, p);
-                        p.tire = 7;
-                        p.dirx = 0;
-                        p.diry = 0;
-                    }
-                    if (p.order.val == "here") {
-                        apply(direction.here, p);
-                        p.tire = 7;
-                        p.dirx = 0;
-                        p.diry = 0;
+                    let tool = p.order.tool;
+                    if (_.isFunction(tool.tp.onApply)) {
+                        tool.tp.onApply(p.order.target, exe.wrapper(tool));
+                    } else {
+                        console.log("can not apply " + JSON.stringify(tool.tp));
                     }
                     break;
                 default:
@@ -158,7 +134,7 @@ exe.onTick = () => {
             }
             m++;
         }
-    }else{
+    } else {
         // console.log('nobody is moving '+world.box.time);
     }
     world.cnActive = m;
@@ -224,50 +200,50 @@ exe.onLoginBot = (val) => {
 // }
 // }
 // ;
-exe.apply = (dir, p) => {
-    let tool = world.map.get(p.id);
-    if (tool == undefined) {
-        handTool();
-    } else {
-        tool = tool[p.order.n - 1];
-        if (tool == undefined) {
-            handTool();
-        }
-    }
-
-    function handTool() {
-        tool = {};
-        tool.tp = {
-            onApply: (obj, wd) => {
-                switch (obj.tp) {
-                    case "space":
-                        break;
-                    default:
-                        world.put(obj, p);
-                        break;
-                }
-            }
-        }
-    }
-
-    let x = p.x + dir.x;
-    let y = p.y + dir.y;
-    let o = world.map.get(x + " " + y);
-    if (o && o.length > 0) {
-        o.sort((a, b) => {
-            return b.tp.z - a.tp.z;
-        });
-        if (_.isFunction(tool.tp.onApply)) {
-            return tool.tp.onApply(o[0], exe.wrapper(tool));
-        }
-    } else {
-        if (_.isFunction(tool.tp.onApply)) {
-            return tool.tp.onApply({tp: "space", x, y}, exe.wrapper(tool));
-        } else {
-            return wrapper(tool).getOut(x, y);
-        }
-    }
-};
+// exe.apply = (dir, p) => {
+//     let tool = world.map.get(p.id);
+//     if (tool == undefined) {
+//         handTool();
+//     } else {
+//         tool = tool[p.order.n - 1];
+//         if (tool == undefined) {
+//             handTool();
+//         }
+//     }
+//
+//     function handTool() {
+//         tool = {};
+//         tool.tp = {
+//             onApply: (obj, wd) => {
+//                 switch (obj.tp) {
+//                     case "space":
+//                         break;
+//                     default:
+//                         world.put(obj, p);
+//                         break;
+//                 }
+//             }
+//         }
+//     }
+//
+//     let x = p.x + dir.x;
+//     let y = p.y + dir.y;
+//     let o = world.map.get(x + " " + y);
+//     if (o && o.length > 0) {
+//         o.sort((a, b) => {
+//             return b.tp.z - a.tp.z;
+//         });
+//         if (_.isFunction(tool.tp.onApply)) {
+//             return tool.tp.onApply(o[0], exe.wrapper(tool));
+//         }
+//     } else {
+//         if (_.isFunction(tool.tp.onApply)) {
+//             return tool.tp.onApply({tp: "space", x, y}, exe.wrapper(tool));
+//         } else {
+//             return wrapper(tool).getOut(x, y);
+//         }
+//     }
+// };
 exe.connection = () => {
     world.connected++;
     // user.player = (world.addPlayer()

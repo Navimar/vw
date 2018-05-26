@@ -151,5 +151,12 @@ meta.plant = {
 };
 meta.orange = {
     img: 'orange',
+    onApply: (obj, wd) => {
+        if (obj.tp.player) {
+            wd.trade(obj);
+            wd.transform(wd.me, meta.kaka);
+            wd.removeWound(obj, "hungry");
+        }
+    },
 };
 module.exports = meta;

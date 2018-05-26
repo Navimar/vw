@@ -6,6 +6,7 @@ const user = require('./user');
 const bot = require('./bot');
 const world = require('./world');
 const config = require('./config');
+const meta = require('./rule');
 
 const send = {};
 
@@ -15,12 +16,13 @@ send.web = () => {
             holst: [],
             obj: [],
             wound: [],
-            inv: []
+            inv: [],
+            ground: []
         };
         for (let x = 0; x < 9; x++) {
-                // data.holst[x] = [];
-                data.wound.push(p.wound[x]);
-                // console.log(p.wound[x]);
+            // data.holst[x] = [];
+            data.wound.push(p.wound[x]);
+            // console.log(p.wound[x]);
             for (let y = 0; y < 9; y++) {
                 //         data.holst[x][y] = [];
                 let key = p.x + x - 4 + " ";
@@ -33,23 +35,26 @@ send.web = () => {
                                 :
                                 r.tp.img;
                         data.obj.push({x: x, y: y, img, id: r.id});
+                        if (x === 4 && y === 4 && r.tp !== meta.player) {
+                            data.ground.push({img, id: r.id})
+                        }
                     }
                 }
             }
         }
 
-            if (world.map.has(p.id)) {
-                for (let i of world.map.get(p.id)) {
-                    let img =
-                        _.isFunction(i.tp.img) ?
-                            i.tp.img(i.data)
-                            :
-                            i.tp.img;
-                    data.inv.push({img, id: i.id});
-                }
+        if (world.map.has(p.id)) {
+            for (let i of world.map.get(p.id)) {
+                let img =
+                    _.isFunction(i.tp.img) ?
+                        i.tp.img(i.data)
+                        :
+                        i.tp.img;
+                data.inv.push({img, id: i.id});
             }
-            data.px = p.x;
-            data.py = p.y;
+        }
+        data.px = p.x;
+        data.py = p.y;
         //     // data.dirx = theUser.dirx;
         //     // data.diry = theUser.diry;
         //     // data.hand = theUser.hand;
@@ -59,7 +64,7 @@ send.web = () => {
         //     // data.cnActive = world.cnActive;
         //     // data.error = world.error;
         //     // data.connected = world.connected;
-            data.time = world.time;
+        data.time = world.time;
         //     // // send.dirx = p.dirx;
         //     // // send.diry = p.diry;
         p.socket.emit('updateState', data);

@@ -11,6 +11,11 @@ login.id = findGetParameter("id");
 
 let model = {};
 let status = {server: 0};
+let click = {x:0,y:0};
+let mouseDown ={x:0,y:0};
+let mousePos ={x:0,y:0};
+let mouseCell ={x:0,y:0};
+let inAir='orange';
 
 // function Pt(x, y) {
 //     if (!_.isFinite(x)) throw "x invalid";
@@ -24,7 +29,7 @@ let status = {server: 0};
 // };
 
 window.onload = function () {
-    //inputMouse();
+    inputMouse();
 
     test();
     // sleep(1000);
@@ -35,26 +40,28 @@ window.onload = function () {
 
 let test = () => {
     initModel();
-
 };
-//
-// function inputMouse() {
-//     function updOrder(e) {
-//         input.mousePos = getMousePos(canvas, e);
-//         if (input.mouseDown) input.order = input.mousePos;
-//     }
-//
-//     canvas.addEventListener("mousedown", e => {
-//         input.mouseDown = true;
-//         updOrder(e);
-//     }, false);
-//     canvas.addEventListener("mouseup", e => {
-//         input.mouseDown = false;
-//     }, false);
-//     canvas.addEventListener("mousemove", e => {
-//         updOrder(e);
-//     }, false);
-// }
+
+function inputMouse() {
+    function updOrder(e) {
+        mousePos = getMousePos(canvas, e);
+        mouseCell = {x:Math.floor((mousePos.x-shiftX)/dh), y:Math.floor(mousePos.y/dh)};
+
+        if (mouseDown) click = mousePos;
+        // console.log(click);
+    }
+
+    canvas.addEventListener("mousedown", e => {
+        mouseDown = true;
+        updOrder(e);
+    }, false);
+    canvas.addEventListener("mouseup", e => {
+        mouseDown = false;
+    }, false);
+    canvas.addEventListener("mousemove", e => {
+        updOrder(e);
+    }, false);
+}
 
 function inputServer() {
     socket.on('connect', function () {
@@ -88,6 +95,7 @@ function initModel() {
     model.holst = [];
     model.wound = [];
     model.inv = [];
+    model.ground=[];
     for (let x = 0; x < 9; x++) {
         model.wound.push("bottle");
         model.inv.push({img: "angel"});
@@ -147,6 +155,7 @@ function onServer(val) {
     model.time = val.time;
     model.cnActive = val.cnActive;
     model.obj = val.obj;
+    model.ground = val.ground;
     // for (let v of val.obj) {
     //     let ok = true;
     //     for (let m of model.obj) {
@@ -281,7 +290,7 @@ function move(fx, fy, tx, ty, speed, timeDiff) {
 
 function render(model) {
     resize();
-    $("#ping").html("status.server: " + status.server + "</br> Пинг: " + model.ping + "</br>Расчет: " + model.delay + "</br> Ходит: " + model.cnActive + "</br> x: " + model.px + "</br> y: " + model.py + "</br> Игроков: " + model.connected + "</br> Err: " + model.error + "</br> Клиент: " + (Date.now() - model.dtStartLoop + "</br> Время: " + model.time));
+    renderStatus();
     for (let y = -1; y < 10; y++) {
         for (let x = -1; x < 10; x++) {
             // drawImg("grass", x + model.trx, y + model.try);
@@ -318,17 +327,23 @@ function render(model) {
     for (let bag = itma; bag < 9; bag++) {
         drawImg("slot", -1, bag);
     }
-    let y = 0;
-    for (let o of model.obj) {
-        if (o.x === 4 && o.y === 4) {
-            if (o.img !== 'hero') {
-                drawImg(o.img, -2, y);
-                y++;
-            }
-        }
+    //
+    for (let i in model.ground) {
+        drawImg(model.ground[i].img, -2, i);
     }
 
-    // drawImg("select", -1, model.selected);
+    // let y = 0;
+    // for (let o of model.obj) {
+    //     if (o.x === 4 && o.y === 4) {
+    //         if (o.img !== 'hero') {
+    //             drawImg(o.img, -2, y);
+    //             y++;
+    //         }
+    //     }
+    // }
+
+    drawImg(inAir, (mousePos.x-shiftX)/dh-0.5, mousePos.y/dh-0.5);
+    drawImg("select", mouseCell.x, mouseCell.y);
     //
     //
     // for (let o of model.obj) {
@@ -340,6 +355,24 @@ function render(model) {
     // // if (model.hand != "hand") drawSize(model.hand.img, 4.25, 4.25,0.6,0.6);
     // if (model.message != model.lastmessage) message(model.message);
 }
+
+let renderStatus = () => {
+    let str = "status.server: " + status.server + "</br>";
+    str += "Пинг: " + model.ping + "</br>";
+    str += "Расчет: " + model.delay + "</br>";
+    str += "Ходит: " + model.cnActive + "</br>";
+    str += "x: " + model.px + "</br>";
+    str += "y: " + model.py + "</br>";
+    str += "Игроков: " + model.connected + "</br>";
+    str += "Err: " + model.error + "</br>";
+    str += "Клиент: " + (Date.now() - model.dtStartLoop) + "</br>";
+    str += "Время: " + model.time + "</br>";
+    str += "ClickX: " + click.x + "</br>";
+    str += "ClickY: " + click.y + "</br>";
+    str += "mouseCellX: " + mouseCell.x + "</br>";
+    str += "mouseCellY: " + mouseCell.y + "</br>";
+    $("#ping").html(str);
+};
 
 let renderTarget = () => {
     let ex = 0;
@@ -453,19 +486,10 @@ function onKeyup(key) {
     model.keyup = true;
 }
 
-// function getMousePos(canvas, evt) {
-//     let rect = canvas.getBoundingClientRect();
-//     return new Pt(
-//         evt.clientX - rect.left,
-//         evt.clientY - rect.top
-//     );
-// }
-
-// function onTestFail(val) {
-//     let $body = $('body');
-//     $body.html('');
-//     val.forEach((item, i, arr) => {
-//         $body.append(item);
-//         $body.append("<br>");
-//     });
-// }
+function getMousePos(canvas, evt) {
+    let rect = canvas.getBoundingClientRect();
+    return {
+        x: evt.clientX - rect.left,
+        y: evt.clientY - rect.top
+    }
+}

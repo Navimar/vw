@@ -25,7 +25,10 @@ module.exports = () => {
         if (val === ok) {
             arrTest.push({status: "OK", text});
         } else {
-            arrTest.push({status: "ERROR!!!", text: text + ". value: " + JSON.stringify(val) + ", expected: " + JSON.stringify(ok)});
+            arrTest.push({
+                status: "ERROR!!!",
+                text: text + ". value: " + JSON.stringify(val) + ", expected: " + JSON.stringify(ok)
+            });
             testFail = true;
         }
     }
@@ -70,10 +73,10 @@ module.exports = () => {
     world.init();
     test(world.find(meta.test, 2, 2), false, "find nobody");
 
-    world.init("apply");
-    let p = world.addPlayer();
-    exe.apply(direction.right, p);
-    test(world.objArrInInv(p), false, "empty doesn't get in inv");
+    // world.init("apply");
+    // let p = world.addPlayer();
+    // exe.apply(direction.right, p);
+    // test(world.objArrInInv(p), false, "empty doesn't get in inv");
 
     world.init("moveTo");
     let w = world.createObj(meta.wolf, -5, 0);
@@ -112,17 +115,33 @@ module.exports = () => {
     w.tp.onTurn(w.data, exe.wrapper(w));
     test(w.y, -3, "wolf goes down");
     world.init();
-    p =  world.addPlayer();
-    world.addWound(p,'hungry');
-    test(p.wound[0],'hungry','worldAddWound');
+    p = world.addPlayer();
+    world.addWound(p, 'hungry');
+    test(p.wound[0], 'hungry', 'worldAddWound');
     world.init();
-    p =  world.addPlayer();
-    for(let i =0;i<500;i++){
+    p = world.addPlayer();
+    for (let i = 0; i < 5000; i++) {
         exe.onTick();
     }
-    test(p.wound[3],'hungry','hungry after time');
+    test(p.wound[3], 'hungry', 'hungry after time');
 
-    user.list=[];
+    world.init();
+    p = world.addPlayer();
+    let orange = world.createObj(meta.orange, 0, 0);
+    world.addWound(p, 'hungry');
+    p.order = {name: 'use', tool: orange, target: p};
+    exe.onTick();
+    test(p.wound[0], 'life', 'applyOnMyself');
+    world.init();
+    p = world.addPlayer();
+    world.createObj(meta.orange, 0, 0);
+    world.addWound(p, 'hungry');
+    event.order(p, {name: 'use', val: {from: "ground", num: 0, targetX: 0, targetY: 0}});
+    exe.onTick();
+    test(p.wound[0], 'life', 'applyOnMyselfFromGroundEvent');
+
+
+    user.list = [];
 
     user.new("slon", 1);
     test(user.byId(1).id, 1, "userById");
@@ -137,7 +156,7 @@ module.exports = () => {
     // event.bot({event: "/start", id: 604944578, username: "testovec"});
     // event.bot({event: "/friend", id: 604944578, words: ["/friend", "@ivan"]});
     // event.bot({event: "/check", id: 604944578, words: ["/check", "@ivan"]});
-    user.list=[];
+    user.list = [];
     user.new("me", 1);
     user.new("friend2", 2);
     user.new("friend3", 3);
@@ -150,7 +169,7 @@ module.exports = () => {
     test(user.findway(user.byId(1), user.byId(4))[0][2], user.byId(3), "findway4");
 
     send.bot(604944578, "send.bot is working");
-    user.list=[];
+    user.list = [];
     event.bot({event: "/start", id: 30626617, username: "happycatfish"});
     send.login(30626617);
 
