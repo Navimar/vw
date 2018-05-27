@@ -11,11 +11,11 @@ login.id = findGetParameter("id");
 
 let model = {};
 let status = {server: 0};
-let click = {x:0,y:0};
-let mouseDown ={x:0,y:0};
-let mousePos ={x:0,y:0};
-let mouseCell ={x:0,y:0};
-let inAir='orange';
+let click = {x: 0, y: 0};
+let mouseDown = {x: 0, y: 0};
+let mousePos = {x: 0, y: 0};
+let mouseCell = {x: 0, y: 0};
+let inAir = false;
 
 // function Pt(x, y) {
 //     if (!_.isFinite(x)) throw "x invalid";
@@ -45,18 +45,23 @@ let test = () => {
 function inputMouse() {
     function updOrder(e) {
         mousePos = getMousePos(canvas, e);
-        mouseCell = {x:Math.floor((mousePos.x-shiftX)/dh), y:Math.floor(mousePos.y/dh)};
+        mouseCell = {x: Math.floor((mousePos.x - shiftX) / dh), y: Math.floor(mousePos.y / dh)};
 
-        if (mouseDown) click = mousePos;
+        if (mouseDown)
+            click = mousePos;
+
         // console.log(click);
     }
 
     canvas.addEventListener("mousedown", e => {
         mouseDown = true;
+        onMouseDown();
         updOrder(e);
     }, false);
     canvas.addEventListener("mouseup", e => {
         mouseDown = false;
+        onMouseUp();
+        updOrder(e);
     }, false);
     canvas.addEventListener("mousemove", e => {
         updOrder(e);
@@ -86,7 +91,7 @@ function inputServer() {
 
 function onLogin(val) {
     console.log('login ' + val);
-    alert('login ' + val);
+    // alert('login ' + val);
     initModel();
     step(new Date().getTime());
 }
@@ -95,7 +100,7 @@ function initModel() {
     model.holst = [];
     model.wound = [];
     model.inv = [];
-    model.ground=[];
+    model.ground = [];
     for (let x = 0; x < 9; x++) {
         model.wound.push("bottle");
         model.inv.push({img: "angel"});
@@ -146,7 +151,7 @@ function onServer(val) {
     model.diry = val.diry;
     model.wound = val.wound;
     model.message = val.message;
-    model.hand = val.hand;
+    // model.hand = val.hand;
     model.inv = val.inv;
     model.delay = val.delay;
     model.cnMass = val.cnMass;
@@ -318,8 +323,7 @@ function render(model) {
     for (let l = 0; l < 9; l++) {
         drawImg(model.wound[l], 9, l);
     }
-    drawImg("hand", -1, 0);
-    let itma = 1;
+    let itma = 0;
     for (let i of model.inv) {
         drawImg(i.img, -1, itma);
         itma++;
@@ -342,7 +346,9 @@ function render(model) {
     //     }
     // }
 
-    drawImg(inAir, (mousePos.x-shiftX)/dh-0.5, mousePos.y/dh-0.5);
+    if (mouseDown && inAir) {
+        drawImg(inAir.obj.img, (mousePos.x - shiftX) / dh - 0.5, mousePos.y / dh - 0.5);
+    }
     drawImg("select", mouseCell.x, mouseCell.y);
     //
     //
@@ -395,6 +401,27 @@ let renderTarget = () => {
     }
     drawImg("from", 4 + ex, 4 + ey);
 };
+
+function onMouseDown() {
+    console.log('mouseDown');
+    if (mouseCell.x === -2) {
+        inAir = {from: 'ground', obj: model.ground[mouseCell.y]};
+    }
+}
+
+function onMouseUp() {
+    if (mouseCell.x === -1 && inAir.from === 'ground') {
+        // alert('take ' + inAir.obj.id + " " + inAir.obj.img);
+        model.order = {
+            name: 'take',
+            val: inAir.obj
+        }
+    }
+    // console.log(inAir.obj);
+    inAir = false;
+    out();
+}
+
 
 function onKeydown(key) {
     if (!_.isFinite(model.targetx) || !_.isFinite(model.targety)) {

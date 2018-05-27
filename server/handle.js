@@ -17,6 +17,7 @@ handle.socket = (socket, eventName, msg) => {
     }
     if (eventName == 'order') {
         let p = world.playerBySocket(socket);
+        // console.log(msg.val);
         event.order(p, {name: msg.name, val: msg.val})
     }
 

@@ -139,6 +139,12 @@ module.exports = () => {
     event.order(p, {name: 'use', val: {from: "ground", num: 0, targetX: 0, targetY: 0}});
     exe.onTick();
     test(p.wound[0], 'life', 'applyOnMyselfFromGroundEvent');
+    world.init();
+    p = world.addPlayer();
+    o = world.createObj(meta.orange, 0, 0);
+    event.order(p, {name: 'take', val: {id: o.id}});
+    exe.onTick();
+    test(world.map.get(p.id)[0].tp, meta.orange, 'take event');
 
 
     user.list = [];

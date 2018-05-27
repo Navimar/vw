@@ -5,6 +5,8 @@ const fs = require('fs');
 const exe = require('./execute');
 const user = require('./user');
 const send = require('./send');
+const world = require('./world');
+
 const event = {};
 
 let tick = 0;
@@ -62,8 +64,25 @@ event.login = (u, socket, pass) => {
 };
 
 event.order = (p, order) => {
-    if (order.name = "move") {
+    if (order.name == "move" || order.name == "stop") {
         p.order = order;
+    }
+    if (order.name == 'take') {
+        let obj = world.objArrInPoint(p.x, p.y);
+        let f = true;
+        for (let o of obj) {
+            if (o.id == order.val.id) {
+                order.take = o;
+                f = false;
+                break;
+            }
+        }
+        if (f) {
+            console.log('wrong take id');
+        } else {
+            p.order = order;
+        }
+
     }
 };
 

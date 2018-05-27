@@ -10,7 +10,8 @@ meta.player = {
 
 meta.highgrass = {
     img: "highgrass",
-    z: 0
+    z: 0,
+    isNailed:true,
 };
 
 meta.test = {

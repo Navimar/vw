@@ -84,7 +84,7 @@ world.addPlayer = (socket, id) => {
     p.satiety = 100;
     p.wound = [];
     p.tire = 0;
-    p.tool = {typ: "hand"};
+    // p.tool = {typ: "hand"};
     p.slct = 0;
     p.tp = meta.player;
     for (let a = 0; a < 9; a++) {

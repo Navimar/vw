@@ -99,6 +99,24 @@ exe.onTick = () => {
                     } else {
                         console.log("can not apply " + JSON.stringify(tool.tp));
                     }
+                    p.order={};
+                    break;
+                case "take":
+                    let take = p.order.take;
+                    if (take.x==p.x&&take.y==p.y) {
+                        if (_.isFunction(take.tp.onTake)) {
+                            take.tp.onTake(p, exe.wrapper(take));
+                        } else {
+
+                            if (!take.tp.isSolid && !take.tp.isNailed) {
+                                world.put(take, p);
+                                // console.log('PUT');
+                            }
+                        }
+                        p.order={};
+                    }else{
+                        console.log("cant take from another cell");
+                    }
                     break;
                 default:
                     p.dirx = 0;
