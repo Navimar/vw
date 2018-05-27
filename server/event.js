@@ -24,8 +24,7 @@ event.init = () => {
 
 event.tick = (val) => {
     saveEvent(val);
-    exe.onTick();
-    send.web();
+    send.web(exe.onTick());
 };
 
 event.bot = (val) => {
@@ -70,19 +69,42 @@ event.order = (p, order) => {
     if (order.name == 'take') {
         let obj = world.objArrInPoint(p.x, p.y);
         let f = true;
-        for (let o of obj) {
-            if (o.id == order.val.id) {
-                order.take = o;
-                f = false;
-                break;
+        if (obj) {
+            for (let o of obj) {
+                if (o.id == order.val.id) {
+                    order.take = o;
+                    f = false;
+                    break;
+                }
             }
+        } else {
+            console.log('wrong take place');
         }
         if (f) {
             console.log('wrong take id');
         } else {
             p.order = order;
         }
-
+    }
+    if (order.name == 'drop') {
+        let inv = world.map.get(p.id);
+        let f = true;
+        if (inv) {
+            for (let i of inv) {
+                if (i.id == order.val.id) {
+                    order.drop = i;
+                    f = false;
+                    break;
+                }
+            }
+        } else {
+            console.log('wrong drop place');
+        }
+        if (f) {
+            console.log('wrong drop id');
+        } else {
+            p.order = order;
+        }
     }
 };
 

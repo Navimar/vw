@@ -4,7 +4,7 @@
 
 const fs = require('fs');
 const world = require('./world');
-const meta = require('./rule');
+const meta = require('./meta');
 const direction = require('./util');
 const exe = require('./execute');
 const bot = require('./bot');
@@ -145,7 +145,13 @@ module.exports = () => {
     event.order(p, {name: 'take', val: {id: o.id}});
     exe.onTick();
     test(world.map.get(p.id)[0].tp, meta.orange, 'take event');
-
+    world.init();
+    p = world.addPlayer();
+    o = world.createObj(meta.orange, 0, 0);
+    world.put(o,p);
+    event.order(p, {name: 'drop', val: {id: o.id}});
+    exe.onTick();
+    test(world.map.get(p.id).length, 0, 'drop event');
 
     user.list = [];
 

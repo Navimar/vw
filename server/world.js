@@ -1,7 +1,8 @@
 const _ = require('underscore');
 const util = require('./util.js');
 const direction = util.dir;
-const meta = require('./rule.js');
+const meta = require('./meta.js');
+const generate = require('./generate');
 
 let world = {};
 
@@ -95,8 +96,8 @@ world.addPlayer = (socket, id) => {
     return p;
 };
 world.playerBySocket = (socket) => {
-    for (let p of world.player){
-        if(p.socket==socket){
+    for (let p of world.player) {
+        if (p.socket == socket) {
             return p
         }
     }
@@ -181,7 +182,7 @@ function addto(k, obj) {
     }
 }
 
-world.createObj = function (tp, x, y) {
+world.createObj = (tp, x, y)=> {
     let data = {};
     if (tp.onCreate) {
         tp.onCreate(data);
@@ -270,6 +271,17 @@ world.removeWound = (player, wound) => {
     }
     return ok;
 };
+world.isInInv = (obj, carrier) => {
+    let arr = world.objArrInInv(carrier);
+    if (arr) {
+        for (let o of arr) {
+            if (o === obj) {
+                return o;
+            }
+        }
+    }
+    return false;
+};
 
 function relocate(obj, x, y) {
     removefromMap(obj);
@@ -291,30 +303,6 @@ world.transform = (obj, tp) => {
     if (tp.onTurn) {
         world.nextTurn(1, obj);
     }
-};
-
-world.start = () => {
-    let wid = 200;
-    // world.createObj(meta.test, 2, 2);
-    for (let a = 0; a < 10000; a++) {
-        // world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
-    world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
-
-    }
-    for (let a = 0; a < 50000; a++) {
-        // world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
-        world.createObj(meta.plant, _.random(-wid, wid), _.random(-wid, wid));
-    }
-    for (let a = 0; a < 200000; a++) {
-        world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
-        // world.createObj(meta.kaka, _.random(-wid, wid), _.random(-wid, wid));
-        // world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
-        world.createObj(meta.orange, _.random(-wid, wid), _.random(-wid, wid));
-    }
-    // for (let a = 0; a < 50; a++) {
-    //     world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));
-    //
-    // }
 };
 
 world.objArrInPoint = (x, y) => {
@@ -367,6 +355,30 @@ world.find = (tp, x, y) => {
         if (f) return f;
     }
     return false;
+};
+
+world.start = () => {
+    let wid = 200;
+    // world.createObj(meta.test, 2, 2);
+    for (let a = 0; a < 10000; a++) {
+        world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
+        // world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));
+        world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
+    }
+    for (let a = 0; a < 10000; a++) {
+        // world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
+        // world.createObj(meta.plant, _.random(-wid, wid), _.random(-wid, wid));
+    }
+    for (let a = 0; a < 10000; a++) {
+        world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
+        world.createObj(meta.kaka, _.random(-wid, wid), _.random(-wid, wid));
+        world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
+        world.createObj(meta.orange, _.random(-wid, wid), _.random(-wid, wid));
+    }
+    // for (let a = 0; a < 50; a++) {
+    //     world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));
+    //
+    // }
 };
 
 module.exports = world;

@@ -63,6 +63,11 @@ exe.wrapper = (me) => {
 exe.onInit = () => {
     world.init();
     world.start();
+    // let dtStartLoop = Date.now();
+    // for (let a = 0; a < 1000; a++) {
+    //     exe.onTick();
+    // }
+    // console.log('finish ' + (Date.now() - dtStartLoop));
 };
 exe.onTick = () => {
     let dtStartLoop = Date.now();
@@ -99,23 +104,32 @@ exe.onTick = () => {
                     } else {
                         console.log("can not apply " + JSON.stringify(tool.tp));
                     }
-                    p.order={};
+                    p.order = {};
                     break;
                 case "take":
                     let take = p.order.take;
-                    if (take.x==p.x&&take.y==p.y) {
+                    if (take.x == p.x && take.y == p.y) {
                         if (_.isFunction(take.tp.onTake)) {
                             take.tp.onTake(p, exe.wrapper(take));
                         } else {
-
                             if (!take.tp.isSolid && !take.tp.isNailed) {
                                 world.put(take, p);
                                 // console.log('PUT');
                             }
                         }
-                        p.order={};
-                    }else{
+                        p.order = {};
+                    } else {
                         console.log("cant take from another cell");
+                    }
+                    break;
+                case "drop":
+                    let drop = world.isInInv(p.order.drop, p);
+                    if (drop) {
+                        if (_.isFunction(drop.tp.onDrop)) {
+                            drop.tp.onDrop(p, exe.wrapper(drop));
+                        } else {
+                            world.drop(drop, p.x, p.y);
+                        }
                     }
                     break;
                 default:
@@ -153,18 +167,13 @@ exe.onTick = () => {
             m++;
         }
     } else {
-        // console.log('nobody is moving '+world.box.time);
+        // console.log('nobody is moving '+world.time);
     }
     world.cnActive = m;
     world.logic.delete(world.time);
     world.time++;
     return dtStartLoop;
 };
-// exe.onOrder = (user, val) => {
-//     user.order = val.order;
-//     user.targetx = val.targetx;
-//     user.targety = val.targety;
-// };
 
 exe.onLoginBot = (val) => {
     token = user.setKey(val.msg.from.id);

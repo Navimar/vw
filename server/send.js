@@ -6,11 +6,11 @@ const user = require('./user');
 const bot = require('./bot');
 const world = require('./world');
 const config = require('./config');
-const meta = require('./rule');
+const meta = require('./meta');
 
 const send = {};
 
-send.web = () => {
+send.web = (dtStartLoop) => {
     for (let p of world.player) {
         let data = {
             holst: [],
@@ -59,14 +59,12 @@ send.web = () => {
         //     // data.diry = theUser.diry;
         //     // data.hand = theUser.hand;
         //     // data.message = theUser.message;
-        //     // send.delay = Date.now() - dtStartLoop;
+        data.delay = Date.now() - dtStartLoop;
         //     // data.cnMass = world.cnMass;
         //     // data.cnActive = world.cnActive;
         //     // data.error = world.error;
         //     // data.connected = world.connected;
         data.time = world.time;
-        //     // // send.dirx = p.dirx;
-        //     // // send.diry = p.diry;
         p.socket.emit('updateState', data);
         // }
     }
