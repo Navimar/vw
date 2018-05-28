@@ -26,9 +26,18 @@ exe.wrapper = (me) => {
         transform: (obj, tp) => world.transform(obj, tp),
         pickUp: (tp) => world.pickUp(me, tp),
         drop: (obj) => world.drop(obj, me.x, me.y),
-        getOut: (x, y) => world.drop(me, x, y),
+        getOut: (x, y) => {
+            if (me.carrier) {
+                world.drop(me, x, y)
+            }
+        },
         trade: (obj) => world.trade(me, obj),
-        removeWound: (player, string) => world.removeWound(player, string),
+        removeWound: (player, string) => {
+            return world.removeWound(player, string)
+        },
+        addWound: (player, string) => {
+            return world.addWound(player, string)
+        },
         moveTo: (x, y) => {
             let dir;
 
@@ -63,11 +72,12 @@ exe.wrapper = (me) => {
 exe.onInit = () => {
     world.init();
     world.start();
-    // let dtStartLoop = Date.now();
-    // for (let a = 0; a < 1000; a++) {
-    //     exe.onTick();
-    // }
-    // console.log('finish ' + (Date.now() - dtStartLoop));
+    let dtStartLoop = Date.now();
+    for (let a = 0; a < 100000; a++) {
+        exe.onTick();
+        console.log(a);
+    }
+    console.log('finish ' + (Date.now() - dtStartLoop));
 };
 exe.onTick = () => {
     let dtStartLoop = Date.now();
@@ -150,9 +160,12 @@ exe.onTick = () => {
         p.satiety--;
         // console.log(p.satiety);
         if (p.satiety <= 0) {
-            p.satiety = 1000;
-            world.addWound(p, "hungry");
-            // console.log(p.wound[0]);
+            if (world.removeWound(p,'glut')) {
+                p.satiety = 300;
+            } else {
+                p.satiety = 1000;
+                world.addWound(p, "hungry");
+            }
         }
     }
 

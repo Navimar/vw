@@ -132,28 +132,101 @@ module.exports = () => {
     p.order = {name: 'use', tool: orange, target: p};
     exe.onTick();
     test(p.wound[0], 'life', 'applyOnMyself');
+    test(orange.tp,meta.seed,'orange became seed');
+
     world.init();
+    o = world.createObj(meta.orange, 0, 0);
     p = world.addPlayer();
-    world.createObj(meta.orange, 0, 0);
     world.addWound(p, 'hungry');
-    event.order(p, {name: 'use', val: {from: "ground", num: 0, targetX: 0, targetY: 0}});
+    event.order(p, {name: 'use', from: "ground", id: o.id, targetX: p.x, targetY: p.y});
     exe.onTick();
     test(p.wound[0], 'life', 'applyOnMyselfFromGroundEvent');
+    event.order(p, {name: 'use', from: "ground", id: o.id, targetX: p.x, targetY: p.y});
+    exe.onTick();
+    event.order(p, {name: 'use', from: "ground", id: o.id, targetX: p.x, targetY: p.y});
+    exe.onTick();
+    test(world.map.get("0 0").length, 2, 'kaka on ground');
     world.init();
     p = world.addPlayer();
     o = world.createObj(meta.orange, 0, 0);
-    event.order(p, {name: 'take', val: {id: o.id}});
+    event.order(p, {name: 'take', id: o.id});
     exe.onTick();
     test(world.map.get(p.id)[0].tp, meta.orange, 'take event');
     world.init();
     p = world.addPlayer();
     o = world.createObj(meta.orange, 0, 0);
-    world.put(o,p);
-    event.order(p, {name: 'drop', val: {id: o.id}});
+    world.put(o, p);
+    event.order(p, {name: 'drop', id: o.id});
     exe.onTick();
     test(world.map.get(p.id).length, 0, 'drop event');
-
+    world.init();
+    p = world.addPlayer();
+    o = world.createObj(meta.orange, 0, 0);
+    exe.wrapper(o).getOut(p.x, p.y);
+    test(world.map.get("0 0").length, 2, 'getOut from ground');
     user.list = [];
+    world.init();
+    p = world.addPlayer();
+    world.createObj(meta.kaka, 0, 0);
+    o = world.createObj(meta.orange, 0, 0);
+    // world.put(o, p);
+    world.createObj(meta.kaka, 0, 0);
+    world.createObj(meta.kaka, 0, 0);
+    event.order(p, {name: 'use', from: "ground", id: o.id, targetX: p.x, targetY: p.y});
+    test(p.wound[0], 'life', 'apply On myself From Ground with many kaka');
+    world.createObj(meta.kaka, 0, 0);
+    world.init();
+    p = world.addPlayer();
+    world.createObj(meta.kaka, 0, 0);
+    world.createObj(meta.kaka, 0, 0);
+    o = world.createObj(meta.orange, 0, 0);
+    world.put(o, p);
+    world.createObj(meta.kaka, 0, 0);
+    world.createObj(meta.kaka, 0, 0);
+    event.order(p, {name: 'use', from: "inv", id: o.id, targetX: p.x, targetY: p.y});
+    test(p.wound[0], 'life', 'apply On myself From INV with many kaka');
+    world.init();
+    p = world.addPlayer();
+    o = world.createObj(meta.orange, 0, 0);
+    // world.addWound(p, 'hungry');
+    p.order = {name: 'use', tool: o, target: p};
+    exe.onTick();
+    test(p.wound[0], 'glut', 'glut because of orange');
+    world.init();
+    p = world.addPlayer();
+    world.addWound(p, 'glut');
+    for (let a = 0; a < 100; a++) {
+        exe.onTick();
+    }
+    test(p.wound[0], 'life', 'cant be glut because of hungry');
+    test(p.wound[1], 'life', 'cant be hungry because of glut');
+    world.init();
+    p = world.addPlayer();
+    for (let a = 0; a < 11; a++) {
+        world.addWound(p, 'glut');
+    }
+    test(p.data.died, true, 'tens wound die');
+    test(p.tp.img(p.data), 'rip', 'rip if died');
+    world.init();
+    p = world.addPlayer();
+    event.order(p,{name:'move',val:'up'});
+    exe.onTick();
+    test(p.y,-1,'event go up');
+    world.init();
+    p = world.addPlayer();
+    p.data.died=true;
+    event.order(p,{name:'move',val:'up'});
+    exe.onTick();
+    test(p.y,0,'cant go when died');
+
+    world.init();
+    o = world.createObj(meta.seed, 0, 0);
+
+    for (let a = 0; a < 4000; a++) {
+        exe.onTick();
+    }
+    test(o.tp, meta.plant, 'seed is going growth');
+
 
     user.new("slon", 1);
     test(user.byId(1).id, 1, "userById");
@@ -197,6 +270,7 @@ module.exports = () => {
         }
         bot.sendMessage(30626617, "Server has been started. ");
         bot.sendMessage(30626617, text);
+        console.log(text);
         // throw 'testFall';
     } else {
         bot.sendMessage(30626617, "Tests are not working");

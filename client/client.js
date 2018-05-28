@@ -111,10 +111,12 @@ function initModel() {
     }
     model.obj = [{x: 1, y: 1, sx: 5, sy: 5, img: "test"}];
     model.stamp = 1;
-    // model.trx = 0;
-    // model.try = 0;
+    model.trx = 0;
+    model.try = 0;
     model.selected = 0;
     model.order = {};
+    model.orderCn = 0;
+    model.lastorder = 0;
 }
 
 window.requestAnimFrame = (function (callback) {
@@ -212,12 +214,13 @@ function onServer(val) {
         if (mouseCell.x + mouseCell.y > 8 && mouseCell.x < mouseCell.y) {
             orderDown();
         }
-        if (mouseCell.x==4 && mouseCell.y==4) {
+        if (mouseCell.x == 4 && mouseCell.y == 4) {
             orderStop();
         }
     }
-    if (model.targetx == model.px && model.targety == model.py) {
+    if (model.order.targetx === model.px && model.order.targety === model.py) {
         if (model.order.name == "move") orderStop();
+    } else {
     }
     out();
 }
@@ -277,8 +280,8 @@ function onStep(timeDiff) {
             }
         }
     }
-    // model.trx = model.dirx * model.stamp;
-    // model.try = model.diry * model.stamp;
+    model.trx = model.dirx * model.stamp;
+    model.try = model.diry * model.stamp;
     render(model);
     model.lastmessage = model.message;
 }
@@ -289,7 +292,10 @@ function out() {
     socket.emit("ping");
     // let send= {order: model.order, targetx: model.targetx, targety: model.targety};
     let send = model.order;
-    socket.emit("order", send);
+    if (model.lastorder !== model.orderCn) {
+        socket.emit("order", send);
+        model.lastorder = model.orderCn;
+    }
 }
 
 function range(fx, fy, tx, ty) {
@@ -312,8 +318,8 @@ function render(model) {
     renderStatus();
     for (let y = -1; y < 10; y++) {
         for (let x = -1; x < 10; x++) {
-            drawImg("grass", x, y);
-            // drawImg("grass", x + model.trx, y + model.try);
+            // drawImg("grass", x, y);
+            drawImg("grass", x + model.trx, y + model.try);
             // for (let h of model.holst[x][y]) {
             //     drawImg(model.holst[x][y], x + model.trx, y + model.try);
             // }
@@ -321,9 +327,8 @@ function render(model) {
     }
 
     for (let o of model.obj) {
-        drawImg(o.img, o.x, o.y);
+        // drawImg(o.img, o.x, o.y);
         drawImg(o.img, o.sx, o.sy);
-
     }
     for (let a = 0; a < 9; a++) {
         drawImg("black", 9, a);
@@ -397,25 +402,26 @@ let renderStatus = () => {
 };
 
 let renderTarget = () => {
-    let ex = 0;
-    let ey = 0;
-    switch (model.order.val) {
-        case "up":
-            ey -= 1;
-            break;
-        case "right":
-            ex += 1;
-            break;
-        case "left":
-            ex -= 1;
-            break;
-        case "down":
-            ey += 1;
-            break;
-        default:
-            break;
-    }
-    drawImg("from", 4 + ex, 4 + ey);
+    // let ex = 0;
+    // let ey = 0;
+    // switch (model.order.val) {
+    //     case "up":
+    //         ey -= 1;
+    //         break;
+    //     case "right":
+    //         ex += 1;
+    //         break;
+    //     case "left":
+    //         ex -= 1;
+    //         break;
+    //     case "down":
+    //         ey += 1;
+    //         break;
+    //     default:
+    //         break;
+    // }
+    // drawImg("from", 4 + ex, 4 + ey);
+    drawImg("from", model.order.targetx - model.px + 4, model.order.targety - model.py + 4);
 };
 
 function onMouseDown() {
@@ -428,7 +434,7 @@ function onMouseDown() {
             inAir = {from: 'inv', obj: model.inv[mouseCell.y]};
         }
     }
-
+    out();
 }
 
 function onMouseUp() {
@@ -437,28 +443,43 @@ function onMouseUp() {
             // alert('take ' + inAir.obj.id + " " + inAir.obj.img);
             model.order = {
                 name: 'take',
-                val: inAir.obj
-            }
+                val: inAir.obj.id
+            };
+            model.orderCn++;
         }
         if (mouseCell.x === -2 && inAir.from === 'inv') {
             model.order = {
                 name: 'drop',
-                val: inAir.obj
-            }
+                val: inAir.obj.id
+            };
+            model.orderCn++;
+        }
+        if (mouseCell.x >= 0) {
+            model.order = {
+                name: 'use',
+                val: {
+                    from: inAir.from,
+                    id: inAir.obj.id,
+                    targetX: model.px + mouseCell.x - 4,
+                    targetY: model.py + mouseCell.y - 4
+                }
+            };
+            model.orderCn++;
+            console.log(model.order);
         }
     }
     // console.log(inAir.obj);
     inAir = false;
-    out();
+    // out();
 }
 
 
 function onKeydown(key) {
-    console.log('keydown');
-    if (!_.isFinite(model.targetx) || !_.isFinite(model.targety)) {
-        model.targetx = model.px;
-        model.targety = model.py;
-    }
+    // console.log('keydown');
+    // if (!_.isFinite(model.targetx) || !_.isFinite(model.targety)) {
+    //     model.targetx = model.px;
+    //     model.targety = model.py;
+    // }
     // if (model.px == model.targetx && model.py == model.targety) {
     switch (key) {
         case "up":
@@ -487,6 +508,7 @@ function onKeydown(key) {
         default:
             model.order.name = key;
             model.order.val = 0;
+            model.orderCn++;
             break;
     }
     // }
@@ -507,34 +529,43 @@ function getMousePos(canvas, evt) {
 
 
 function orderRight() {
-    model.targety = model.py;
-    model.targetx = model.px + 1;
-    model.order.name = "move";
-    model.order.val = "right";
+    model.order = {
+        targety: model.py,
+        targetx: model.px + 1,
+        name: "move",
+        val: "right"
+    };
+    model.orderCn++;
 }
 
 function orderLeft() {
-    model.targety = model.py;
-    model.targetx = model.px - 1;
+    model.order.targety = model.py;
+    model.order.targetx = model.px - 1;
     model.order.name = "move";
     model.order.val = "left";
+    model.orderCn++;
 }
 
 function orderUp() {
-    model.targetx = model.px;
-    model.targety = model.py - 1;
+    model.order.targetx = model.px;
+    model.order.targety = model.py - 1;
     model.order.name = "move";
     model.order.val = "up";
+    model.orderCn++;
 }
 
 function orderDown() {
-    model.targetx = model.px;
-    model.targety = model.py + 1;
+    model.order.targetx = model.px;
+    model.order.targety = model.py + 1;
     model.order.name = "move";
     model.order.val = "down";
+    model.orderCn++;
 }
 
 function orderStop() {
     model.order.name = "stop";
     model.order.val = 0;
+    model.order.targetx = model.px;
+    model.order.targety = model.py;
+    model.orderCn++;
 }

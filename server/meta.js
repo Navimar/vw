@@ -3,15 +3,23 @@ const direction = require('./util');
 let meta = {};
 meta.player = {
     player: true,
-    img: "hero",
+    onCreate: (data) => {
+        data.died = false;
+    },
+    img: (data) => {
+        if (data.died) {
+            return "rip"
+        }
+        return "hero"
+    },
     isSolid: true,
-    z: -1,
+    z: 999,
 };
 
 meta.highgrass = {
     img: "highgrass",
     z: 0,
-    isNailed:true,
+    isNailed: true,
 };
 
 meta.test = {
@@ -44,19 +52,57 @@ meta.stone = {
     img: "stone",
     z: 1
 };
+meta.bone = {
+    img: "bone",
+    z: 1,
+    onCreate(data) {
+        data.new = true;
+    },
+    onTurn: (data, wd) => {
+        if (data.new) {
+            data.new = false;
+            wd.nextTurn(3500);
+        } else {
+            wd.transform(wd.me, meta.highgrass);
+        }
+    },
+};
+
 
 meta.kaka = {
     img: "kaka",
     z: 2,
     onApply: (obj, wd) => {
         wd.getOut(obj.x, obj.y);
-    }
+    },
+    onCreate(data) {
+        data.new = true;
+    },
+    onTurn: (data, wd) => {
+        if (data.new) {
+            data.new = false;
+            wd.nextTurn(3500);
+        } else {
+            wd.transform(wd.me, meta.highgrass);
+        }
+    },
 };
 
 meta.tree = {
     z: 20,
     img: "tree",
     isSolid: true,
+    onCreate(data) {
+        data.new = true;
+    },
+    onTurn: (data, wd) => {
+        if (data.new) {
+            data.new = false;
+            wd.nextTurn(700);
+        } else {
+            wd.transform(wd.me, meta.kaka);
+        }
+    },
 };
 
 meta.box = {
@@ -71,7 +117,7 @@ meta.box = {
 
 meta.jelly = {
     z: 5,
-    img: "jelly",
+    img: "egg",
     onCreate(data) {
         data.new = true;
     },
@@ -85,9 +131,11 @@ meta.jelly = {
     },
     onApply: (obj, wd) => {
         if (obj.tp.player) {
-            wd.trade(obj);
+            // wd.trade(obj);
             wd.transform(wd.me, meta.kaka);
-            wd.removeWound(obj, "hungry");
+            if (!wd.removeWound(obj, "hungry")) {
+                wd.addWound(obj, "glut");
+            }
         }
     },
 };
@@ -105,9 +153,10 @@ meta.aphid = {
         data.sat = false;
     },
     onTurn: (data, wd) => {
-        if (wd.inv(meta.highgrass)) {
+        let food = meta.highgrass;
+        if (wd.inv(food)) {
             if (data.convert > 70) {
-                let hg = wd.inv(meta.highgrass);
+                let hg = wd.inv(food);
                 wd.transform(hg, meta.jelly);
                 wd.drop(hg);
                 data.sat = false;
@@ -119,10 +168,10 @@ meta.aphid = {
         } else {
             data.satiety -= 1;
             if (data.satiety == 0) {
-                wd.transform(wd.me, meta.highgrass);
+                wd.transform(wd.me, meta.bone);
             } else {
-                if (wd.isHere(meta.highgrass)) {
-                    wd.pickUp(meta.highgrass);
+                if (wd.isHere(food)) {
+                    wd.pickUp(food);
                     data.satiety = 70;
                     data.convert = 0;
                 } else {
@@ -131,7 +180,16 @@ meta.aphid = {
             }
         }
         wd.nextTurn(20);
-    }
+    },
+    onApply: (obj, wd) => {
+        if (obj.tp.player) {
+            // wd.trade(obj);
+            wd.transform(wd.me, meta.bone);
+            if (!wd.removeWound(obj, "hungry")) {
+                wd.addWound(obj, "glut");
+            }
+        }
+    },
 };
 
 meta.plant = {
@@ -146,17 +204,56 @@ meta.plant = {
             data.new = false;
             wd.nextTurn(3500);
         } else {
-            wd.transform(wd.me, meta.orange);
+            wd.transform(wd.me, meta.tree);
         }
     },
 };
 meta.orange = {
+    z: 1,
     img: 'orange',
+    onCreate(data) {
+        data.new = true;
+    },
     onApply: (obj, wd) => {
         if (obj.tp.player) {
-            wd.trade(obj);
+            // wd.trade(obj);
+            wd.transform(wd.me, meta.plant);
+            if (!wd.removeWound(obj, "hungry")) {
+                wd.addWound(obj, "glut");
+            }
+        }
+    },
+    onTurn: (data, wd) => {
+        if (data.new) {
+            data.new = false;
+            wd.nextTurn(1200);
+        } else {
             wd.transform(wd.me, meta.kaka);
-            wd.removeWound(obj, "hungry");
+        }
+    },
+};
+
+meta.seed = {
+    z: 2,
+    img: 'seed',
+    onCreate(data) {
+        data.new = true;
+    },
+    onApply: (obj, wd) => {
+        if (obj.tp.player) {
+            // wd.trade(obj);
+            wd.transform(wd.me, meta.kaka);
+            if (!wd.removeWound(obj, "hungry")) {
+                wd.addWound(obj, "glut");
+            }
+        }
+    },
+    onTurn: (data, wd) => {
+        if (data.new) {
+            data.new = false;
+            wd.nextTurn(3500);
+        } else {
+            wd.transform(wd.me, meta.plant);
         }
     },
 };

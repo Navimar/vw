@@ -81,13 +81,18 @@ world.addPlayer = (socket, id) => {
     p.diry = 0;
     p.order = "stop";
     p.order.n = 0;
-    p.img = "hero";
+    p.lastorder = {val: {}};
+    // p.img = meta.player.img;
     p.satiety = 100;
     p.wound = [];
     p.tire = 0;
+    p.died = false;
     // p.tool = {typ: "hand"};
     p.slct = 0;
     p.tp = meta.player;
+    let data = {};
+    p.data = data;
+    p.tp.onCreate(data);
     for (let a = 0; a < 9; a++) {
         p.wound[a] = "life";
     }
@@ -182,7 +187,7 @@ function addto(k, obj) {
     }
 }
 
-world.createObj = (tp, x, y)=> {
+world.createObj = (tp, x, y) => {
     let data = {};
     if (tp.onCreate) {
         tp.onCreate(data);
@@ -257,16 +262,16 @@ world.addWound = (player, wound) => {
         }
     }
     if (ok) {
-        // player.message = ("Вы погибли");
+        player.data.died = true;
     }
 };
 
 world.removeWound = (player, wound) => {
-    let ok = true;
+    let ok = false;
     for (let x in player.wound) {
-        if (player.wound[x] == wound && ok) {
+        if (player.wound[x] == wound && !ok) {
             player.wound[x] = "life";
-            ok = false;
+            ok = true;
         }
     }
     return ok;
@@ -361,19 +366,22 @@ world.start = () => {
     let wid = 200;
     // world.createObj(meta.test, 2, 2);
     for (let a = 0; a < 10000; a++) {
-        world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
+
         // world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));
-        world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
-    }
-    for (let a = 0; a < 10000; a++) {
-        // world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
-        // world.createObj(meta.plant, _.random(-wid, wid), _.random(-wid, wid));
+        // world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
     }
     for (let a = 0; a < 10000; a++) {
         world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
+    }
+    for (let a = 0; a < 10000; a++) {
+        world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
+        world.createObj(meta.plant, _.random(-wid, wid), _.random(-wid, wid));
         world.createObj(meta.kaka, _.random(-wid, wid), _.random(-wid, wid));
         world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
         world.createObj(meta.orange, _.random(-wid, wid), _.random(-wid, wid));
+    }
+    for (let a = 0; a < 1000; a++) {
+        // world.createObj(meta.orange, _.random(-wid, wid), _.random(-wid, wid));
     }
     // for (let a = 0; a < 50; a++) {
     //     world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));

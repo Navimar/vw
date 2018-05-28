@@ -55,8 +55,8 @@ send.web = (dtStartLoop) => {
         }
         data.px = p.x;
         data.py = p.y;
-        //     // data.dirx = theUser.dirx;
-        //     // data.diry = theUser.diry;
+            data.dirx = p.dirx;
+            data.diry = p.diry;
         //     // data.hand = theUser.hand;
         //     // data.message = theUser.message;
         data.delay = Date.now() - dtStartLoop;
@@ -65,6 +65,7 @@ send.web = (dtStartLoop) => {
         //     // data.error = world.error;
         //     // data.connected = world.connected;
         data.time = world.time;
+        data.died = p.data.died;
         p.socket.emit('updateState', data);
         // }
     }
