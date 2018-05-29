@@ -225,6 +225,30 @@ module.exports = () => {
         exe.onTick();
     }
     test(o.tp, meta.plant, 'seed is going growth');
+    world.init();
+    o = world.createObj(meta.plant, 0, 0);
+    let k = world.createObj(meta.kaka, 0, 0);
+    world.createObj(meta.kaka, 0, 0);
+    world.createObj(meta.kaka, 0, 0);
+    world.createObj(meta.kaka, 0, 0);
+    world.createObj(meta.kaka, 0, 0);
+    world.createObj(meta.kaka, 0, 0);
+    for (let a = 0; a < 8000; a++) {
+        exe.onTick();
+    }
+    test(k.tp, meta.orange, 'tree makes oranges');
+    world.init();
+    o = world.createObj(meta.aphid, 0, 0);
+    k = world.createObj(meta.orange, 0, 0);
+    for (let a = 0; a < 250; a++) {
+        exe.onTick();
+    }
+    test(k.tp, meta.kaka, 'aphid transform kaka');
+    test(k.carrier, false, 'aphid drops kaka');
+    for (let a = 0; a < 4000; a++) {
+        exe.onTick();
+    }
+    test(o.tp, meta.bone, 'aphid dies without food');
 
     // world.init();
     // let metatest = {

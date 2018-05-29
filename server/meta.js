@@ -79,11 +79,16 @@ meta.kaka = {
         data.new = true;
     },
     onTurn: (data, wd) => {
-        if (data.new) {
-            data.new = false;
-            wd.nextTurn(3500);
+        if (wd.me.carrier) {
+            wd.nextTurn(1000);
+            data.new = true;
         } else {
-            wd.transform(wd.me, meta.highgrass);
+            if (data.new) {
+                data.new = false;
+                wd.nextTurn(3500);
+            } else {
+                wd.transform(wd.me, meta.highgrass);
+            }
         }
     },
 };
@@ -93,15 +98,32 @@ meta.tree = {
     img: "tree",
     isSolid: true,
     onCreate(data) {
-        data.new = true;
+        data.sat = false;
+        data.old = 0;
     },
     onTurn: (data, wd) => {
-        if (data.new) {
-            data.new = false;
-            wd.nextTurn(35000);
+        let food = wd.findinInv(meta.kaka);
+
+        if (food) {
+            if (data.sat) {
+                wd.transform(food, meta.orange);
+                wd.drop(food);
+                data.sat = false;
+            }
+            data.sat = true;
         } else {
-            wd.transform(wd.me, meta.kaka);
+            data.old++;
+            if (data.old > 10) {
+                wd.transform(wd.me, meta.orange);
+            }
         }
+        wd.nextTurn(3500);
+        // if (data.new) {
+        //     data.new = false;
+        //     wd.nextTurn(35000);
+        // } else {
+        //     wd.transform(wd.me, meta.kaka);
+        // }
     },
 };
 
@@ -115,7 +137,7 @@ meta.box = {
 };
 
 
-meta.jelly = {
+meta.egg = {
     z: 5,
     img: "egg",
     onCreate(data) {
@@ -124,7 +146,7 @@ meta.jelly = {
     onTurn: (data, wd) => {
         if (data.new) {
             data.new = false;
-            wd.nextTurn(700);
+            wd.nextTurn(3500);
         } else {
             wd.transform(wd.me, meta.aphid);
         }
@@ -149,37 +171,76 @@ meta.aphid = {
     },
     isSolid: true,
     onCreate(data) {
-        data.satiety = 70;
+        data.satiety = 3000;
         data.sat = false;
+        data.kaka = true
     },
     onTurn: (data, wd) => {
-        let food = meta.highgrass;
-        if (wd.findinInv(food)) {
-            if (data.convert > 70) {
-                let hg = wd.findinInv(food);
-                wd.transform(hg, meta.jelly);
-                wd.drop(hg);
-                data.sat = false;
-            } else {
-                wd.move(wd.dirRnd);
-                data.convert++;
-                data.sat = true;
+        let food = [meta.highgrass, meta.orange];
+        let obj = wd.pickUp(food);
+        if (obj) {
+            data.satiety+=1000;
+            if (obj.tp === meta.highgrass) {
+                data.kaka ? wd.transform(obj, meta.kaka) : wd.transform(obj, meta.egg);
+                data.kaka ^= true;
+            }
+            if (obj.tp === meta.orange){
+                data.kaka ? wd.transform(obj, meta.kaka) : wd.transform(obj, meta.seed);
+                data.kaka ^= true;
             }
         } else {
-            data.satiety -= 1;
-            if (data.satiety == 0) {
-                wd.transform(wd.me, meta.bone);
-            } else {
-                if (wd.isHere(food)) {
-                    wd.pickUp(food);
-                    data.satiety = 70;
-                    data.convert = 0;
-                } else {
-                    wd.move(wd.dirRnd);
-                }
+            wd.drop();
+            wd.move(wd.dirRnd);
+            if (data.satiety<=0){
+                wd.transform(wd.me, meta.bone)
             }
         }
-        wd.nextTurn(20);
+        // if (wd.findinInv(food)) {
+        //     if (data.convert > 70) {
+        //         let hg = wd.findinInv(food);
+        //         if (hg === meta.highgrass) {
+        //             if (data.kaka) {
+        //                 wd.transform(hg, meta.kaka);
+        //                 data.kaka = false;
+        //             } else {
+        //                 wd.transform(hg, meta.jelly);
+        //                 data.kaka = true;
+        //             }
+        //         }
+        //         if (hg === meta.orange) {
+        //             if (data.kaka) {
+        //                 wd.transform(hg, meta.kaka);
+        //                 data.kaka = false;
+        //             } else {
+        //                 wd.transform(hg, meta.seed);
+        //                 data.kaka = true;
+        //             }
+        //         }
+        //         wd.drop(hg);
+        //         data.sat = false;
+        //     } else {
+        //         wd.move(wd.dirRnd);
+        //         data.convert++;
+        //         data.sat = true;
+        //     }
+        // } else {
+        //     data.satiety -= 1;
+        //     if (data.satiety <= 0) {
+        //         wd.transform(wd.me, meta.bone);
+        //     } else {
+        //         if (wd.isHere(food)) {
+        //             wd.pickUp(food);
+        //
+        //             data.satiety = 70;
+        //             data.convert = 0;
+        //         } else {
+        //             wd.move(wd.dirRnd);
+        //         }
+        //     }
+        // }
+        let f=20;
+        data.satiety-=f;
+        wd.nextTurn(f);
     },
     onApply: (obj, wd) => {
         if (obj.tp.player) {
@@ -202,7 +263,7 @@ meta.plant = {
     },
     onTurn: (data, wd) => {
         if (wd.inv() >= 5) {
-            wd.transform(wd.me,meta.tree)
+            wd.transform(wd.me, meta.tree)
         } else {
             let food = meta.kaka;
             if (wd.isHere(food)) {
@@ -231,8 +292,11 @@ meta.orange = {
     },
     onTurn: (data, wd) => {
         if (data.new) {
+            if (wd.isHere(meta.tree)) {
+                wd.movetrought(wd.dirRnd)
+            }
             data.new = false;
-            wd.nextTurn(1200);
+            wd.nextTurn(3000);
         } else {
             wd.transform(wd.me, meta.plant);
         }
@@ -255,11 +319,16 @@ meta.seed = {
         }
     },
     onTurn: (data, wd) => {
-        if (data.new) {
-            data.new = false;
-            wd.nextTurn(3500);
+        if (wd.me.carrier) {
+            wd.nextTurn(1000);
+            data.new = true;
         } else {
-            wd.transform(wd.me, meta.plant);
+            if (data.new) {
+                data.new = false;
+                wd.nextTurn(3500);
+            } else {
+                wd.transform(wd.me, meta.plant);
+            }
         }
     },
 };

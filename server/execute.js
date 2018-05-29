@@ -18,7 +18,16 @@ let token = null;
 exe.wrapper = (me) => {
     return {
         me,
-        findinInv: (tp) => world.inv(tp, me),
+        findinInv: (tp) => {
+            if (Array.isArray(tp)) {
+                for (let t of tp) {
+                    let i = world.inv(t, me);
+                    if (i) return i;
+                }
+            } else {
+                return world.inv(tp, me)
+            }
+        },
         inv: () => {
             let i = world.map.get(me.id);
             if (i) {
@@ -27,13 +36,41 @@ exe.wrapper = (me) => {
                 return 0
             }
         },
-        isHere: (tp) => world.lay(tp, me.x, me.y),
+        isHere: (tp) => {
+            if (!Array.isArray(tp)) tp = [tp];
+            for (let t of tp) {
+                let i = world.lay(t, me.x, me.y);
+                if (i) return i;
+            }
+        },
         move: (dir) => world.move(me, dir),
+        movetrought: (dir) => {
+            let x = me.x + dir.x;
+            let y = me.y + dir.y;
+            world.relocate(me, x, y)
+        },
+        relocate: (x, y) => world.relocate(me, x, y),
         dirRnd: util.dirs[_.random(3)],
         nextTurn: (time) => world.nextTurn(time, me),
         transform: (obj, tp) => world.transform(obj, tp),
-        pickUp: (tp) => world.pickUp(me, tp),
-        drop: (obj) => world.drop(obj, me.x, me.y),
+        pickUp: (tp) => {
+            if (!Array.isArray(tp)) tp = [tp];
+            for (let t of tp) {
+                let i = world.pickUp(me, t);
+                if (i) return i;
+            }
+        },
+        drop: (obj) => {
+            if (!obj) {
+                obj = world.map.get(me.id);
+                if (obj) obj = obj[0];
+            }
+            if (obj) {
+                world.drop(obj, me.x, me.y);
+            } else {
+                return false
+            }
+        },
         getOut: (x, y) => {
             if (me.carrier) {
                 world.drop(me, x, y)
@@ -80,12 +117,12 @@ exe.wrapper = (me) => {
 exe.onInit = () => {
     world.init();
     world.start();
-    // let dtStartLoop = Date.now();
-    // for (let a = 0; a < 100000; a++) {
-    //     exe.onTick();
-    //     console.log(a);
-    // }
-    // console.log('finish ' + (Date.now() - dtStartLoop));
+    let dtStartLoop = Date.now();
+    for (let a = 0; a < 300000; a++) {
+        exe.onTick();
+        console.log(a);
+    }
+    console.log('finish ' + (Date.now() - dtStartLoop));
 };
 exe.onTick = () => {
     let dtStartLoop = Date.now();
