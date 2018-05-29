@@ -71,6 +71,13 @@ exe.wrapper = (me) => {
                 return false
             }
         },
+        dropAll: () => {
+            let a = world.map.get(me.id);
+            if (a)
+                for (let o of a) {
+                    world.drop(o, me.x, me.y)
+                }
+        },
         getOut: (x, y) => {
             if (me.carrier) {
                 world.drop(me, x, y)
@@ -110,6 +117,7 @@ exe.wrapper = (me) => {
                 goY();
             }
             world.move(me, dir);
+            return {xWant, yWant};
         },
         find: (target) => world.find(target, me.x, me.y),
     };
@@ -118,7 +126,7 @@ exe.onInit = () => {
     world.init();
     world.start();
     // let dtStartLoop = Date.now();
-    // for (let a = 0; a < 300000; a++) {
+    // for (let a = 0; a < 50000; a++) {
     //     exe.onTick();
     //     console.log(a);
     // }
@@ -187,6 +195,18 @@ exe.onTick = () => {
                         }
                     }
                     break;
+                case "respawn":
+                    p.tire = 7;
+                    if (!world.removeWound(p)) {
+                        p.data.died = false;
+                        p.x = _.random(p.x - 30, p.x + 30);
+                        p.y = _.random(p.y - 30, p.y + 30);
+                        p.dirx = 0;
+                        p.diry = 0;
+                        p.order.name = "stop";
+                        p.order.val = 0;
+                    }
+                    break;
                 default:
                     p.dirx = 0;
                     p.diry = 0;
@@ -203,13 +223,13 @@ exe.onTick = () => {
             p.tire -= 1;
         }
         p.satiety--;
-        // console.log(p.satiety);
         if (p.satiety <= 0) {
             if (world.removeWound(p, 'glut')) {
                 p.satiety = 300;
             } else {
                 p.satiety = 1000;
                 world.addWound(p, "hungry");
+                world.removeWound(p, "bite");
             }
         }
     }

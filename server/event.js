@@ -169,6 +169,8 @@ event.order = (p, order) => {
                 }
             }
         }
+    }else{
+        p.order.name = 'respawn';
     }
 };
 

@@ -250,6 +250,15 @@ module.exports = () => {
     }
     test(o.tp, meta.bone, 'aphid dies without food');
 
+    world.init();
+    p = world.addPlayer();
+    o = world.createObj(meta.stick,0,0);
+    world.put(o, p);
+    k = world.createObj(meta.wolf,1,0);
+    event.order(p, {name: 'use', from: "inv", id: o.id, targetX: 1, targetY: 0});
+    exe.onTick();
+    test(k.tp,meta.orange,'aplly near');
+
     // world.init();
     // let metatest = {
     //     onTurn(data, wd) {

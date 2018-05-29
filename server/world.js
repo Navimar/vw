@@ -261,27 +261,38 @@ world.move = function (obj, dir) {
 };
 
 world.addWound = (player, wound) => {
-    let ok = true;
-    for (let x in player.wound) {
-        if (player.wound[x] == "life" && ok) {
-            player.wound[x] = wound;
-            ok = false;
+    if (!player.data.died) {
+        let ok = true;
+        for (let x in player.wound) {
+            if (player.wound[x] == "life" && ok) {
+                player.wound[x] = wound;
+                ok = false;
+            }
         }
-    }
-    if (ok) {
-        player.data.died = true;
+        if (ok) {
+            player.data.died = true;
+        }
+    } else {
+        return false;
     }
 };
 
 world.removeWound = (player, wound) => {
-    let ok = false;
-    for (let x in player.wound) {
-        if (player.wound[x] == wound && !ok) {
-            player.wound[x] = "life";
-            ok = true;
+    if (wound) {
+        for (let x in player.wound) {
+            if (player.wound[x] === wound) {
+                player.wound[x] = "life";
+                return true;
+            }
+        }
+    } else {
+        for (let x in player.wound) {
+            if (player.wound[x] !== 'life') {
+                player.wound[x] = "life";
+                return true;
+            }
         }
     }
-    return ok;
 };
 world.isInInv = (obj, carrier) => {
     let arr = world.objArrInInv(carrier);
@@ -378,20 +389,23 @@ world.find = (tp, x, y) => {
 world.start = () => {
     let wid = 100;
     // world.createObj(meta.test, 2, 2);
-    for (let a = 0; a < 10000; a++) {
-
-        // world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));
-        // world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
-    }
-    for (let a = 0; a < 5000; a++) {
-        world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
-    }
-    for (let a = 0; a < 5000; a++) {
-        world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
-        world.createObj(meta.plant, _.random(-wid, wid), _.random(-wid, wid));
-        world.createObj(meta.kaka, _.random(-wid, wid), _.random(-wid, wid));
-        // world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
+    for (let a = 0; a < 1000; a++) {
+        world.createObj(meta.stick, _.random(-wid, wid), _.random(-wid, wid));
         world.createObj(meta.orange, _.random(-wid, wid), _.random(-wid, wid));
+
+
+        // world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
+    }
+    for (let a = 0; a < 4000; a++) {
+        world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
+
+        // world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
+    }
+    for (let a = 0; a < 2000; a++) {
+        //     world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
+        //     world.createObj(meta.plant, _.random(-wid, wid), _.random(-wid, wid));
+        //     world.createObj(meta.kaka, _.random(-wid, wid), _.random(-wid, wid));
+        world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));
     }
     for (let a = 0; a < 1000; a++) {
         // world.createObj(meta.orange, _.random(-wid, wid), _.random(-wid, wid));
