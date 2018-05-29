@@ -18,7 +18,15 @@ let token = null;
 exe.wrapper = (me) => {
     return {
         me,
-        inv: (tp) => world.inv(tp, me),
+        findinInv: (tp) => world.inv(tp, me),
+        inv: () => {
+            let i = world.map.get(me.id);
+            if (i) {
+                return i.length
+            } else {
+                return 0
+            }
+        },
         isHere: (tp) => world.lay(tp, me.x, me.y),
         move: (dir) => world.move(me, dir),
         dirRnd: util.dirs[_.random(3)],
@@ -72,12 +80,12 @@ exe.wrapper = (me) => {
 exe.onInit = () => {
     world.init();
     world.start();
-    let dtStartLoop = Date.now();
-    for (let a = 0; a < 100000; a++) {
-        exe.onTick();
-        console.log(a);
-    }
-    console.log('finish ' + (Date.now() - dtStartLoop));
+    // let dtStartLoop = Date.now();
+    // for (let a = 0; a < 100000; a++) {
+    //     exe.onTick();
+    //     console.log(a);
+    // }
+    // console.log('finish ' + (Date.now() - dtStartLoop));
 };
 exe.onTick = () => {
     let dtStartLoop = Date.now();
@@ -160,7 +168,7 @@ exe.onTick = () => {
         p.satiety--;
         // console.log(p.satiety);
         if (p.satiety <= 0) {
-            if (world.removeWound(p,'glut')) {
+            if (world.removeWound(p, 'glut')) {
                 p.satiety = 300;
             } else {
                 p.satiety = 1000;
@@ -173,9 +181,11 @@ exe.onTick = () => {
     let go = world.logic.get(world.time);
     if (go != undefined) {
         for (let me of go) {
-            if (me.tp.onTurn) {
-                let wd = exe.wrapper(me);
-                me.tp.onTurn(me.data, wd);
+            if (me.nextTurn === world.time) {
+                if (me.tp.onTurn) {
+                    let wd = exe.wrapper(me);
+                    me.tp.onTurn(me.data, wd);
+                }
             }
             m++;
         }

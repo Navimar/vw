@@ -132,7 +132,7 @@ module.exports = () => {
     p.order = {name: 'use', tool: orange, target: p};
     exe.onTick();
     test(p.wound[0], 'life', 'applyOnMyself');
-    test(orange.tp,meta.seed,'orange became seed');
+    test(orange.tp, meta.seed, 'orange became seed');
 
     world.init();
     o = world.createObj(meta.orange, 0, 0);
@@ -209,26 +209,47 @@ module.exports = () => {
     test(p.tp.img(p.data), 'rip', 'rip if died');
     world.init();
     p = world.addPlayer();
-    event.order(p,{name:'move',val:'up'});
+    event.order(p, {name: 'move', val: 'up'});
     exe.onTick();
-    test(p.y,-1,'event go up');
+    test(p.y, -1, 'event go up');
     world.init();
     p = world.addPlayer();
-    p.data.died=true;
-    event.order(p,{name:'move',val:'up'});
+    p.data.died = true;
+    event.order(p, {name: 'move', val: 'up'});
     exe.onTick();
-    test(p.y,0,'cant go when died');
+    test(p.y, 0, 'cant go when died');
 
     world.init();
     o = world.createObj(meta.seed, 0, 0);
-
     for (let a = 0; a < 4000; a++) {
         exe.onTick();
     }
     test(o.tp, meta.plant, 'seed is going growth');
 
+    // world.init();
+    // let metatest = {
+    //     onTurn(data, wd) {
+    //         wd.nextTurn(data);
+    //     }
+    // };
+    // o = [];
+    // for (let a = 0; a < 10; a++) {
+    //     o[a] = world.createObj(metatest, 0, 0);
+    // }
+    // test(world.willgo,{obj:o[0],t:1},'add to willgo when was created');
+    // o[0].data = 100;
+    // o[1].data = 40;
+    // o[2].data = 3000;
+    // o[3].data = 123;
+    // o[4].data = 15;
+    // exe.onTick();
+    // test(world.willgo, [{obj: o[4], t: 16}, {obj: o[1], t: 41}, {obj: o[0], t: 101}, {obj: o[3], t: 124}, {
+    //     obj: o[2],
+    //     t: 3001
+    // }], 'add in queue to make turn');
 
-    user.new("slon", 1);
+
+    test(user.new("slon", 1));
     test(user.byId(1).id, 1, "userById");
     test(user.byName("slon").username, "slon", "userByName");
     user.new("baton", 2);

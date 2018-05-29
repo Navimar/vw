@@ -98,7 +98,7 @@ meta.tree = {
     onTurn: (data, wd) => {
         if (data.new) {
             data.new = false;
-            wd.nextTurn(700);
+            wd.nextTurn(35000);
         } else {
             wd.transform(wd.me, meta.kaka);
         }
@@ -154,9 +154,9 @@ meta.aphid = {
     },
     onTurn: (data, wd) => {
         let food = meta.highgrass;
-        if (wd.inv(food)) {
+        if (wd.findinInv(food)) {
             if (data.convert > 70) {
-                let hg = wd.inv(food);
+                let hg = wd.findinInv(food);
                 wd.transform(hg, meta.jelly);
                 wd.drop(hg);
                 data.sat = false;
@@ -196,15 +196,21 @@ meta.plant = {
     z: 15,
     img: 'fruit',
     isSolid: false,
+    isNailed: true,
     onCreate(data) {
         data.new = true;
     },
     onTurn: (data, wd) => {
-        if (data.new) {
-            data.new = false;
-            wd.nextTurn(3500);
+        if (wd.inv() >= 5) {
+            wd.transform(wd.me,meta.tree)
         } else {
-            wd.transform(wd.me, meta.tree);
+            let food = meta.kaka;
+            if (wd.isHere(food)) {
+                wd.pickUp(food);
+                wd.nextTurn(500);
+            } else {
+                wd.nextTurn(50);
+            }
         }
     },
 };
@@ -217,7 +223,7 @@ meta.orange = {
     onApply: (obj, wd) => {
         if (obj.tp.player) {
             // wd.trade(obj);
-            wd.transform(wd.me, meta.plant);
+            wd.transform(wd.me, meta.seed);
             if (!wd.removeWound(obj, "hungry")) {
                 wd.addWound(obj, "glut");
             }
@@ -228,7 +234,7 @@ meta.orange = {
             data.new = false;
             wd.nextTurn(1200);
         } else {
-            wd.transform(wd.me, meta.kaka);
+            wd.transform(wd.me, meta.plant);
         }
     },
 };

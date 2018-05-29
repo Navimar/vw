@@ -15,6 +15,7 @@ world.init = function () {
     world.cnMass = 0;
     world.cnId = 0;
     world.cnError = 1;
+    world.willgo = [];
     // world.box.test = true;
     // world.box.error = "everything is fine";
     // world.box.testfail = false;
@@ -297,6 +298,12 @@ world.nextTurn = (time, obj) => {
     let t = world.time + time;
     addtologic(obj, t);
 };
+
+// world.nextTurn = (time, obj) => {
+//     let t = world.time + time;
+//     world.willgo.push({obj,t});
+//     // addtologic(obj, t);
+// };
 
 world.transform = (obj, tp) => {
     obj.tp = tp;
