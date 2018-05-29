@@ -117,12 +117,12 @@ exe.wrapper = (me) => {
 exe.onInit = () => {
     world.init();
     world.start();
-    let dtStartLoop = Date.now();
-    for (let a = 0; a < 300000; a++) {
-        exe.onTick();
-        console.log(a);
-    }
-    console.log('finish ' + (Date.now() - dtStartLoop));
+    // let dtStartLoop = Date.now();
+    // for (let a = 0; a < 300000; a++) {
+    //     exe.onTick();
+    //     console.log(a);
+    // }
+    // console.log('finish ' + (Date.now() - dtStartLoop));
 };
 exe.onTick = () => {
     let dtStartLoop = Date.now();
