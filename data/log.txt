@@ -1,2 +1,0 @@
-{"val":{"event":"init"},"date":1527256662171}
-{"val":{"event":"/start","words":["/start"],"username":"Happycatfish","id":30626617},"date":1527257195278,"tick":125}
