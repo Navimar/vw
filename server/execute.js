@@ -216,7 +216,7 @@ exe.onTick = () => {
             }
 
             function moveLocal(dir) {
-                p.tire = 10;
+                p.tire = 7;
                 world.move(p, dir);
             }
         } else {
