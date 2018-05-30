@@ -7,7 +7,7 @@ if (os.platform() == 'darwin') {
     }
 } else {
     module.exports = {
-        ip: "139.162.182.31",
+        ip: "46.101.23.21",
         port: "80"
     }
 }
