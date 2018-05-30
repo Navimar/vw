@@ -401,7 +401,7 @@ world.start = () => {
 
         // world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
     }
-    for (let a = 0; a < 2000; a++) {
+    for (let a = 0; a < 200; a++) {
         //     world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
         //     world.createObj(meta.plant, _.random(-wid, wid), _.random(-wid, wid));
         //     world.createObj(meta.kaka, _.random(-wid, wid), _.random(-wid, wid));
