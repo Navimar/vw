@@ -30,7 +30,6 @@ let inAir = false;
 
 window.onload = function () {
     inputMouse();
-
     test();
     // sleep(1000);
     initModel();
@@ -91,7 +90,9 @@ function inputServer() {
 
 function onLogin(val) {
     console.log('login ' + val);
-    // alert('login ' + val);
+    if (val == 'authentication error') {
+        alert(val);
+    }
     initModel();
     step(new Date().getTime());
 }

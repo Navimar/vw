@@ -2,3 +2,5 @@
 /test-server/
 /test/
 /.idea/
+data/log.txt
+data/testlog.txt

@@ -242,8 +242,8 @@ world.trade = function (obj, carrier) {
 
 world.move = function (obj, dir) {
     if (_.isFinite(obj.x) && _.isFinite(obj.y)) {
-        let x = obj.x + dir.x;
-        let y = obj.y + dir.y;
+        let x = obj.x + (dir.x);
+        let y = obj.y + (dir.y);
         // if (obj.x === false || obj.y === false) {
         //     world.error = "move (obj.x && obj.y) == false";
         //     return false;
@@ -401,7 +401,7 @@ world.start = () => {
 
         // world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
     }
-    for (let a = 0; a < 200; a++) {
+    for (let a = 0; a < 2000; a++) {
         //     world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
         //     world.createObj(meta.plant, _.random(-wid, wid), _.random(-wid, wid));
         //     world.createObj(meta.kaka, _.random(-wid, wid), _.random(-wid, wid));
