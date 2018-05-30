@@ -405,7 +405,7 @@ world.start = () => {
         //     world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
         //     world.createObj(meta.plant, _.random(-wid, wid), _.random(-wid, wid));
         //     world.createObj(meta.kaka, _.random(-wid, wid), _.random(-wid, wid));
-        world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));
+        // world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));
     }
     for (let a = 0; a < 1000; a++) {
         // world.createObj(meta.orange, _.random(-wid, wid), _.random(-wid, wid));

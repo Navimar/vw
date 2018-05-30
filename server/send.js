@@ -65,6 +65,7 @@ send.web = (dtStartLoop) => {
         //     // data.error = world.error;
         //     // data.connected = world.connected;
         data.time = world.time;
+        data.tire = p.tire;
         data.died = p.data.died;
         p.socket.emit('updateState', data);
         // }

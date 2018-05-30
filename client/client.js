@@ -1,5 +1,5 @@
 const socket = io();
-const constSpeed = 0.00065;
+const constSpeed = 0.0017;
 const login = {};
 login.pass = findGetParameter("key");
 login.id = findGetParameter("id");
@@ -115,6 +115,7 @@ function initModel() {
     model.trx = 0;
     model.try = 0;
     model.selected = 0;
+    model.tire = 0;
     model.order = {};
     model.orderCn = 0;
     model.lastorder = 0;
@@ -150,6 +151,7 @@ function onServer(val) {
     //         model.holst[x][y] = "grass";
     //     }
     // }
+    model.tire = val.tire;
     model.dirx = val.dirx;
     model.diry = val.diry;
     model.wound = val.wound;
@@ -326,7 +328,9 @@ function render(model) {
             // }
         }
     }
-
+    for (let a = 0;  a <model.tire; a++) {
+        drawImg("target", 4,  4);
+    }
     for (let o of model.obj) {
         // drawImg(o.img, o.x, o.y);
         drawImg(o.img, o.sx, o.sy);
@@ -422,7 +426,9 @@ let renderTarget = () => {
     //         break;
     // }
     // drawImg("from", 4 + ex, 4 + ey);
-    drawImg("from", model.order.targetx - model.px + 4, model.order.targety - model.py + 4);
+    // console.log(model.tire);
+    // drawImg("from", model.order.targetx - model.px + 4, model.order.targety - model.py + 4);
+
 };
 
 function onMouseDown() {
