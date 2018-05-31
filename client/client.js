@@ -1,5 +1,5 @@
 const socket = io();
-const constSpeed = 0.0017;
+const constSpeed = 0.00065;
 const login = {};
 login.pass = findGetParameter("key");
 login.id = findGetParameter("id");
@@ -205,18 +205,23 @@ function onServer(val) {
     model.px = val.px;
     model.py = val.py;
     if (!inAir && mouseDown) {
-        if (mouseCell.x + mouseCell.y > 8 && mouseCell.x > mouseCell.y) {
-            orderRight();
-        }
-        if (mouseCell.x + mouseCell.y < 8 && mouseCell.x > mouseCell.y) {
-            orderUp();
-        }
-        if (mouseCell.x + mouseCell.y < 8 && mouseCell.x < mouseCell.y) {
-            orderLeft();
-        }
-        if (mouseCell.x + mouseCell.y > 8 && mouseCell.x < mouseCell.y) {
-            orderDown();
-        }
+        // if (mouseCell.x + mouseCell.y > 8 && mouseCell.x > mouseCell.y) {
+        //     orderRight();
+        // }
+        // if (mouseCell.x + mouseCell.y < 8 && mouseCell.x > mouseCell.y) {
+        //     orderUp();
+        // }
+        // if (mouseCell.x + mouseCell.y < 8 && mouseCell.x < mouseCell.y) {
+        //     orderLeft();
+        // }
+        // if (mouseCell.x + mouseCell.y > 8 && mouseCell.x < mouseCell.y) {
+        //     orderDown();
+        // }
+        model.order.targetx = model.px + mouseCell.x - 4;
+        model.order.targety = model.py + mouseCell.y - 4;
+        model.order.name = "move";
+        model.order.val = "point";
+        model.orderCn++;
         if (mouseCell.x == 4 && mouseCell.y == 4) {
             orderStop();
         }
@@ -292,11 +297,10 @@ function onStep(timeDiff) {
 
 function out() {
     model.date = new Date().getTime();
-    socket.emit("ping");
+    // socket.emit("ping");
     // let send= {order: model.order, targetx: model.targetx, targety: model.targety};
-    let send = model.order;
     if (model.lastorder !== model.orderCn) {
-        socket.emit("order", send);
+        socket.emit("order", model.order);
         model.lastorder = model.orderCn;
     }
 }
@@ -328,9 +332,9 @@ function render(model) {
             // }
         }
     }
-    for (let a = 0;  a <model.tire; a++) {
-        drawImg("target", 4,  4);
-    }
+    // for (let a = 0; a < model.tire; a++) {
+    //     drawImg("target", 4, 4);
+    // }
     for (let o of model.obj) {
         // drawImg(o.img, o.x, o.y);
         drawImg(o.img, o.sx, o.sy);
@@ -427,7 +431,7 @@ let renderTarget = () => {
     // }
     // drawImg("from", 4 + ex, 4 + ey);
     // console.log(model.tire);
-    // drawImg("from", model.order.targetx - model.px + 4, model.order.targety - model.py + 4);
+    drawImg("from", model.order.targetx - model.px + 4, model.order.targety - model.py + 4);
 
 };
 

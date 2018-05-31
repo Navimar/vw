@@ -51,7 +51,7 @@ input.socket = (io) => {
         // });
         socket.on('ping', function () {
             // console.log('ping');
-            socket.emit('ping');
+            // socket.emit('ping');
         });
     });
 };

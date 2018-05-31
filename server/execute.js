@@ -138,26 +138,63 @@ exe.onTick = () => {
         if (p.tire <= 0) {
             // console.log()
             switch (p.order.name) {
+                // case "move":
+                //     if (p.order.val == "up") {
+                //         moveLocal(direction.up);
+                //         p.dirx = 0;
+                //         p.diry = -1;
+                //     }
+                //     if (p.order.val == "right") {
+                //         moveLocal(direction.right);
+                //         p.dirx = 1;
+                //         p.diry = 0;
+                //     }
+                //     if (p.order.val == "left") {
+                //         moveLocal(direction.left);
+                //         p.dirx = -1;
+                //         p.diry = 0;
+                //     }
+                //     if (p.order.val == "down") {
+                //         moveLocal(direction.down);
+                //         p.dirx = 0;
+                //         p.diry = 1;
+                //     }
+                //     break;
                 case "move":
+                    if (p.order.val == "point") {
+                        p.data.order = {x: p.order.targetx, y: p.order.targety};
+                        p.tp.onTurn(p.data, exe.wrapper(p));
+                        p.dirx = 0;
+                        p.diry = 0;
+                        p.tire = 7;
+                    }
                     if (p.order.val == "up") {
-                        moveLocal(direction.up);
+                        p.data.order = {x: p.x, y: p.y - 1};
+                        p.tp.onTurn(p.data, exe.wrapper(p));
                         p.dirx = 0;
                         p.diry = -1;
+                        p.tire = 7;
                     }
                     if (p.order.val == "right") {
-                        moveLocal(direction.right);
-                        p.dirx = 1;
-                        p.diry = 0;
+                        p.data.order = {x: p.x + 1, y: p.y};
+                        p.tp.onTurn(p.data, exe.wrapper(p));
+                        p.dirx = 0;
+                        p.diry = -1;
+                        p.tire = 7;
                     }
                     if (p.order.val == "left") {
-                        moveLocal(direction.left);
-                        p.dirx = -1;
-                        p.diry = 0;
+                        p.data.order = {x: p.x-1, y: p.y};
+                        p.tp.onTurn(p.data, exe.wrapper(p));
+                        p.dirx = 0;
+                        p.diry = -1;
+                        p.tire = 7;
                     }
                     if (p.order.val == "down") {
-                        moveLocal(direction.down);
+                        p.data.order = {x: p.x, y: p.y + 1};
+                        p.tp.onTurn(p.data, exe.wrapper(p));
                         p.dirx = 0;
-                        p.diry = 1;
+                        p.diry = -1;
+                        p.tire = 7;
                     }
                     break;
                 case "use":
@@ -216,7 +253,7 @@ exe.onTick = () => {
             }
 
             function moveLocal(dir) {
-                p.tire = 7;
+
                 world.move(p, dir);
             }
         } else {

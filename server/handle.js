@@ -21,7 +21,7 @@ handle.socket = (socket, eventName, msg) => {
         let name = msg.name;
         switch (name) {
             case 'move':
-                event.order(p, {name, val: msg.val});
+                event.order(p, {name, val: msg.val,targetx:msg.targetx,targety:msg.targety,});
                 break;
             case 'stop':
                 event.order(p, {name, val: msg.val});

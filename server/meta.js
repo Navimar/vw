@@ -14,6 +14,10 @@ meta.player = {
     },
     isSolid: true,
     z: 999,
+    onTurn: (data, wd) => {
+        let w = wd.moveTo(data.order.x, data.order.y);
+        // wd.nextTurn(16);
+    },
 };
 
 meta.highgrass = {
