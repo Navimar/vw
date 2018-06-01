@@ -34,7 +34,7 @@ send.web = (dtStartLoop) => {
                                 r.tp.img(r.data)
                                 :
                                 r.tp.img;
-                        data.obj.push({x: x, y: y, img, id: r.id});
+                        data.obj.push({x, y, img, id: r.id, z: r.tp.z});
                         if (x === 4 && y === 4 && r.tp !== meta.player) {
                             data.ground.push({img, id: r.id})
                         }
@@ -55,15 +55,9 @@ send.web = (dtStartLoop) => {
         }
         data.px = p.x;
         data.py = p.y;
-            data.dirx = p.dirx;
-            data.diry = p.diry;
-        //     // data.hand = theUser.hand;
-        //     // data.message = theUser.message;
+        data.dir = p.data.dir;
         data.delay = Date.now() - dtStartLoop;
-        //     // data.cnMass = world.cnMass;
-        //     // data.cnActive = world.cnActive;
-        //     // data.error = world.error;
-        //     // data.connected = world.connected;
+        data.connected = world.connected;
         data.time = world.time;
         data.tire = p.tire;
         data.died = p.data.died;

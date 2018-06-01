@@ -63,6 +63,9 @@ event.login = (u, socket, pass) => {
 };
 
 event.order = (p, order) => {
+    // if(!p.data){
+    //     throw j;
+    // }
     if (!p.data.died) {
         // if (p.lastorder.name !== order.name || p.lastorder.val.id !== order.val.id) {
         //     console.log(p.lastorder);

@@ -1,7 +1,7 @@
 /**
  * Created by igor on 16/02/2017.
  */
-
+const _ = require('underscore');
 const fs = require('fs');
 const world = require('./world');
 const meta = require('./meta');
@@ -77,23 +77,6 @@ module.exports = () => {
     // let p = world.addPlayer();
     // exe.apply(direction.right, p);
     // test(world.objArrInInv(p), false, "empty doesn't get in inv");
-
-    world.init("moveTo");
-    let w = world.createObj(meta.wolf, -5, 0);
-    exe.wrapper(w).moveTo(0, 0);
-    test(w.x, -4, "wolf moveTo right");
-    world.init("moveTo");
-    w = world.createObj(meta.wolf, 5, 0);
-    exe.wrapper(w).moveTo(0, 0);
-    test(w.x, 4, "wolf moveTo left");
-    world.init("moveTo");
-    w = world.createObj(meta.wolf, 0, -5);
-    exe.wrapper(w).moveTo(0, 0);
-    test(w.y, -4, "wolf moveTo up");
-    world.init("moveTo");
-    w = world.createObj(meta.wolf, 0, 5);
-    exe.wrapper(w).moveTo(0, 0);
-    test(w.y, 4, "wolf moveTo down");
     world.init("wolf");
     world.addPlayer();
     w = world.createObj(meta.wolf, -4, 0);
@@ -252,36 +235,26 @@ module.exports = () => {
 
     world.init();
     p = world.addPlayer();
-    o = world.createObj(meta.stick,0,0);
+    o = world.createObj(meta.stick, 0, 0);
     world.put(o, p);
-    k = world.createObj(meta.wolf,1,0);
+    k = world.createObj(meta.wolf, 1, 0);
     event.order(p, {name: 'use', from: "inv", id: o.id, targetX: 1, targetY: 0});
     exe.onTick();
-    test(k.tp,meta.orange,'aplly near');
+    test(k.tp, meta.orange, 'aplly near');
 
     // world.init();
-    // let metatest = {
-    //     onTurn(data, wd) {
-    //         wd.nextTurn(data);
-    //     }
-    // };
-    // o = [];
-    // for (let a = 0; a < 10; a++) {
-    //     o[a] = world.createObj(metatest, 0, 0);
+    // for (let a = 0; a < 10000; a++) {
+    //     //     world.createObj(meta.kaka, _.random(-wid, wid), _.random(-wid, wid));
+    //     world.createObj(meta.wolf, _.random(-1000, 1000), _.random(-1000, 1000));
     // }
-    // test(world.willgo,{obj:o[0],t:1},'add to willgo when was created');
-    // o[0].data = 100;
-    // o[1].data = 40;
-    // o[2].data = 3000;
-    // o[3].data = 123;
-    // o[4].data = 15;
-    // exe.onTick();
-    // test(world.willgo, [{obj: o[4], t: 16}, {obj: o[1], t: 41}, {obj: o[0], t: 101}, {obj: o[3], t: 124}, {
-    //     obj: o[2],
-    //     t: 3001
-    // }], 'add in queue to make turn');
-
-
+    //
+    // for (let a = 0; a < 5; a++) {
+    //     let dtStartLoop = Date.now();
+    //     for (let b = 0; b < 100; b++) {
+    //         exe.onTick();
+    //     }
+    //     console.log('wolfs finishs ' + (Date.now() - dtStartLoop));
+    // }
     test(user.new("slon", 1));
     test(user.byId(1).id, 1, "userById");
     test(user.byName("slon").username, "slon", "userByName");

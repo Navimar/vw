@@ -109,15 +109,23 @@ exe.wrapper = (me) => {
                 }
             }
 
-            let xWant = Math.abs(me.x - x);
-            let yWant = Math.abs(me.y - y);
-            if (xWant > yWant) {
+            let xWant = me.x - x;
+            let yWant = me.y - y;
+            if (Math.abs(xWant) > Math.abs(yWant)) {
                 goX();
-            } else {
+            }
+            if (Math.abs(xWant) < Math.abs(yWant)) {
                 goY();
             }
-            world.move(me, dir);
-            return {xWant, yWant};
+            if (Math.abs(xWant) === Math.abs(yWant)) {
+                if (_.random(0, 1)) {
+                    goY();
+                } else {
+                    goX();
+                }
+            }
+
+            return {dir, xWant, yWant};
         },
         find: (target) => world.find(target, me.x, me.y),
     };
@@ -183,7 +191,7 @@ exe.onTick = () => {
                         p.tire = 7;
                     }
                     if (p.order.val == "left") {
-                        p.data.order = {x: p.x-1, y: p.y};
+                        p.data.order = {x: p.x - 1, y: p.y};
                         p.tp.onTurn(p.data, exe.wrapper(p));
                         p.dirx = 0;
                         p.diry = -1;
@@ -272,20 +280,30 @@ exe.onTick = () => {
     }
 
     let m = 0;
-    let go = world.logic.get(world.time);
-    if (go != undefined) {
-        for (let me of go) {
-            if (me.nextTurn === world.time) {
-                if (me.tp.onTurn) {
-                    let wd = exe.wrapper(me);
-                    me.tp.onTurn(me.data, wd);
-                }
+    // let go = world.logic.get(world.time);
+    // if (go != undefined) {
+    //     for (let me of go) {
+    //         if (me.nextTurn === world.time) {
+    //             if (me.tp.onTurn) {
+    //                 let wd = exe.wrapper(me);
+    //                 me.tp.onTurn(me.data, wd);
+    //             }
+    //         }
+    //         m++;
+    //     }
+    // } else {
+    //     // console.log('nobody is moving '+world.time);
+    // }
+    for (let o of world.obj){
+        // let o =world.obj[i];
+        if(o.nextTurn===world.time){
+            if (o.tp.onTurn) {
+                let wd = exe.wrapper(o);
+                o.tp.onTurn(o.data, wd);
             }
-            m++;
         }
-    } else {
-        // console.log('nobody is moving '+world.time);
     }
+
     world.cnActive = m;
     world.logic.delete(world.time);
     world.time++;

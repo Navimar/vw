@@ -15,8 +15,9 @@ meta.player = {
     isSolid: true,
     z: 999,
     onTurn: (data, wd) => {
-        let w = wd.moveTo(data.order.x, data.order.y);
-        // wd.nextTurn(16);
+        let dir = wd.moveTo(data.order.x, data.order.y).dir;
+        data.dir = dir;
+        wd.move(dir);
     },
 };
 
@@ -42,12 +43,16 @@ meta.wolf = {
     z: 14,
     isSolid: true,
     onTurn: (data, wd) => {
-        let t = wd.find(meta.player);
+        let t;
+        t = wd.find(meta.player);
         if (t) {
-            let w = wd.moveTo(t.x, t.y);
-            if (w.xWant+w.yWant<=1){
-                wd.addWound(t,"bite");
+            let mt = wd.moveTo(t.x, t.y);
+            wd.move(mt.dir);
+            if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
+                wd.addWound(t, "bite");
             }
+        }else{
+            wd.move(wd.dirRnd);
         }
         wd.nextTurn(16);
     },
@@ -100,7 +105,7 @@ meta.kaka = {
 meta.oranger = {
     img: "fruit",
     z: 2,
-    isNailed:true,
+    isNailed: true,
     onApply: (obj, wd) => {
         wd.getOut(obj.x, obj.y);
     },
@@ -229,19 +234,19 @@ meta.aphid = {
         let food = [meta.highgrass, meta.orange];
         let obj = wd.pickUp(food);
         if (obj) {
-            data.satiety+=1000;
+            data.satiety += 1000;
             if (obj.tp === meta.highgrass) {
                 data.kaka ? wd.transform(obj, meta.kaka) : wd.transform(obj, meta.seed);
                 data.kaka ^= true;
             }
-            if (obj.tp === meta.orange){
+            if (obj.tp === meta.orange) {
                 data.kaka ? wd.transform(obj, meta.kaka) : wd.transform(obj, meta.seed);
                 data.kaka ^= true;
             }
         } else {
             wd.drop();
             wd.move(wd.dirRnd);
-            if (data.satiety<=0){
+            if (data.satiety <= 0) {
                 wd.transform(wd.me, meta.bone)
             }
         }
@@ -288,8 +293,8 @@ meta.aphid = {
         //         }
         //     }
         // }
-        let f=20;
-        data.satiety-=f;
+        let f = 20;
+        data.satiety -= f;
         wd.nextTurn(f);
     },
     onApply: (obj, wd) => {
@@ -310,7 +315,7 @@ meta.plant = {
     isNailed: true,
     onCreate(data) {
         data.new = true;
-        data.hungry=0;
+        data.hungry = 0;
     },
     onTurn: (data, wd) => {
         if (wd.inv() >= 4) {
@@ -322,8 +327,8 @@ meta.plant = {
                 // wd.transform(o, meta.kaka);
                 wd.nextTurn(500);
             } else {
-                data.hungry+=50;
-                if (data.hungry>30000){
+                data.hungry += 50;
+                if (data.hungry > 30000) {
                     wd.dropAll();
                     wd.transform(wd.me, meta.highgrass)
                 }
@@ -360,11 +365,11 @@ meta.orange = {
     // },
 };
 
-meta.stick ={
-  z:3,
-  img:'stick',
+meta.stick = {
+    z: 3,
+    img: 'stick',
     onApply: (obj, wd) => {
-        if (obj.tp== meta.wolf) {
+        if (obj.tp == meta.wolf) {
             // wd.trade(obj);
             wd.transform(obj, meta.orange);
             wd.transform(wd.me, meta.seed);

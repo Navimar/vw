@@ -16,6 +16,9 @@ world.init = function () {
     world.cnId = 0;
     world.cnError = 1;
     world.willgo = [];
+
+
+    world.obj = [];
     // world.box.test = true;
     // world.box.error = "everything is fine";
     // world.box.testfail = false;
@@ -41,37 +44,6 @@ function remove(k, obj) {
         world.error = "remove error. Key = " + k;
     }
 }
-
-
-// world.addPlayer = (key, socket, name, chatId) => {
-//     let p = {
-//         socket,
-//         name,
-//         key,
-//         chatId,
-//         id: makeid()
-//     };
-//     p.x = 0;
-//     p.y = 0;
-//     p.solid = true;
-//     p.dirx = 0;
-//     p.diry = 0;
-//     p.order = "stop";
-//     p.order.n = 0;
-//     p.img = "hero";
-//     p.satiety = 1000;
-//     p.wound = [];
-//     p.tire = 0;
-//     p.tool = {typ: "hand"};
-//     p.slct = 0;
-//     p.tp = meta.player;
-//     for (let a = 0; a < 9; a++) {
-//         p.wound[a] = "life";
-//     }
-//     addtoMap(p.x, p.y, p);
-//     world.box.player.push(p);
-//     return p;
-// };
 
 world.addPlayer = (socket, id) => {
     let p = {socket, id,};
@@ -102,9 +74,11 @@ world.addPlayer = (socket, id) => {
     return p;
 };
 world.playerBySocket = (socket) => {
-    for (let p of world.player) {
-        if (p.socket == socket) {
-            return p
+    if (socket) {
+        for (let p of world.player) {
+            if (p.socket == socket) {
+                return p
+            }
         }
     }
     return false;
@@ -200,7 +174,11 @@ world.createObj = (tp, x, y) => {
         tp.onCreate(data);
     }
     let o = {x: x, y: y, id: makeid(), tp, data};
+
+
     addtoMap(x, y, o);
+    world.obj.push(o);
+
     if (tp.onTurn) {
         let t = world.time + _.random(99);
         addtologic(o, t);
@@ -307,6 +285,20 @@ world.isInInv = (obj, carrier) => {
 };
 
 world.relocate = (obj, x, y) => {
+
+    // if (obj.carrier!==undefined&& obj.carrier!==false) {
+    //     console.log (obj.carrier);
+    //     throw 'relocate from inv';
+    // }
+    // for (let o of world.obj) {
+    //     if (o === obj) {
+    //         o.x = x;
+    //         o.y = y;
+    //         break;
+    //     }
+    // }
+
+
     removefromMap(obj);
     addtoMap(x, y, obj)
 };
@@ -315,12 +307,6 @@ world.nextTurn = (time, obj) => {
     let t = world.time + time;
     addtologic(obj, t);
 };
-
-// world.nextTurn = (time, obj) => {
-//     let t = world.time + time;
-//     world.willgo.push({obj,t});
-//     // addtologic(obj, t);
-// };
 
 world.transform = (obj, tp) => {
     obj.tp = tp;
@@ -335,6 +321,20 @@ world.transform = (obj, tp) => {
 };
 
 world.objArrInPoint = (x, y) => {
+    ////array
+    // let arr = [];
+    // for (let o of world.obj) {
+    //     if (o.x === x && o.x === y) {
+    //         arr.push(o);
+    //     }
+    // }
+    // if (arr[0]) {
+    //     return arr;
+    // } else {
+    //     return false;
+    // }
+
+    //keys
     if (world.map.has(x + " " + y)) {
         let obj = world.map.get(x + " " + y);
         if (obj.length > 0) {
@@ -387,27 +387,27 @@ world.find = (tp, x, y) => {
 };
 
 world.start = () => {
-    let wid = 100;
+    let wid = 1000;
     // world.createObj(meta.test, 2, 2);
-    for (let a = 0; a < 1000; a++) {
+    for (let a = 0; a < 10000; a++) {
         world.createObj(meta.stick, _.random(-wid, wid), _.random(-wid, wid));
         world.createObj(meta.orange, _.random(-wid, wid), _.random(-wid, wid));
 
 
         // world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
     }
-    for (let a = 0; a < 4000; a++) {
+    for (let a = 0; a < 40000; a++) {
         world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
 
         // world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
     }
-    for (let a = 0; a < 2000; a++) {
-        //     world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
+    for (let a = 0; a < 20000; a++) {
+        // world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
         //     world.createObj(meta.plant, _.random(-wid, wid), _.random(-wid, wid));
         //     world.createObj(meta.kaka, _.random(-wid, wid), _.random(-wid, wid));
-        // world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));
+        world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));
     }
-    for (let a = 0; a < 1000; a++) {
+    for (let a = 0; a < 10000; a++) {
         // world.createObj(meta.orange, _.random(-wid, wid), _.random(-wid, wid));
     }
     // for (let a = 0; a < 50; a++) {

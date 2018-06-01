@@ -41,17 +41,20 @@ let test = () => {
     initModel();
 };
 
+function updOrder(e) {
+    mousePos = getMousePos(canvas, e);
+    // mouseCell = {
+    //     x: Math.floor((mousePos.x - shiftX) / dh)-model.trx,
+    //     y: Math.floor((mousePos.y ) / dh-model.try)
+    // };
+
+    if (mouseDown)
+        click = mousePos;
+
+    // console.log(click);
+}
+
 function inputMouse() {
-    function updOrder(e) {
-        mousePos = getMousePos(canvas, e);
-        mouseCell = {x: Math.floor((mousePos.x - shiftX) / dh), y: Math.floor(mousePos.y / dh)};
-
-        if (mouseDown)
-            click = mousePos;
-
-        // console.log(click);
-    }
-
     canvas.addEventListener("mousedown", e => {
         mouseDown = true;
         onMouseDown();
@@ -112,13 +115,13 @@ function initModel() {
     }
     model.obj = [{x: 1, y: 1, sx: 5, sy: 5, img: "test"}];
     model.stamp = 1;
-    model.trx = 0;
-    model.try = 0;
     model.selected = 0;
     model.tire = 0;
     model.order = {};
     model.orderCn = 0;
     model.lastorder = 0;
+    model.dirx = 0;
+    model.diry =0;
 }
 
 window.requestAnimFrame = (function (callback) {
@@ -152,8 +155,9 @@ function onServer(val) {
     //     }
     // }
     model.tire = val.tire;
-    model.dirx = val.dirx;
-    model.diry = val.diry;
+    if(val.dir){
+    model.dirx = val.dir.x;
+    model.diry = val.dir.y;}
     model.wound = val.wound;
     model.message = val.message;
     // model.hand = val.hand;
@@ -164,14 +168,20 @@ function onServer(val) {
     model.error = val.error;
     model.time = val.time;
     model.cnActive = val.cnActive;
-    // model.obj = val.obj;
     model.ground = val.ground;
     for (let v of val.obj) {
         let ok = true;
         for (let m of model.obj) {
             if (m.id == v.id) {
-                m.x = v.x;
-                m.y = v.y;
+                m.z = v.z;
+                if (m.x !== v.x) {
+                    // m.ox =m.x;
+                    m.x = v.x;
+                }
+                if (m.y !== v.y) {
+                    // m.oy =m.y;
+                    m.y = v.y;
+                }
                 m.img = v.img;
                 ok = false;
             }
@@ -199,6 +209,8 @@ function onServer(val) {
             model.obj.splice(n, 1);
         }
     }
+    // model.obj = val.obj;
+
     if (model.px != val.px || model.py != val.py) {
         model.stamp = 1;
     }
@@ -244,40 +256,30 @@ function onStep(timeDiff) {
         if (!_.isFinite(o.sy)) {
             o.sy = o.y + model.diry;
         }
-        // let ex = 0;
-        // let ey = 0;
-        // if ((model.targetx != model.px || model.targety != model.py) && o.name !== model.name) {
-        //     switch (model.order) {
-        //         case "up":
-        //             ey += 1;
-        //             break;
-        //         case "right":
-        //             ex -= 1;
-        //             break;
-        //         case "left":
-        //             ex += 1;
-        //             break;
-        //         case "down":
-        //             ey -= 1;
-        //             break;
-        //         default:
-        //             break;
-        //     }
-        // // console.log(o.name);
-        // }
         let r = range(o.sx, o.sy, o.x, o.y);
         if (r < 1) {
             r = 1;
-        } else {
-            r = 2;
-            // console.log(r);
         }
+        // else {
+        //     r = 2;
+        //     // console.log(r);
+        // }
         let m = move(o.sx, o.sy, o.x, o.y, r * constSpeed, timeDiff);
         o.sx = m.x;
         o.sy = m.y;
         // o.sx = o.x;
         // o.sy = o.y;
     }
+    // for (let o of model.obj) {
+    //     // let dirx = o.x - o.ox;
+    //     // let diry = o.y - o.oy;
+    //     o.trx = o.dirx * model.stamp;
+    //     o.try = o.diry * model.stamp;
+    //     o.trx = 1 * model.stamp;
+    //     o.try = 0 * model.stamp;
+    //
+    // }
+
     model.stamp -= timeDiff * constSpeed;
     if (model.stamp < 0) {
         model.stamp = 0;
@@ -290,8 +292,21 @@ function onStep(timeDiff) {
     }
     model.trx = model.dirx * model.stamp;
     model.try = model.diry * model.stamp;
+
+    if (mousePos.x > shiftX) {
+        mouseCell = {
+            x: Math.floor((mousePos.x - shiftX) / dh - model.trx),
+            y: Math.floor((mousePos.y) / dh - model.try)
+        }
+    } else {
+        mouseCell = {
+            x: Math.floor((mousePos.x - shiftX) / dh),
+            y: Math.floor((mousePos.y) / dh)
+        }
+    }
+
     render(model);
-    model.lastmessage = model.message;
+    // model.lastmessage = model.message;
 }
 
 
@@ -323,21 +338,45 @@ function move(fx, fy, tx, ty, speed, timeDiff) {
 function render(model) {
     resize();
     renderStatus();
+
+    //render grass
     for (let y = -1; y < 10; y++) {
         for (let x = -1; x < 10; x++) {
             // drawImg("grass", x, y);
-            drawImg("grass", x + model.trx, y + model.try);
+            drawImg("dark", x + model.trx, y + model.try);
             // for (let h of model.holst[x][y]) {
             //     drawImg(model.holst[x][y], x + model.trx, y + model.try);
             // }
         }
     }
+    //render tire
     // for (let a = 0; a < model.tire; a++) {
     //     drawImg("target", 4, 4);
     // }
+    drawImg("friend", model.order.targetx - model.px + 4 + model.trx, model.order.targety - model.py + 4 + model.try);
+
     for (let o of model.obj) {
-        // drawImg(o.img, o.x, o.y);
+        drawImg("from", o.x + model.trx, o.y + model.try);
+    }
+
+    model.obj.sort((a, b) => {
+        if (a.z < b.z) {
+            return -1;
+        } else return 1;
+    });
+
+    for (let o of model.obj) {
+        // drawImg(o.img, o.x + model.trx + o.trx, o.y + model.try + o.try);
+        //
+        // drawImg(o.img, o.sx-model.trx, o.sy - model.try);
         drawImg(o.img, o.sx, o.sy);
+
+
+    }
+    for (let o of model.obj) {
+        // drawImg(o.img, o.x + model.trx, o.y + model.try);
+
+        // drawImg(o.img, o.sx, o.sy);
     }
     for (let a = 0; a < 9; a++) {
         drawImg("black", 9, a);
@@ -378,16 +417,13 @@ function render(model) {
     if (mouseDown && inAir.obj) {
         drawImg(inAir.obj.img, (mousePos.x - shiftX) / dh - 0.5, mousePos.y / dh - 0.5);
     }
-    drawImg("select", mouseCell.x, mouseCell.y);
-    renderTarget();
-    //
-    //
-    // for (let o of model.obj) {
-    //     // drawImg("from", o.x, o.y);
-    // }
-    //
+    if (mouseCell.x >= 0 && mouseCell.x < 9) {
+        drawImg("select", mouseCell.x + model.trx, mouseCell.y + model.try);
+    } else {
+        drawImg("select", mouseCell.x, mouseCell.y);
+        // drawImg("select", mouseCell.x + model.trx, mouseCell.y + model.try);
 
-
+    }
     // // if (model.hand != "hand") drawSize(model.hand.img, 4.25, 4.25,0.6,0.6);
     // if (model.message != model.lastmessage) message(model.message);
 }
@@ -408,31 +444,6 @@ let renderStatus = () => {
     str += "mouseCellX: " + mouseCell.x + "</br>";
     str += "mouseCellY: " + mouseCell.y + "</br>";
     $("#ping").html(str);
-};
-
-let renderTarget = () => {
-    // let ex = 0;
-    // let ey = 0;
-    // switch (model.order.val) {
-    //     case "up":
-    //         ey -= 1;
-    //         break;
-    //     case "right":
-    //         ex += 1;
-    //         break;
-    //     case "left":
-    //         ex -= 1;
-    //         break;
-    //     case "down":
-    //         ey += 1;
-    //         break;
-    //     default:
-    //         break;
-    // }
-    // drawImg("from", 4 + ex, 4 + ey);
-    // console.log(model.tire);
-    drawImg("from", model.order.targetx - model.px + 4, model.order.targety - model.py + 4);
-
 };
 
 function onMouseDown() {

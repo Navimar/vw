@@ -17,32 +17,33 @@ handle.socket = (socket, eventName, msg) => {
     }
     if (eventName == 'order') {
         let p = world.playerBySocket(socket);
-        // console.log(msg.val);
-        let name = msg.name;
-        switch (name) {
-            case 'move':
-                event.order(p, {name, val: msg.val,targetx:msg.targetx,targety:msg.targety,});
-                break;
-            case 'stop':
-                event.order(p, {name, val: msg.val});
-                break;
-            case'use':
-                event.order(p, {
-                    name,
-                    id: msg.val.id,
-                    from: msg.val.from,
-                    targetX: msg.val.targetX,
-                    targetY: msg.val.targetY,
-                });
-                break;
-            case 'take':
-                event.order(p, {name, id: msg.val});
-                break;
-            case 'drop':
-                event.order(p, {name, id: msg.val});
-                break;
+        if(p) {
+            // console.log(msg.val);
+            let name = msg.name;
+            switch (name) {
+                case 'move':
+                    event.order(p, {name, val: msg.val, targetx: msg.targetx, targety: msg.targety,});
+                    break;
+                case 'stop':
+                    event.order(p, {name, val: msg.val});
+                    break;
+                case'use':
+                    event.order(p, {
+                        name,
+                        id: msg.val.id,
+                        from: msg.val.from,
+                        targetX: msg.val.targetX,
+                        targetY: msg.val.targetY,
+                    });
+                    break;
+                case 'take':
+                    event.order(p, {name, id: msg.val});
+                    break;
+                case 'drop':
+                    event.order(p, {name, id: msg.val});
+                    break;
+            }
         }
-
 
     }
 
