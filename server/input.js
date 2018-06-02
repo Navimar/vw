@@ -58,8 +58,8 @@ input.tick = () => {
         // update(delta);
         event.tick();
 
-        console.log('delta', delta, '(target: ' + tickLengthMs +' ms)', 'node ticks', actualTicks);
-        actualTicks = 0
+        // console.log('delta', delta, '(target: ' + tickLengthMs +' ms)', 'node ticks', actualTicks);
+        actualTicks = 0;
     }
 
     if (Date.now() - previousTick < tickLengthMs - 16) {
