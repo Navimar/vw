@@ -426,26 +426,26 @@ world.find = (tp, x, y) => {
 
 world.start = () => {
     let start = 5000;
-    let wid = 250;
+    let wid = 400;
     wid += start;
     // world.createObj(meta.test, 2, 2);
-    for (let a = 0; a < 300; a++) {
+    for (let a = 0; a < 3000; a++) {
         world.createObj(meta.stick, _.random(start, wid), _.random(start, wid));
         world.createObj(meta.orange, _.random(start, wid), _.random(start, wid));
         // world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
     }
-    for (let a = 0; a < 6000; a++) {
+    for (let a = 0; a < 60000; a++) {
         world.createObj(meta.tree, _.random(start, wid), _.random(start, wid));
 
         // world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
     }
-    for (let a = 0; a < 700; a++) {
+    for (let a = 0; a < 7000; a++) {
         // world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
         //     world.createObj(meta.plant, _.random(-wid, wid), _.random(-wid, wid));
         //     world.createObj(meta.kaka, _.random(-wid, wid), _.random(-wid, wid));
         world.createObj(meta.wolf, _.random(start, wid), _.random(start, wid));
     }
-    for (let a = 0; a < 100; a++) {
+    for (let a = 0; a < 1000; a++) {
         // world.createObj(meta.orange, _.random(-wid, wid), _.random(-wid, wid));
     }
     // for (let a = 0; a < 50; a++) {

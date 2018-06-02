@@ -23,7 +23,7 @@ event.init = () => {
 };
 
 event.tick = (val) => {
-    saveEvent(val);
+    saveEvent({event: 'tick'});
     send.web(exe.onTick());
 };
 
