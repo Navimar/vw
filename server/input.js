@@ -11,7 +11,7 @@ let dtLoop = Date.now();
 input.init =()=>{
   event.init();
 };
-//
+
 // input.tick = () => {
 //     setInterval(function () {
 //         let dtNow = Date.now();
