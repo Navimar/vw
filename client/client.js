@@ -78,10 +78,9 @@ function inputServer() {
     socket.on('updateState', function (val) {
         onServer(val);
     });
-    // socket.on('testFail', (val) => {
-    //     onTestFail(val);
-    //     socket.emit('end');
-    // });
+    socket.on('errorr', (val) => {
+        alert(val);
+    });
     socket.on('login', (val) => {
         onLogin(val);
     });

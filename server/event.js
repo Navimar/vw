@@ -61,11 +61,11 @@ event.bot = (val) => {
 event.login = (u, socket, pass) => {
     user.login(u, socket, pass);
 };
+event.unregistered=(id,socket)=>{
+    send.error(id,socket,id+' is unregistered, please type /start to bot');
+};
 
 event.order = (p, order) => {
-    // if(!p.data){
-    //     throw j;
-    // }
     if (!p.data.died) {
         // if (p.lastorder.name !== order.name || p.lastorder.val.id !== order.val.id) {
         //     console.log(p.lastorder);

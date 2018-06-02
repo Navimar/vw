@@ -9,7 +9,11 @@ handle.socket = (socket, eventName, msg) => {
 
     if (eventName == 'login') {
         let u = user.byId(msg.id);
-        event.login(u, socket, msg.pass);
+        if (u) {
+            return event.login(u, socket, msg.pass);
+        } else {
+            return event.unregistered(msg.id, socket);
+        }
     }
     if (eventName == 'connection') {
         // let u = user.bySocket(socket);
@@ -17,7 +21,7 @@ handle.socket = (socket, eventName, msg) => {
     }
     if (eventName == 'order') {
         let p = world.playerBySocket(socket);
-        if(p) {
+        if (p) {
             // console.log(msg.val);
             let name = msg.name;
             switch (name) {

@@ -72,11 +72,20 @@ exe.wrapper = (me) => {
             }
         },
         dropAll: () => {
-            let a = world.map.get(me.id);
-            if (a)
-                for (let o of a) {
-                    world.drop(o, me.x, me.y)
+            let obj = world.map.get(me.id);
+            if (obj) {
+                while (obj[0])
+                    world.drop(obj[0], me.x, me.y);
+            }
+        },
+        transformdropAll: (tp) => {
+            let obj = world.map.get(me.id);
+            if (obj) {
+                while (obj[0]) {
+                    world.transform(obj[0], tp);
+                    world.drop(obj[0], me.x, me.y);
                 }
+            }
         },
         getOut: (x, y) => {
             if (me.carrier) {
@@ -251,9 +260,11 @@ exe.onTick = () => {
                 case "respawn":
                     p.tire = 7;
                     if (!world.removeWound(p)) {
+                        exe.wrapper(p).dropAll();
                         p.data.died = false;
-                        p.x = _.random(p.x - 30, p.x + 30);
-                        p.y = _.random(p.y - 30, p.y + 30);
+                        world.relocate(p,p.x - 30,p.x + 30);
+                        // p.x = _.random(p.x - 30, p.x + 30);
+                        // p.y = _.random(p.y - 30, p.y + 30);
                         p.dirx = 0;
                         p.diry = 0;
                         p.order.name = "stop";

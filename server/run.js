@@ -5,19 +5,21 @@ const input = require('./input');
 const test = require('./test');
 const load = require('./load');
 const fs = require('fs');
+// const path = require('path');
+
+
 // const event = require('./event');
 
 
 exports.main = function main(io) {
     test();
-    fs.access('data/log.txt', fs.constants.F_OK, (err) => {
-        // console.log(`${path} ${err ? 'does not exist' : 'exists'}`);
-        if (err) {
-            input.init();
-        } else {
-            load();
-        }
-    });
+
+    if (fs.existsSync('data/log.txt')) {
+        load();
+    }else{
+        input.init();
+    }
+
     input.socket(io);
     input.bot();
     input.tick();

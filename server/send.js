@@ -65,6 +65,10 @@ send.web = (dtStartLoop) => {
         // }
     }
 };
+
+send.error = (id, socket, text) => {
+    socket.emit('errorr', text);
+};
 send.bot = (id, text) => {
     bot.sendMessage(id, text);
 };

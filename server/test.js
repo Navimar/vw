@@ -38,7 +38,30 @@ module.exports = () => {
     });
     event.path = "data/testlog.txt";
 
+    // let socket = (nm,msg) => {
+    //     return {
+    //         nm,
+    //         msg,
+    //         emit: (nm,msg) => {
+    //             console.log(nm+' '+msg);
+    //         }
+    //     }
+    // };
+
+
     test(true, false, "Tests are working, they could be false");
+
+    world.init();
+    let p = world.addPlayer(false, false, 371, 250);
+    test(p.x, 371, 'player is creating in point where was created on x');
+    test(p.y, 250, 'player is creating in point where was created on y');
+
+    world.init();
+    p = world.addPlayer();
+    test(p.x, 0, 'player without params is creating in 0 0');
+    test(p.y, 0, 'player without params is creating in 0 0');
+
+
     world.init("objArrInPoint");
     world.createObj(meta.test, 5, 5);
     world.createObj(meta.highgrass, 5, 5);
@@ -58,26 +81,6 @@ module.exports = () => {
     // let p = world.addPlayer();
     // exe.apply(direction.right, p);
     // test(world.objArrInInv(p), false, "empty doesn't get in inv");
-    world.init("wolf");
-    world.addPlayer();
-    let w = world.createObj(meta.wolf, -4, 0);
-    w.tp.onTurn(w.data, exe.wrapper(w));
-    test(w.x, -3, "wolf goes right");
-    world.init();
-    world.addPlayer();
-    w = world.createObj(meta.wolf, 4, 0);
-    w.tp.onTurn(w.data, exe.wrapper(w));
-    test(w.x, 3, "wolf goes left");
-    world.init();
-    world.addPlayer();
-    w = world.createObj(meta.wolf, 0, 4);
-    w.tp.onTurn(w.data, exe.wrapper(w));
-    test(w.y, 3, "wolf goes up");
-    world.init();
-    world.addPlayer();
-    w = world.createObj(meta.wolf, 0, -4);
-    w.tp.onTurn(w.data, exe.wrapper(w));
-    test(w.y, -3, "wolf goes down");
     world.init();
     p = world.addPlayer();
     world.addWound(p, 'hungry');
@@ -99,18 +102,6 @@ module.exports = () => {
     test(orange.tp, meta.seed, 'orange became seed');
 
     world.init();
-    o = world.createObj(meta.orange, 0, 0);
-    p = world.addPlayer();
-    world.addWound(p, 'hungry');
-    event.order(p, {name: 'use', from: "ground", id: o.id, targetX: p.x, targetY: p.y});
-    exe.onTick();
-    test(p.wound[0], 'life', 'applyOnMyselfFromGroundEvent');
-    event.order(p, {name: 'use', from: "ground", id: o.id, targetX: p.x, targetY: p.y});
-    exe.onTick();
-    event.order(p, {name: 'use', from: "ground", id: o.id, targetX: p.x, targetY: p.y});
-    exe.onTick();
-    test(world.map.get("0 0").length, 2, 'kaka on ground');
-    world.init();
     p = world.addPlayer();
     o = world.createObj(meta.orange, 0, 0);
     event.order(p, {name: 'take', id: o.id});
@@ -124,7 +115,7 @@ module.exports = () => {
     exe.onTick();
     test(world.map.get(p.id).length, 0, 'drop event');
     world.init();
-    p = world.addPlayer();
+    p = world.addPlayer(false, false, 0, 0);
     o = world.createObj(meta.orange, 0, 0);
     exe.wrapper(o).getOut(p.x, p.y);
     test(world.map.get("0 0").length, 2, 'getOut from ground');
@@ -172,24 +163,6 @@ module.exports = () => {
     test(p.data.died, true, 'tens wound die');
     test(p.tp.img(p.data), 'rip', 'rip if died');
     world.init();
-    p = world.addPlayer();
-    event.order(p, {name: 'move', val: 'up'});
-    exe.onTick();
-    test(p.y, -1, 'event go up');
-    world.init();
-    p = world.addPlayer();
-    p.data.died = true;
-    event.order(p, {name: 'move', val: 'up'});
-    exe.onTick();
-    test(p.y, 0, 'cant go when died');
-
-    world.init();
-    o = world.createObj(meta.seed, 0, 0);
-    for (let a = 0; a < 4000; a++) {
-        exe.onTick();
-    }
-    test(o.tp, meta.plant, 'seed is going growth');
-    world.init();
     o = world.createObj(meta.plant, 0, 0);
     let k = world.createObj(meta.kaka, 0, 0);
     world.createObj(meta.kaka, 0, 0);
@@ -220,16 +193,17 @@ module.exports = () => {
     for (let a = 0; a < 100; a++) {
         exe.onTick();
     }
-    test(k.tp,meta.wolf,'wolf eats meat');
+    test(k.tp, meta.wolf, 'wolf eats meat');
 
     world.init();
-    p = world.addPlayer();
-    o = world.createObj(meta.stick, 0, 0);
-    world.put(o, p);
-    k = world.createObj(meta.wolf, 1, 0);
-    event.order(p, {name: 'use', from: "inv", id: o.id, targetX: 1, targetY: 0});
-    exe.onTick();
-    test(k.tp, meta.orange, 'aplly near');
+    p = world.addPlayer(false, false, 0, 0);
+    o = [];
+    for (let a = 0; a < 9; a++) {
+        o[a] = world.createObj({}, 0, 0);
+        world.put(o[a], p);
+    }
+    exe.wrapper(p).dropAll();
+    test(world.map.get(p.id).length, 0, 'dropAll() drops everything');
 
     // world.init();
     // for (let a = 0; a < 200000; a++) {
@@ -244,7 +218,7 @@ module.exports = () => {
     //     for (let b = 0; b < 100; b++) {
     //         exe.onTick();
     //     }
-    //     console.log('wolfs finishs ' + (Date.now() - dtStartLoop));
+    //     console.log('wolfs finishes ' + (Date.now() - dtStartLoop));
     // }
     test(user.new("slon", 1));
     test(user.byId(1).id, 1, "userById");
@@ -272,10 +246,10 @@ module.exports = () => {
     test(user.findway(user.byId(1), user.byId(4))[0][2], user.byId(3), "findway4");
 
     send.bot(604944578, "send.bot is working");
+
     user.list = [];
     event.bot({event: "/start", id: 30626617, username: "happycatfish"});
     send.login(30626617);
-
 
     event.path = 'data/log.txt';
 
@@ -295,8 +269,3 @@ module.exports = () => {
     }
 
 };
-
-// let clean = () => {
-//     user.list = [];
-//     world.box = {};
-// };

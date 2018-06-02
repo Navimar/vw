@@ -6,7 +6,7 @@ const generate = require('./generate');
 
 let world = {};
 
-world.init = function () {
+world.init = () => {
     world.player = [];
     world.time = 0;
     world.connected = 0;
@@ -45,10 +45,12 @@ function remove(k, obj) {
     }
 }
 
-world.addPlayer = (socket, id) => {
-    let p = {socket, id,};
-    p.x = 5200;
-    p.y = 5200;
+world.addPlayer = (socket, id, x, y) => {
+    if (!x || !y) {
+        x = 0;
+        y = 0;
+    }
+    let p = {socket, id, x, y};
     p.solid = true;
     p.dirx = 0;
     p.diry = 0;
@@ -130,7 +132,7 @@ world.drop = function (obj, x, y) {
 };
 
 function addtoInv(obj, carrier) {
-    addto(carrier.id, obj);
+    addkey(carrier.id, obj);
     obj.x = false;
     obj.y = false;
     obj.carrier = carrier.id;
@@ -152,13 +154,13 @@ function makeid() {
 }
 
 function addtoMap(x, y, obj) {
-    addto(x + " " + y, obj);
+    addkey(x + " " + y, obj);
     obj.x = x;
     obj.y = y;
     obj.carrier = false;
 }
 
-function addto(k, obj) {
+function addkey(k, obj) {
     if (world.map.has(k)) {
         let i = world.map.get(k);
         i.push(obj);

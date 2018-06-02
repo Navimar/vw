@@ -1,4 +1,4 @@
-const dir= require('./util');
+const dir = require('./util');
 
 let meta = {};
 meta.player = {
@@ -35,7 +35,8 @@ meta.test = {
 };
 meta.wolf = {
     onCreate: (data) => {
-        data.img = "wolf"
+        data.img = "wolf";
+        data.satiety = 4000;
     },
     img: (data) => {
         return data.img;
@@ -52,23 +53,29 @@ meta.wolf = {
                 let obj = wd.pickUp(food);
                 if (obj) {
                     tire = 32;
-                    // data.satiety += 1000;
+                    data.satiety += 4000;
                     wd.transform(obj, meta.wolf);
                 } else {
-                    // if (data.satiety <= 0) {
-                    //     wd.transform(wd.me, meta.bone)
-                    // }
+                    if (data.satiety <= 0) {
+                        wd.transform(wd.me, meta.bone)
+                    }
                 }
             } else {
-                wd.move(mt.dir);
-                if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
-                    wd.addWound(t, "bite");
+                if (t.tp === meta.player) {
+                    if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
+                        wd.addWound(t, "bite");
+                    } else {
+                        wd.move(mt.dir);
+                    }
+                } else {
+                    wd.move(mt.dir);
                 }
             }
         } else {
             wd.drop();
             wd.move(wd.dirRnd);
         }
+        data.satiety -= tire;
         wd.nextTurn(tire);
     },
 };
@@ -84,12 +91,13 @@ meta.bone = {
         data.new = true;
     },
     onTurn: (data, wd) => {
-        if (data.new) {
-            data.new = false;
-            wd.nextTurn(3500);
-        } else {
-            wd.transform(wd.me, meta.highgrass);
-        }
+        wd.transformdropAll(meta.meat);
+        // if (data.new) {
+        //     data.new = false;
+        //     wd.nextTurn(3500);
+        // } else {
+        //     wd.transform(wd.me, meta.highgrass);
+        // }
     },
 };
 
@@ -143,7 +151,7 @@ meta.oranger = {
 };
 meta.tree = {
     z: 20,
-    img: "tree",
+    img: "wall",
     isSolid: true,
     onCreate(data) {
         data.sat = false;
@@ -160,10 +168,10 @@ meta.tree = {
             }
             data.sat = true;
         } else {
-            data.old++;
-            if (data.old > 10) {
-                wd.transform(wd.me, meta.aphid);
-            }
+            // data.old++;
+            // if (data.old > 10) {
+            //     wd.transform(wd.me, meta.aphid);
+            // }
         }
         wd.nextTurn(3500);
         // if (data.new) {
@@ -395,7 +403,7 @@ meta.stick = {
         }
         if (obj.tp === meta.tree) {
             // wd.trade(obj);
-            wd.transform(obj, meta.orange);
+            wd.transform(obj, meta.treeseed);
             broke()
         }
     }
@@ -405,6 +413,9 @@ meta.meat = {
     img: 'meat',
     onCreate(data) {
         data.new = true;
+    },
+    onTurn: (data, wd) => {
+        wd.transformdropAll(meta.meat);
     },
     onApply: (obj, wd) => {
         if (obj.tp.player) {
@@ -461,7 +472,7 @@ meta.seed = {
     //     }
     // },
     onTurn: (data, wd) => {
-        if (wd.me.carrier) {
+        if (wd.me.carrier || wd.isHere(meta.oranger)) {
             wd.nextTurn(1000);
             data.new = true;
         } else {
