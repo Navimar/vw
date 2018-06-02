@@ -430,19 +430,19 @@ function render(model) {
 
 let renderStatus = () => {
     let str = "status.server: " + status.server + "</br>";
-    str += "Пинг: " + model.ping + "</br>";
+    // str += "Пинг: " + model.ping + "</br>";
     str += "Расчет: " + model.delay + "</br>";
-    str += "Ходит: " + model.cnActive + "</br>";
+    // str += "Ходит: " + model.cnActive + "</br>";
     str += "x: " + model.px + "</br>";
     str += "y: " + model.py + "</br>";
     str += "Игроков: " + model.connected + "</br>";
-    str += "Err: " + model.error + "</br>";
+    // str += "Err: " + model.error + "</br>";
     str += "Клиент: " + (Date.now() - model.dtStartLoop) + "</br>";
     str += "Время: " + model.time + "</br>";
-    str += "ClickX: " + click.x + "</br>";
-    str += "ClickY: " + click.y + "</br>";
-    str += "mouseCellX: " + mouseCell.x + "</br>";
-    str += "mouseCellY: " + mouseCell.y + "</br>";
+    // str += "ClickX: " + click.x + "</br>";
+    // str += "ClickY: " + click.y + "</br>";
+    // str += "mouseCellX: " + mouseCell.x + "</br>";
+    // str += "mouseCellY: " + mouseCell.y + "</br>";
     $("#ping").html(str);
 };
 

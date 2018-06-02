@@ -90,22 +90,30 @@ exe.wrapper = (me) => {
         addWound: (player, string) => {
             return world.addWound(player, string)
         },
-        moveTo: (x, y) => {
+        dirTo: (x, y) => {
             let dir;
 
             function goX() {
                 if (me.x - x > 0) {
                     dir = direction.left;
-                } else {
+                }
+                if (me.x - x < 0) {
                     dir = direction.right;
+                }
+                if (me.x - x === 0) {
+                    dir = direction.here;
                 }
             }
 
             function goY() {
                 if (me.y - y > 0) {
                     dir = direction.up;
-                } else {
+                }
+                if (me.y - y < 0) {
                     dir = direction.down;
+                }
+                if (me.y - y === 0) {
+                    dir = direction.here;
                 }
             }
 
@@ -294,9 +302,9 @@ exe.onTick = () => {
     // } else {
     //     // console.log('nobody is moving '+world.time);
     // }
-    for (let o of world.obj){
+    for (let o of world.obj) {
         // let o =world.obj[i];
-        if(o.nextTurn===world.time){
+        if (o.nextTurn === world.time) {
             if (o.tp.onTurn) {
                 let wd = exe.wrapper(o);
                 o.tp.onTurn(o.data, wd);

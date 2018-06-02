@@ -47,8 +47,8 @@ function remove(k, obj) {
 
 world.addPlayer = (socket, id) => {
     let p = {socket, id,};
-    p.x = 0;
-    p.y = 0;
+    p.x = 5200;
+    p.y = 5200;
     p.solid = true;
     p.dirx = 0;
     p.diry = 0;
@@ -181,6 +181,7 @@ world.createObj = (tp, x, y) => {
 
     if (tp.onTurn) {
         let t = world.time + _.random(99);
+
         addtologic(o, t);
     }
     world.cnMass++;
@@ -335,12 +336,14 @@ world.objArrInPoint = (x, y) => {
     // }
 
     //keys
-    if (world.map.has(x + " " + y)) {
-        let obj = world.map.get(x + " " + y);
+    // if (world.map.has(x + " " + y)) {
+    let obj = world.map.get(x + " " + y);
+    if (obj) {
         if (obj.length > 0) {
             return obj;
         }
     }
+    // }
     return false;
 };
 
@@ -356,16 +359,49 @@ world.objArrInInv = (obj) => {
 
 world.findInPoint = (tp, x, y) => {
     let o = world.objArrInPoint(x, y);
-    if (Array.isArray(o)) {
-        for (let item of o) {
-            if (tp === item.tp) {
-                return item;
+    if (_.isArray(o)) {
+        if (tp.length) {
+            for (let item of o) {
+                if (tp.includes(item.tp)) {
+                    return item;
+                }
+            }
+        } else {
+            for (let item of o) {
+                if (tp === item.tp) {
+                    return item;
+                }
             }
         }
     }
+
     return false;
 };
 world.find = (tp, x, y) => {
+
+
+    // let arr = [];
+    // for (let i = 0; i < world.obj.length; i++) {
+    //     let dx = Math.abs(x - world.obj[i].x);
+    //     let dy = Math.abs(y - world.obj[i].y);
+    //     if (dx <= 4 && dy <= 4 && world.obj[i].tp === tp) {
+    //         arr.push({obj: world.obj[i], dx, dy});
+    //     }
+    // }
+    // arr.sort(function (a, b) {
+    //     if (a.dx + a.dy > b.dx + b.dy) {
+    //         return 1
+    //     } else {
+    //         return -1
+    //     }
+    // });
+    //
+    // if (arr.length === 0) {
+    //     return false;
+    // } else {
+    //     return arr[0].obj;
+    // }
+
     function findInSircle(a) {
         for (let xx = x - a; xx <= x + a; xx++) {
             for (let yy = y - a; yy <= y + a; yy++) {
@@ -387,27 +423,27 @@ world.find = (tp, x, y) => {
 };
 
 world.start = () => {
-    let wid = 1000;
+    let start = 5000;
+    let wid = 400;
+    wid += start;
     // world.createObj(meta.test, 2, 2);
-    for (let a = 0; a < 10000; a++) {
-        world.createObj(meta.stick, _.random(-wid, wid), _.random(-wid, wid));
-        world.createObj(meta.orange, _.random(-wid, wid), _.random(-wid, wid));
-
-
+    for (let a = 0; a < 3000; a++) {
+        world.createObj(meta.stick, _.random(start, wid), _.random(start, wid));
+        world.createObj(meta.orange, _.random(start, wid), _.random(start, wid));
         // world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
     }
-    for (let a = 0; a < 40000; a++) {
-        world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
+    for (let a = 0; a < 60000; a++) {
+        world.createObj(meta.tree, _.random(start, wid), _.random(start, wid));
 
         // world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
     }
-    for (let a = 0; a < 20000; a++) {
+    for (let a = 0; a < 7000; a++) {
         // world.createObj(meta.aphid, _.random(-wid, wid), _.random(-wid, wid));
         //     world.createObj(meta.plant, _.random(-wid, wid), _.random(-wid, wid));
         //     world.createObj(meta.kaka, _.random(-wid, wid), _.random(-wid, wid));
-        world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));
+        world.createObj(meta.wolf, _.random(start, wid), _.random(start, wid));
     }
-    for (let a = 0; a < 10000; a++) {
+    for (let a = 0; a < 1000; a++) {
         // world.createObj(meta.orange, _.random(-wid, wid), _.random(-wid, wid));
     }
     // for (let a = 0; a < 50; a++) {

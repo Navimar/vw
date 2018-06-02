@@ -1,4 +1,4 @@
-const direction = require('./util');
+const dir= require('./util');
 
 let meta = {};
 meta.player = {
@@ -15,7 +15,7 @@ meta.player = {
     isSolid: true,
     z: 999,
     onTurn: (data, wd) => {
-        let dir = wd.moveTo(data.order.x, data.order.y).dir;
+        let dir = wd.dirTo(data.order.x, data.order.y).dir;
         data.dir = dir;
         wd.move(dir);
     },
@@ -43,18 +43,33 @@ meta.wolf = {
     z: 14,
     isSolid: true,
     onTurn: (data, wd) => {
-        let t;
-        t = wd.find(meta.player);
+        let tire = 16;
+        let t = wd.find([meta.player, meta.meat, meta.bone]);
         if (t) {
-            let mt = wd.moveTo(t.x, t.y);
-            wd.move(mt.dir);
-            if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
-                wd.addWound(t, "bite");
+            let mt = wd.dirTo(t.x, t.y);
+            if (mt.dir === dir.here) {
+                let food = [meta.bone, meta.meat];
+                let obj = wd.pickUp(food);
+                if (obj) {
+                    tire = 32;
+                    // data.satiety += 1000;
+                    wd.transform(obj, meta.wolf);
+                } else {
+                    // if (data.satiety <= 0) {
+                    //     wd.transform(wd.me, meta.bone)
+                    // }
+                }
+            } else {
+                wd.move(mt.dir);
+                if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
+                    wd.addWound(t, "bite");
+                }
             }
-        }else{
+        } else {
+            wd.drop();
             wd.move(wd.dirRnd);
         }
-        wd.nextTurn(16);
+        wd.nextTurn(tire);
     },
 };
 
@@ -64,7 +79,7 @@ meta.stone = {
 };
 meta.bone = {
     img: "bone",
-    z: 1,
+    z: 3,
     onCreate(data) {
         data.new = true;
     },
@@ -104,7 +119,7 @@ meta.kaka = {
 };
 meta.oranger = {
     img: "fruit",
-    z: 2,
+    z: 3,
     isNailed: true,
     onApply: (obj, wd) => {
         wd.getOut(obj.x, obj.y);
@@ -338,7 +353,7 @@ meta.plant = {
     },
 };
 meta.orange = {
-    z: 1,
+    z: 2,
     img: 'orange',
     onCreate(data) {
         data.new = true;
@@ -369,14 +384,67 @@ meta.stick = {
     z: 3,
     img: 'stick',
     onApply: (obj, wd) => {
-        if (obj.tp == meta.wolf) {
+        function broke() {
+            wd.transform(wd.me, meta.treeseed);
+        }
+
+        if (obj.tp === meta.wolf) {
+            // wd.trade(obj);
+            wd.transform(obj, meta.meat);
+            broke();
+        }
+        if (obj.tp === meta.tree) {
             // wd.trade(obj);
             wd.transform(obj, meta.orange);
-            wd.transform(wd.me, meta.seed);
+            broke()
         }
     }
 };
-
+meta.meat = {
+    z: 1,
+    img: 'meat',
+    onCreate(data) {
+        data.new = true;
+    },
+    onApply: (obj, wd) => {
+        if (obj.tp.player) {
+            // wd.trade(obj);
+            wd.transform(wd.me, meta.bone);
+            if (!wd.removeWound(obj, "hungry")) {
+                wd.addWound(obj, "glut");
+            }
+        }
+    }
+};
+meta.treeseed = {
+    z: 2,
+    img: 'jelly',
+    onCreate(data) {
+        data.new = true;
+    },
+    // onApply: (obj, wd) => {
+    //     if (obj.tp.player) {
+    //         // wd.trade(obj);
+    //         wd.transform(wd.me, meta.kaka);
+    //         if (!wd.removeWound(obj, "hungry")) {
+    //             wd.addWound(obj, "glut");
+    //         }
+    //     }
+    // },
+    onTurn: (data, wd) => {
+        if (wd.me.carrier) {
+            wd.nextTurn(1000);
+            data.new = true;
+        } else {
+            if (data.new) {
+                data.new = false;
+                wd.nextTurn(7000);
+            } else {
+                wd.transform(wd.me, meta.tree);
+            }
+        }
+    },
+};
 meta.seed = {
     z: 2,
     img: 'seed',
