@@ -61,6 +61,39 @@ module.exports = () => {
     test(p.x, 0, 'player without params is creating in 0 0');
     test(p.y, 0, 'player without params is creating in 0 0');
 
+    world.init();
+    p = world.addPlayer();
+    p.data.order = {x: 4, y: 0};
+    p.tp.onTurn(p.data, exe.wrapper(p));
+    test(p.x, 1, 'player onTurn dirTo right');
+    test(p.y, 0, 'player onTurn dirTo right');
+    world.init();
+    p = world.addPlayer();
+    p.data.order = {x: 0, y: 4};
+    p.tp.onTurn(p.data, exe.wrapper(p));
+    test(p.y, 1, 'player onTurn dirTo up');
+    test(p.x, 0, 'player onTurn dirTo up');
+    world.init();
+    p = world.addPlayer();
+    p.data.order = {x: 0, y: -4};
+    p.tp.onTurn(p.data, exe.wrapper(p));
+    test(p.y, -1, 'player onTurn dirTo down');
+    test(p.x, 0, 'player onTurn dirTo down');
+    world.init();
+    p = world.addPlayer();
+    p.data.order = {x: -4, y: 0};
+    p.tp.onTurn(p.data, exe.wrapper(p));
+    test(p.x, -1, 'player onTurn dirTo left');
+    test(p.y, 0, 'player onTurn dirTo left');
+    world.init();
+    p = world.addPlayer();
+    let o = world.createObj({isSolid:true},0,1);
+    p.data.order = {x: 1, y: 4};
+    p.tp.onTurn(p.data, exe.wrapper(p));
+    test(p.x, 1, 'player onTurn dirTo right when tree is on the pass');
+    test(p.y, 0, 'player onTurn dirTo right when tree is on the pass');
+
+
 
     world.init("objArrInPoint");
     world.createObj(meta.test, 5, 5);

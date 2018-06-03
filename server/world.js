@@ -435,7 +435,7 @@ world.start = () => {
         // world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
     }
     for (let a = 0; a < 60000; a++) {
-        // world.createObj(meta.tree, _.random(start, wid), _.random(start, wid));
+        world.createObj(meta.tree, _.random(start, wid), _.random(start, wid));
 
         // world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
     }

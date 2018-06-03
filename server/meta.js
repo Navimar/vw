@@ -16,10 +16,16 @@ meta.player = {
     z: 999,
     onTurn: (data, wd) => {
         let d = wd.dirTo(data.order.x, data.order.y).dir;
-        data.dir = d;
-        wd.move(d);
-        // data.dir = dir.left;
-        // wd.move(dir.left);
+        // data.dir = d[0];
+        // wd.move(d[0]);
+        let ox = wd.me.x;
+        let oy = wd.me.y;
+        wd.move(d[0]);
+        data.dir = d[0];
+        if (ox === wd.me.x && oy === wd.me.y) {
+            data.dir = d[1];
+            wd.move(d[1]);
+        }
     },
 };
 
@@ -67,7 +73,9 @@ meta.wolf = {
                     if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
                         wd.addWound(t, "bite");
                     } else {
-                        wd.move(mt.dir);
+                        if (wd.move(mt.dir[0]) === false) {
+                            wd.move(mt.dir[1])
+                        }
                     }
                 } else {
                     wd.move(mt.dir);
@@ -153,7 +161,7 @@ meta.oranger = {
 };
 meta.tree = {
     z: 20,
-    img: "wall",
+    img: "tree",
     isSolid: true,
     onCreate(data) {
         data.sat = false;

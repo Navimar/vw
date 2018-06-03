@@ -43,7 +43,7 @@ exe.wrapper = (me) => {
                 if (i) return i;
             }
         },
-        move: (dir) => world.move(me, dir),
+        move: (dir) => {return world.move(me, dir)},
         movetrought: (dir) => {
             let x = me.x + dir.x;
             let y = me.y + dir.y;
@@ -100,23 +100,27 @@ exe.wrapper = (me) => {
             return world.addWound(player, string)
         },
         dirTo: (x, y) => {
-            let dir = direction.left;
+            let dir = [direction.left, direction.here];
             let xWant = Math.abs(x - me.x);
             let yWant = Math.abs(y - me.y);
+            let dx;
+            let dy;
             if (xWant > yWant) {
-                if (x - me.x > 0) {
-                    dir = direction.right;
-                } else {
-                    dir = direction.left;
-                }
+                dx = 0;
+                dy = 1;
             } else {
-                if (y - me.y > 0) {
-                    dir = direction.down;
-                } else if (y - me.y < 0) {
-                    dir = direction.up;
-                } else {
-                    dir = direction.here;
-                }
+                dx = 1;
+                dy = 0;
+            }
+            if (x - me.x > 0) {
+                dir[dx] = direction.right;
+            } else {
+                dir[dx] = direction.left;
+            }
+            if (y - me.y > 0) {
+                dir[dy] = direction.down;
+            } else {
+                dir[dy] = direction.up;
             }
             return {dir, xWant, yWant};
         },
