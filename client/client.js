@@ -313,10 +313,10 @@ function out() {
     model.date = new Date().getTime();
     // socket.emit("ping");
     // let send= {order: model.order, targetx: model.targetx, targety: model.targety};
-    if (model.lastorder !== model.orderCn) {
+    // if (model.lastorder !== model.orderCn) {
         socket.emit("order", model.order);
         model.lastorder = model.orderCn;
-    }
+    // }
 }
 
 function range(fx, fy, tx, ty) {
