@@ -1,5 +1,5 @@
 const socket = io();
-const constSpeed = 0.00075;
+const constSpeed = 0.00065;
 const login = {};
 login.pass = findGetParameter("key");
 login.id = findGetParameter("id");
