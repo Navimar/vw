@@ -313,10 +313,10 @@ function out() {
     model.date = new Date().getTime();
     // socket.emit("ping");
     // let send= {order: model.order, targetx: model.targetx, targety: model.targety};
-    // if (model.lastorder !== model.orderCn) {
+    if (model.lastorder !== model.orderCn) {
         socket.emit("order", model.order);
         model.lastorder = model.orderCn;
-    // }
+    }
 }
 
 function range(fx, fy, tx, ty) {
@@ -453,6 +453,28 @@ function onMouseDown() {
     if (mouseCell.x === -1) {
         if (model.inv[mouseCell.y]) {
             inAir = {from: 'inv', obj: model.inv[mouseCell.y]};
+        }
+    }
+    if (!inAir && mouseDown) {
+        // if (mouseCell.x + mouseCell.y > 8 && mouseCell.x > mouseCell.y) {
+        //     orderRight();
+        // }
+        // if (mouseCell.x + mouseCell.y < 8 && mouseCell.x > mouseCell.y) {
+        //     orderUp();
+        // }
+        // if (mouseCell.x + mouseCell.y < 8 && mouseCell.x < mouseCell.y) {
+        //     orderLeft();
+        // }
+        // if (mouseCell.x + mouseCell.y > 8 && mouseCell.x < mouseCell.y) {
+        //     orderDown();
+        // }
+        model.order.targetx = model.px + mouseCell.x - 4;
+        model.order.targety = model.py + mouseCell.y - 4;
+        model.order.name = "move";
+        model.order.val = "point";
+        model.orderCn++;
+        if (mouseCell.x == 4 && mouseCell.y == 4) {
+            orderStop();
         }
     }
     out();
