@@ -215,32 +215,32 @@ function onServer(val) {
     }
     model.px = val.px;
     model.py = val.py;
-    if (!inAir && mouseDown) {
-        // if (mouseCell.x + mouseCell.y > 8 && mouseCell.x > mouseCell.y) {
-        //     orderRight();
-        // }
-        // if (mouseCell.x + mouseCell.y < 8 && mouseCell.x > mouseCell.y) {
-        //     orderUp();
-        // }
-        // if (mouseCell.x + mouseCell.y < 8 && mouseCell.x < mouseCell.y) {
-        //     orderLeft();
-        // }
-        // if (mouseCell.x + mouseCell.y > 8 && mouseCell.x < mouseCell.y) {
-        //     orderDown();
-        // }
-        model.order.targetx = model.px + mouseCell.x - 4;
-        model.order.targety = model.py + mouseCell.y - 4;
-        model.order.name = "move";
-        model.order.val = "point";
-        model.orderCn++;
-        if (mouseCell.x == 4 && mouseCell.y == 4) {
-            orderStop();
-        }
-    }
-    if (model.order.targetx === model.px && model.order.targety === model.py) {
-        if (model.order.name == "move") orderStop();
-    } else {
-    }
+    // if (!inAir && mouseDown) {
+    //     // if (mouseCell.x + mouseCell.y > 8 && mouseCell.x > mouseCell.y) {
+    //     //     orderRight();
+    //     // }
+    //     // if (mouseCell.x + mouseCell.y < 8 && mouseCell.x > mouseCell.y) {
+    //     //     orderUp();
+    //     // }
+    //     // if (mouseCell.x + mouseCell.y < 8 && mouseCell.x < mouseCell.y) {
+    //     //     orderLeft();
+    //     // }
+    //     // if (mouseCell.x + mouseCell.y > 8 && mouseCell.x < mouseCell.y) {
+    //     //     orderDown();
+    //     // }
+    //     model.order.targetx = model.px + mouseCell.x - 4;
+    //     model.order.targety = model.py + mouseCell.y - 4;
+    //     model.order.name = "move";
+    //     model.order.val = "point";
+    //     model.orderCn++;
+    //     if (mouseCell.x == 4 && mouseCell.y == 4) {
+    //         orderStop();
+    //     }
+    // }
+    // if (model.order.targetx === model.px && model.order.targety === model.py) {
+    //     if (model.order.name == "move") orderStop();
+    // } else {
+    // }
     out();
 }
 
