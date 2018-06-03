@@ -33,9 +33,9 @@ module.exports = () => {
         }
     }
 
-    fs.unlink('data/testlog.txt', (err) => {
-        // if (err) throw err;
-    });
+    // fs.unlink('data/testlog.txt', (err) => {
+    //     if (err) throw err;
+    // });
     event.path = "data/testlog.txt";
 
     // let socket = (nm,msg) => {
@@ -251,6 +251,9 @@ module.exports = () => {
     event.bot({event: "/start", id: 30626617, username: "happycatfish"});
     send.login(30626617);
 
+    fs.unlink('data/testlog.txt', (err) => {
+        if (err) throw err;
+    });
     event.path = 'data/log.txt';
 
     if (testFail) {
