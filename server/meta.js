@@ -73,12 +73,10 @@ meta.wolf = {
                     if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
                         wd.addWound(t, "bite");
                     } else {
-                        if (wd.move(mt.dir[0]) === false) {
-                            wd.move(mt.dir[1])
-                        }
+                            wd.move(mt.dir[0])
                     }
                 } else {
-                    wd.move(mt.dir);
+                    wd.move(mt.dir[0]);
                 }
             }
         } else {
