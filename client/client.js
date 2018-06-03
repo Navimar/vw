@@ -576,7 +576,7 @@ function orderRight() {
         targety: model.py,
         targetx: model.px + 1,
         name: "move",
-        val: "right"
+        val: "point"
     };
     model.orderCn++;
 }
@@ -585,7 +585,7 @@ function orderLeft() {
     model.order.targety = model.py;
     model.order.targetx = model.px - 1;
     model.order.name = "move";
-    model.order.val = "left";
+    model.order.val = "point";
     model.orderCn++;
 }
 
@@ -593,7 +593,7 @@ function orderUp() {
     model.order.targetx = model.px;
     model.order.targety = model.py - 1;
     model.order.name = "move";
-    model.order.val = "up";
+    model.order.val = "point";
     model.orderCn++;
 }
 
@@ -601,7 +601,7 @@ function orderDown() {
     model.order.targetx = model.px;
     model.order.targety = model.py + 1;
     model.order.name = "move";
-    model.order.val = "down";
+    model.order.val = "point";
     model.orderCn++;
 }
 

@@ -429,13 +429,13 @@ world.start = () => {
     let wid = 400;
     wid += start;
     // world.createObj(meta.test, 2, 2);
-    for (let a = 0; a < 3000; a++) {
-        world.createObj(meta.stick, _.random(start, wid), _.random(start, wid));
-        world.createObj(meta.orange, _.random(start, wid), _.random(start, wid));
+    for (let a = 0; a < 30000; a++) {
+        // world.createObj(meta.stick, _.random(start, wid), _.random(start, wid));
+        // world.createObj(meta.orange, _.random(start, wid), _.random(start, wid));
         // world.createObj(meta.tree, _.random(-wid, wid), _.random(-wid, wid));
     }
     for (let a = 0; a < 60000; a++) {
-        world.createObj(meta.tree, _.random(start, wid), _.random(start, wid));
+        // world.createObj(meta.tree, _.random(start, wid), _.random(start, wid));
 
         // world.createObj(meta.highgrass, _.random(-wid, wid), _.random(-wid, wid));
     }

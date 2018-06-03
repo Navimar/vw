@@ -100,48 +100,24 @@ exe.wrapper = (me) => {
             return world.addWound(player, string)
         },
         dirTo: (x, y) => {
-            let dir;
-
-            function goX() {
-                if (me.x - x > 0) {
+            let dir = direction.left;
+            let xWant = Math.abs(x - me.x);
+            let yWant = Math.abs(y - me.y);
+            if (xWant > yWant) {
+                if (x - me.x > 0) {
+                    dir = direction.right;
+                } else {
                     dir = direction.left;
                 }
-                if (me.x - x < 0) {
-                    dir = direction.right;
-                }
-                if (me.x - x === 0) {
-                    dir = direction.here;
-                }
-            }
-
-            function goY() {
-                if (me.y - y > 0) {
-                    dir = direction.up;
-                }
-                if (me.y - y < 0) {
+            } else {
+                if (y - me.y > 0) {
                     dir = direction.down;
-                }
-                if (me.y - y === 0) {
+                } else if (y - me.y < 0) {
+                    dir = direction.up;
+                } else {
                     dir = direction.here;
                 }
             }
-
-            let xWant = me.x - x;
-            let yWant = me.y - y;
-            if (Math.abs(xWant) > Math.abs(yWant)) {
-                goX();
-            }
-            if (Math.abs(xWant) < Math.abs(yWant)) {
-                goY();
-            }
-            if (Math.abs(xWant) === Math.abs(yWant)) {
-                if (_.random(0, 1)) {
-                    goY();
-                } else {
-                    goX();
-                }
-            }
-
             return {dir, xWant, yWant};
         },
         find: (target) => world.find(target, me.x, me.y),
@@ -186,41 +162,43 @@ exe.onTick = () => {
                 //     }
                 //     break;
                 case "move":
-                    if (p.order.val == "point") {
+                    if (p.order.val === "point") {
                         p.data.order = {x: p.order.targetx, y: p.order.targety};
-                        p.tp.onTurn(p.data, exe.wrapper(p));
-                        p.dirx = 0;
-                        p.diry = 0;
-                        p.tire = 7;
+                        if (p.x !== p.order.targetx || p.y !== p.order.targety) {
+                            p.tp.onTurn(p.data, exe.wrapper(p));
+                            p.dirx = 0;
+                            p.diry = 0;
+                            p.tire = 7;
+                        }
                     }
-                    if (p.order.val == "up") {
-                        p.data.order = {x: p.x, y: p.y - 1};
-                        p.tp.onTurn(p.data, exe.wrapper(p));
-                        p.dirx = 0;
-                        p.diry = -1;
-                        p.tire = 7;
-                    }
-                    if (p.order.val == "right") {
-                        p.data.order = {x: p.x + 1, y: p.y};
-                        p.tp.onTurn(p.data, exe.wrapper(p));
-                        p.dirx = 0;
-                        p.diry = -1;
-                        p.tire = 7;
-                    }
-                    if (p.order.val == "left") {
-                        p.data.order = {x: p.x - 1, y: p.y};
-                        p.tp.onTurn(p.data, exe.wrapper(p));
-                        p.dirx = 0;
-                        p.diry = -1;
-                        p.tire = 7;
-                    }
-                    if (p.order.val == "down") {
-                        p.data.order = {x: p.x, y: p.y + 1};
-                        p.tp.onTurn(p.data, exe.wrapper(p));
-                        p.dirx = 0;
-                        p.diry = -1;
-                        p.tire = 7;
-                    }
+                    // if (p.order.val == "up") {
+                    //     p.data.order = {x: p.x, y: p.y - 1};
+                    //     p.tp.onTurn(p.data, exe.wrapper(p));
+                    //     p.dirx = 0;
+                    //     p.diry = -1;
+                    //     p.tire = 7;
+                    // }
+                    // if (p.order.val == "right") {
+                    //     p.data.order = {x: p.x + 1, y: p.y};
+                    //     p.tp.onTurn(p.data, exe.wrapper(p));
+                    //     p.dirx = 0;
+                    //     p.diry = -1;
+                    //     p.tire = 7;
+                    // }
+                    // if (p.order.val == "left") {
+                    //     p.data.order = {x: p.x - 1, y: p.y};
+                    //     p.tp.onTurn(p.data, exe.wrapper(p));
+                    //     p.dirx = 0;
+                    //     p.diry = -1;
+                    //     p.tire = 7;
+                    // }
+                    // if (p.order.val == "down") {
+                    //     p.data.order = {x: p.x, y: p.y + 1};
+                    //     p.tp.onTurn(p.data, exe.wrapper(p));
+                    //     p.dirx = 0;
+                    //     p.diry = -1;
+                    //     p.tire = 7;
+                    // }
                     break;
                 case "use":
                     let tool = p.order.tool;
@@ -262,7 +240,7 @@ exe.onTick = () => {
                     if (!world.removeWound(p)) {
                         exe.wrapper(p).dropAll();
                         p.data.died = false;
-                        world.relocate(p,p.x - 30,p.x + 30);
+                        world.relocate(p, p.x - 30, p.x + 30);
                         // p.x = _.random(p.x - 30, p.x + 30);
                         // p.y = _.random(p.y - 30, p.y + 30);
                         p.dirx = 0;

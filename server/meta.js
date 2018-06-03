@@ -15,9 +15,11 @@ meta.player = {
     isSolid: true,
     z: 999,
     onTurn: (data, wd) => {
-        let dir = wd.dirTo(data.order.x, data.order.y).dir;
-        data.dir = dir;
-        wd.move(dir);
+        let d = wd.dirTo(data.order.x, data.order.y).dir;
+        data.dir = d;
+        wd.move(d);
+        // data.dir = dir.left;
+        // wd.move(dir.left);
     },
 };
 
