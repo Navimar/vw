@@ -43,7 +43,9 @@ exe.wrapper = (me) => {
                 if (i) return i;
             }
         },
-        move: (dir) => {return world.move(me, dir)},
+        move: (dir) => {
+            return world.move(me, dir)
+        },
         movetrought: (dir) => {
             let x = me.x + dir.x;
             let y = me.y + dir.y;
@@ -114,13 +116,17 @@ exe.wrapper = (me) => {
             }
             if (x - me.x > 0) {
                 dir[dx] = direction.right;
-            } else {
+            } else if (x - me.x < 0) {
                 dir[dx] = direction.left;
+            } else {
+                dir[dx] = direction.here
             }
             if (y - me.y > 0) {
                 dir[dy] = direction.down;
-            } else {
+            } else if (y - me.y < 0) {
                 dir[dy] = direction.up;
+            } else {
+                dir[dy] = direction.here;
             }
             return {dir, xWant, yWant};
         },
@@ -220,7 +226,12 @@ exe.onTick = () => {
                             take.tp.onTake(p, exe.wrapper(take));
                         } else {
                             if (!take.tp.isSolid && !take.tp.isNailed) {
-                                world.put(take, p);
+                                let inv = world.map.get(p.id);
+                                if (inv === undefined) {
+                                    world.put(take, p);
+                                } else if (inv.length < 9) {
+                                    world.put(take, p);
+                                }
                                 // console.log('PUT');
                             }
                         }

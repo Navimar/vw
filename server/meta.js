@@ -56,24 +56,20 @@ meta.wolf = {
         let t = wd.find([meta.player, meta.meat, meta.bone]);
         if (t) {
             let mt = wd.dirTo(t.x, t.y);
-            if (mt.dir === dir.here) {
+            if (mt.dir[0] === dir.here) {
                 let food = [meta.bone, meta.meat];
                 let obj = wd.pickUp(food);
                 if (obj) {
                     tire = 32;
                     data.satiety += 4000;
                     wd.transform(obj, meta.wolf);
-                } else {
-                    if (data.satiety <= 0) {
-                        wd.transform(wd.me, meta.bone)
-                    }
                 }
             } else {
                 if (t.tp === meta.player) {
                     if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
                         wd.addWound(t, "bite");
                     } else {
-                            wd.move(mt.dir[0])
+                        wd.move(mt.dir[0])
                     }
                 } else {
                     wd.move(mt.dir[0]);
@@ -84,7 +80,11 @@ meta.wolf = {
             wd.move(wd.dirRnd);
         }
         data.satiety -= tire;
-        wd.nextTurn(tire);
+        if (data.satiety <= 0) {
+            wd.transform(wd.me, meta.bone)
+        } else {
+            wd.nextTurn(tire);
+        }
     },
 };
 
@@ -99,7 +99,7 @@ meta.bone = {
         data.new = true;
     },
     onTurn: (data, wd) => {
-        wd.transformdropAll(meta.meat);
+        wd.transformdropAll(meta.bone);
         // if (data.new) {
         //     data.new = false;
         //     wd.nextTurn(3500);
@@ -135,7 +135,7 @@ meta.kaka = {
 };
 meta.oranger = {
     img: "fruit",
-    z: 3,
+    z: 4,
     isNailed: true,
     onApply: (obj, wd) => {
         wd.getOut(obj.x, obj.y);
@@ -152,7 +152,7 @@ meta.oranger = {
                 data.new = false;
                 wd.nextTurn(3500);
             } else {
-                wd.transform(wd.me, meta.orange);
+                wd.transform(wd.me, meta.stick);
             }
         }
     },
@@ -164,30 +164,66 @@ meta.tree = {
     onCreate(data) {
         data.sat = false;
         data.old = 0;
+        data.new = true;
     },
     onTurn: (data, wd) => {
-        let food = wd.findinInv(meta.kaka);
-
-        if (food) {
-            if (data.sat) {
-                wd.transform(food, meta.orange);
-                wd.drop(food);
-                data.sat = false;
-            }
-            data.sat = true;
-        } else {
-            // data.old++;
-            // if (data.old > 10) {
-            //     wd.transform(wd.me, meta.aphid);
-            // }
-        }
-        wd.nextTurn(3500);
-        // if (data.new) {
-        //     data.new = false;
-        //     wd.nextTurn(35000);
+        // let food = wd.findinInv(meta.kaka);
+        //
+        // if (food) {
+        //     if (data.sat) {
+        //         wd.transform(food, meta.orange);
+        //         wd.drop(food);
+        //         data.sat = false;
+        //     }
+        //     data.sat = true;
         // } else {
-        //     wd.transform(wd.me, meta.kaka);
+        //     // data.old++;
+        //     // if (data.old > 10) {
+        //     //     wd.transform(wd.me, meta.aphid);
+        //     // }
         // }
+        // wd.nextTurn(3500);
+        if (data.new) {
+            data.new = false;
+            wd.nextTurn(70000);
+        } else {
+            wd.transform(wd.me, meta.orangetree);
+        }
+    },
+};
+
+meta.orangetree = {
+    z: 21,
+    img: "wall",
+    isSolid: true,
+    onCreate(data) {
+        data.sat = false;
+        data.old = 0;
+        data.new = true;
+    },
+    onTurn: (data, wd) => {
+        // let food = wd.findinInv(meta.kaka);
+        //
+        // if (food) {
+        //     if (data.sat) {
+        //         wd.transform(food, meta.orange);
+        //         wd.drop(food);
+        //         data.sat = false;
+        //     }
+        //     data.sat = true;
+        // } else {
+        //     // data.old++;
+        //     // if (data.old > 10) {
+        //     //     wd.transform(wd.me, meta.aphid);
+        //     // }
+        // }
+        // wd.nextTurn(3500);
+        if (data.new) {
+            data.new = false;
+            wd.nextTurn(20000);
+        } else {
+            wd.transform(wd.me, meta.treeseed);
+        }
     },
 };
 
@@ -225,6 +261,21 @@ meta.egg = {
         }
     },
 };
+
+meta.ant = {
+    img: 'ant',
+    z: 15,
+    onCreate(data) {
+        // data.new = true;
+    },
+    onTurn: (data, wd) => {
+        wd.move(wd.dirRnd);
+
+        wd.nextTurn(5)
+    }
+};
+
+
 meta.aphidka = {
     img: "fruit",
     z: 2,
@@ -409,6 +460,11 @@ meta.stick = {
             wd.transform(obj, meta.meat);
             broke();
         }
+        if (obj.tp === meta.orangetree) {
+            // wd.trade(obj);
+            wd.transform(obj, meta.orange);
+            broke()
+        }
         if (obj.tp === meta.tree) {
             // wd.trade(obj);
             wd.transform(obj, meta.treeseed);
@@ -424,6 +480,12 @@ meta.meat = {
     },
     onTurn: (data, wd) => {
         wd.transformdropAll(meta.meat);
+        if (data.new) {
+            data.new = false;
+            wd.nextTurn(5000);
+        } else {
+            wd.transform(wd.me, meta.bone);
+        }
     },
     onApply: (obj, wd) => {
         if (obj.tp.player) {
@@ -457,7 +519,7 @@ meta.treeseed = {
         } else {
             if (data.new) {
                 data.new = false;
-                wd.nextTurn(7000);
+                wd.nextTurn(10000);
             } else {
                 wd.transform(wd.me, meta.tree);
             }

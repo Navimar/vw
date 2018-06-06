@@ -95,6 +95,9 @@ module.exports = () => {
 
 
 
+
+
+
     world.init("objArrInPoint");
     world.createObj(meta.test, 5, 5);
     world.createObj(meta.highgrass, 5, 5);

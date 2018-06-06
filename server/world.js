@@ -89,15 +89,16 @@ world.pickUp = (objTaker, tp) => {
     let k = objTaker.x + " " + objTaker.y;
     let obs = world.map.get(k);
     if (obs) {
-        for (let o of obs) {
-            if (o.tp === tp) {
-                world.put(o, objTaker);
-                return o;
-            }
+        // if (obs.length < 8) {
+            for (let o of obs) {
+                if (o.tp === tp) {
+                    world.put(o, objTaker);
+                    return o;
+                }
+            // }
         }
-    } else {
-        return false;
     }
+    return false;
 };
 
 function addtologic(obj, t) {
@@ -432,12 +433,14 @@ world.start = () => {
     for (let a = 0; a < 3000; a++) {
         world.createObj(meta.stick, _.random(start, wid), _.random(start, wid));
         world.createObj(meta.orange, _.random(start, wid), _.random(start, wid));
+        world.createObj(meta.ant, _.random(start, wid), _.random(start, wid));
     }
-    for (let a = 0; a < 60000; a++) {
+    for (let a = 0; a < 27000; a++) {
         world.createObj(meta.tree, _.random(start, wid), _.random(start, wid));
+        world.createObj(meta.orangetree, _.random(start, wid), _.random(start, wid));
     }
     for (let a = 0; a < 7000; a++) {
-        world.createObj(meta.wolf, _.random(start, wid), _.random(start, wid));
+        // world.createObj(meta.wolf, _.random(start, wid), _.random(start, wid));
     }
     for (let a = 0; a < 1000; a++) {
         // world.createObj(meta.orange, _.random(-wid, wid), _.random(-wid, wid));
