@@ -62,6 +62,9 @@ exe.wrapper = (me) => {
                 if (i) return i;
             }
         },
+        take: (obj) => {
+            world.put(obj, me);
+        },
         drop: (obj) => {
             if (!obj) {
                 obj = world.map.get(me.id);
@@ -101,43 +104,66 @@ exe.wrapper = (me) => {
         addWound: (player, string) => {
             return world.addWound(player, string)
         },
-        dirTo: (x, y) => {
-            let dir = [direction.left, direction.here];
-            let xWant = Math.abs(x - me.x);
-            let yWant = Math.abs(y - me.y);
-            let dx;
-            let dy;
-            if (xWant > yWant) {
-                dx = 0;
-                dy = 1;
-            } else {
-                dx = 1;
-                dy = 0;
+        dirFrom: (x, y) => {
+            let o = dirTo(x, y, me);
+            for (let a = 0; a < 1; a++) {
+                if (o.dir[a] === direction.up) {
+                    o.dir[a] = direction.down
+                }else
+                if (o.dir[a] === direction.down) {
+                    o.dir[a] = direction.up
+                }else
+                if (o.dir[a] === direction.left) {
+                    o.dir[a] = direction.right
+                }else
+                if (o.dir[a] === direction.right) {
+                    o.dir[a] = direction.left
+                }
             }
-            if (x - me.x > 0) {
-                dir[dx] = direction.right;
-            } else if (x - me.x < 0) {
-                dir[dx] = direction.left;
-            } else {
-                dir[dx] = direction.here
-            }
-            if (y - me.y > 0) {
-                dir[dy] = direction.down;
-            } else if (y - me.y < 0) {
-                dir[dy] = direction.up;
-            } else {
-                dir[dy] = direction.here;
-            }
-            return {dir, xWant, yWant};
+            return o;
         },
-        find: (target) => world.find(target, me.x, me.y),
+        dirTo: (x, y) => {
+            return dirTo(x, y, me);
+        },
+        find: (target, first, last) => world.find(target, me.x, me.y, first, last),
     };
 };
+
+function dirTo(x, y, me) {
+    let dir = [direction.here, direction.here];
+    let xWant = Math.abs(x - me.x);
+    let yWant = Math.abs(y - me.y);
+    let dx;
+    let dy;
+    if (xWant > yWant) {
+        dx = 0;
+        dy = 1;
+    } else {
+        dx = 1;
+        dy = 0;
+    }
+    if (x - me.x > 0) {
+        dir[dx] = direction.right;
+    } else if (x - me.x < 0) {
+        dir[dx] = direction.left;
+    } else {
+        dir[dx] = direction.here
+    }
+    if (y - me.y > 0) {
+        dir[dy] = direction.down;
+    } else if (y - me.y < 0) {
+        dir[dy] = direction.up;
+    } else {
+        dir[dy] = direction.here;
+    }
+    return {dir, xWant, yWant};
+}
+
 exe.onInit = () => {
     world.init();
     world.start();
     // let dtStartLoop = Date.now();
-    // for (let a = 0; a < 50000; a++) {
+    // for (let a = 0; a < 10000; a++) {
     //     exe.onTick();
     //     console.log(a);
     // }

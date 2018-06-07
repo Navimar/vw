@@ -90,11 +90,11 @@ world.pickUp = (objTaker, tp) => {
     let obs = world.map.get(k);
     if (obs) {
         // if (obs.length < 8) {
-            for (let o of obs) {
-                if (o.tp === tp) {
-                    world.put(o, objTaker);
-                    return o;
-                }
+        for (let o of obs) {
+            if (o.tp === tp) {
+                world.put(o, objTaker);
+                return o;
+            }
             // }
         }
     }
@@ -380,9 +380,13 @@ world.findInPoint = (tp, x, y) => {
 
     return false;
 };
-world.find = (tp, x, y) => {
-
-
+world.find = (tp, x, y, first, last) => {
+    if (first === undefined) {
+        first = 0;
+    }
+    if (last === undefined) {
+        last = 5;
+    }
     // let arr = [];
     // for (let i = 0; i < world.obj.length; i++) {
     //     let dx = Math.abs(x - world.obj[i].x);
@@ -408,17 +412,16 @@ world.find = (tp, x, y) => {
     function findInSircle(a) {
         for (let xx = x - a; xx <= x + a; xx++) {
             for (let yy = y - a; yy <= y + a; yy++) {
-                // if (Math.abs(xx - x + yy - y) == a) {
-                let f = world.findInPoint(tp, xx, yy);
-                if (f) return f;
-                // }
+                if (Math.abs(xx - x) === a || Math.abs(yy - y) === a) {
+                    let f = world.findInPoint(tp, xx, yy);
+                    if (f) return f;
+                }
             }
         }
         return false;
     }
 
-
-    for (let a = 0; a < 5; a++) {
+    for (let a = first; a < last; a++) {
         let f = findInSircle(a);
         if (f) return f;
     }
@@ -433,18 +436,23 @@ world.start = () => {
     for (let a = 0; a < 3000; a++) {
         world.createObj(meta.stick, _.random(start, wid), _.random(start, wid));
         world.createObj(meta.orange, _.random(start, wid), _.random(start, wid));
-        world.createObj(meta.ant, _.random(start, wid), _.random(start, wid));
+
+
     }
-    for (let a = 0; a < 27000; a++) {
-        world.createObj(meta.tree, _.random(start, wid), _.random(start, wid));
+    for (let a = 0; a < 60000; a++) {
+        // world.createObj(meta.tree, _.random(start, wid), _.random(start, wid));
         world.createObj(meta.orangetree, _.random(start, wid), _.random(start, wid));
+        // world.createObj(meta.treeseed, _.random(start, wid), _.random(start, wid));
     }
     for (let a = 0; a < 7000; a++) {
-        // world.createObj(meta.wolf, _.random(start, wid), _.random(start, wid));
+        world.createObj(meta.wolf, _.random(start, wid), _.random(start, wid));
+
     }
-    for (let a = 0; a < 1000; a++) {
-        // world.createObj(meta.orange, _.random(-wid, wid), _.random(-wid, wid));
-    }
+    // for (let a = 0; a < 1000; a++) {
+    //     // world.createObj(meta.ant, _.random(start, wid), _.random(start, wid));
+    //     world.createObj(meta.ant, _.random(start, wid), _.random(start, wid));
+    //     // world.createObj(meta.flag, _.random(start, wid), _.random(start, wid));
+    // }
     // for (let a = 0; a < 50; a++) {
     //     world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));
     //

@@ -1,4 +1,5 @@
 const dir = require('./util');
+const _ = require('underscore');
 
 let meta = {};
 meta.player = {
@@ -80,11 +81,11 @@ meta.wolf = {
             wd.move(wd.dirRnd);
         }
         data.satiety -= tire;
-        if (data.satiety <= 0) {
-            wd.transform(wd.me, meta.bone)
-        } else {
+        // if (data.satiety <= 0) {
+        //     wd.transform(wd.me, meta.bone)
+        // } else {
             wd.nextTurn(tire);
-        }
+        // }
     },
 };
 
@@ -135,7 +136,7 @@ meta.kaka = {
 };
 meta.oranger = {
     img: "fruit",
-    z: 4,
+    z: 5,
     isNailed: true,
     onApply: (obj, wd) => {
         wd.getOut(obj.x, obj.y);
@@ -185,7 +186,7 @@ meta.tree = {
         // wd.nextTurn(3500);
         if (data.new) {
             data.new = false;
-            wd.nextTurn(70000);
+            wd.nextTurn(35000);
         } else {
             wd.transform(wd.me, meta.orangetree);
         }
@@ -194,7 +195,7 @@ meta.tree = {
 
 meta.orangetree = {
     z: 21,
-    img: "wall",
+    img: "orangetree",
     isSolid: true,
     onCreate(data) {
         data.sat = false;
@@ -218,12 +219,12 @@ meta.orangetree = {
         //     // }
         // }
         // wd.nextTurn(3500);
-        if (data.new) {
-            data.new = false;
-            wd.nextTurn(20000);
-        } else {
-            wd.transform(wd.me, meta.treeseed);
-        }
+        // if (data.new) {
+        //     data.new = false;
+        //     wd.nextTurn(10000);
+        // } else {
+        //     wd.transform(wd.me, meta.treeseed);
+        // }
     },
 };
 
@@ -261,19 +262,103 @@ meta.egg = {
         }
     },
 };
-
+meta.flag = {
+    img: 'flag',
+    z: 30,
+};
 meta.ant = {
     img: 'ant',
     z: 15,
+    isSolid: true,
     onCreate(data) {
         // data.new = true;
+        data.command = 'walk';
+        data.times = 3;
+        data.flagId = false;
     },
     onTurn: (data, wd) => {
-        wd.move(wd.dirRnd);
+        let tire = 20;
+        // if (data.satiety <= 0) {
+        //     // let t = wd.find([meta.flag], 1);
+        //     // if (t) {
+        //     //     let dt = wd.dirFrom(t.x, t.y);
+        //     //     wd.move(dt.dir[0]);
+        //     // }
+        //     wd.move(wd.dirRnd);
+        //     wd.dropAll();
+        //     data.satiety = 100;
+        // }
 
-        wd.nextTurn(5)
+        switch (data.command) {
+            case "walk":
+                if (data.times > 0) {
+                    wd.move(wd.dirRnd);
+                    data.times--;
+                } else {
+                    data.command = "search";
+                    data.times = 10;
+                }
+                break;
+            case "search":
+                if (wd.inv() === 0 && data.times > 0) {
+                    let t = wd.find([meta.tree, meta.orangetree], 1);
+                    if (t) {
+                        let dt = wd.dirTo(t.x, t.y);
+                        if (Math.abs(dt.xWant) + Math.abs(dt.yWant) <= 1) {
+                            wd.take(t);
+                            wd.transform(t, meta.tree);
+                        } else {
+                            wd.move(dt.dir[0])
+                        }
+                    } else {
+                        wd.move(wd.dirRnd);
+                    }
+                    data.times--;
+                } else {
+                    data.command = "build";
+                    data.times = 10;
+                }
+                break;
+            case "build":
+                if (data.times > 0) {
+                    wd.move(wd.dirRnd);
+                    data.times--;
+                }
+                else {
+                    // let t = wd.find([meta.ant], 0, 3);
+                    // if (t) {
+                    //     data.times = 10;
+                    //     data.command = 'build';
+                    // } else {
+                        wd.dropAll();
+                        data.times = 10;
+                        data.command = 'walk';
+                    // }
+                }
+                break;
+        }
+        //     } else {
+        //         let t = wd.find([meta.flag], 1);
+        //         if (t && data.goAway > 0) {
+        //             let dt = wd.dirFrom(t.x, t.y);
+        //             wd.move(dt.dir[0]);
+        //             data.flag = 500;
+        //             data.goAway--;
+        //         } else {
+        //
+        //             data.goAway = 5;
+        //             data.needRest = 7;
+        //             data.flag -= tire;
+        //             if (data.flag <= 0) {
+        //                 wd.transform(wd.me, meta.flag);
+        //             }
+        //         }
+        //     }
+        // }
+        wd.nextTurn(tire)
     }
-};
+}
+;
 
 
 meta.aphidka = {
@@ -410,7 +495,7 @@ meta.plant = {
                 wd.nextTurn(500);
             } else {
                 data.hungry += 50;
-                if (data.hungry > 30000) {
+                if (data.hungry > 300) {
                     wd.dropAll();
                     wd.transform(wd.me, meta.highgrass)
                 }
@@ -420,7 +505,7 @@ meta.plant = {
     },
 };
 meta.orange = {
-    z: 2,
+    z: 3,
     img: 'orange',
     onCreate(data) {
         data.new = true;
@@ -519,7 +604,7 @@ meta.treeseed = {
         } else {
             if (data.new) {
                 data.new = false;
-                wd.nextTurn(10000);
+                wd.nextTurn(5000);
             } else {
                 wd.transform(wd.me, meta.tree);
             }
