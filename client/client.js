@@ -441,8 +441,8 @@ let renderStatus = () => {
     // str += "Err: " + model.error + "</br>";
     str += "Клиент: " + (Date.now() - model.dtStartLoop) + "</br>";
     str += "Время: " + model.time + "</br>";
-    str += "dirX: " + model.dirx + "</br>";
-    str += "dirY: " + model.diry + "</br>";
+    str += "extraX: " + extra.x + "</br>";
+    str += "extraY: " + extra.y + "</br>";
     // str += "ClickX: " + click.x + "</br>";
     // str += "ClickY: " + click.y + "</br>";
     // str += "mouseCellX: " + mouseCell.x + "</br>";
@@ -608,7 +608,7 @@ function orderDown() {
     model.order.name = "move";
     model.order.val = "point";
     model.orderCn++;
-    if(model.stamp=0) {
+    if(model.stamp===0) {
         extra.x = 0;
         extra.y = 1;
     }
