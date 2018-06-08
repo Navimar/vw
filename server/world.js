@@ -445,7 +445,7 @@ world.start = () => {
         // world.createObj(meta.treeseed, _.random(start, wid), _.random(start, wid));
     }
     for (let a = 0; a < 7000; a++) {
-        world.createObj(meta.wolf, _.random(start, wid), _.random(start, wid));
+        // world.createObj(meta.wolf, _.random(start, wid), _.random(start, wid));
 
     }
     // for (let a = 0; a < 1000; a++) {

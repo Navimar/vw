@@ -109,14 +109,11 @@ exe.wrapper = (me) => {
             for (let a = 0; a < 1; a++) {
                 if (o.dir[a] === direction.up) {
                     o.dir[a] = direction.down
-                }else
-                if (o.dir[a] === direction.down) {
+                } else if (o.dir[a] === direction.down) {
                     o.dir[a] = direction.up
-                }else
-                if (o.dir[a] === direction.left) {
+                } else if (o.dir[a] === direction.left) {
                     o.dir[a] = direction.right
-                }else
-                if (o.dir[a] === direction.right) {
+                } else if (o.dir[a] === direction.right) {
                     o.dir[a] = direction.left
                 }
             }
@@ -288,6 +285,7 @@ exe.onTick = () => {
                         p.diry = 0;
                         p.order.name = "stop";
                         p.order.val = 0;
+                        p.data.dir = direction.here;
                     }
                     break;
                 default:

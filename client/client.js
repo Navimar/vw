@@ -16,7 +16,7 @@ let mouseDown = false;
 let mousePos = {x: 0, y: 0};
 let mouseCell = {x: 0, y: 0};
 let inAir = false;
-
+let extra = {x: 0, y: 0};
 // function Pt(x, y) {
 //     if (!_.isFinite(x)) throw "x invalid";
 //     if (!_.isFinite(y)) throw "y invalid";
@@ -120,7 +120,7 @@ function initModel() {
     model.orderCn = 0;
     model.lastorder = 0;
     model.dirx = 0;
-    model.diry =0;
+    model.diry = 0;
 }
 
 window.requestAnimFrame = (function (callback) {
@@ -143,6 +143,8 @@ function step(lastTime) {
 }
 
 function onServer(val) {
+    extra.x = 0;
+    extra.y = 0;
     status.server = 0;
     // for (let x = 0; x < 9; x++) {
     //     let r = model.holst[x][0];
@@ -154,9 +156,10 @@ function onServer(val) {
     //     }
     // }
     model.tire = val.tire;
-    if(val.dir){
-    model.dirx = val.dir.x;
-    model.diry = val.dir.y;}
+    if (val.dir) {
+        model.dirx = val.dir.x;
+        model.diry = val.dir.y;
+    }
     model.wound = val.wound;
     model.message = val.message;
     // model.hand = val.hand;
@@ -263,7 +266,7 @@ function onStep(timeDiff) {
         //     r = 2;
         //     // console.log(r);
         // }
-        let m = move(o.sx, o.sy, o.x, o.y, r * constSpeed, timeDiff);
+        let m = move(o.sx, o.sy, o.x + extra.x, o.y + extra.y, r * constSpeed, timeDiff);
         o.sx = m.x;
         o.sy = m.y;
         // o.sx = o.x;
@@ -438,6 +441,8 @@ let renderStatus = () => {
     // str += "Err: " + model.error + "</br>";
     str += "Клиент: " + (Date.now() - model.dtStartLoop) + "</br>";
     str += "Время: " + model.time + "</br>";
+    str += "dirX: " + model.dirx + "</br>";
+    str += "dirY: " + model.diry + "</br>";
     // str += "ClickX: " + click.x + "</br>";
     // str += "ClickY: " + click.y + "</br>";
     // str += "mouseCellX: " + mouseCell.x + "</br>";
@@ -603,6 +608,8 @@ function orderDown() {
     model.order.name = "move";
     model.order.val = "point";
     model.orderCn++;
+    extra.x = 0;
+    extra.y = 1;
 }
 
 function orderStop() {
