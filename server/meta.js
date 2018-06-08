@@ -505,7 +505,7 @@ meta.plant = {
     },
 };
 meta.orange = {
-    z: 3,
+    z: 4,
     img: 'orange',
     onCreate(data) {
         data.new = true;

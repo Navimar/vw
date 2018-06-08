@@ -608,8 +608,10 @@ function orderDown() {
     model.order.name = "move";
     model.order.val = "point";
     model.orderCn++;
-    extra.x = 0;
-    extra.y = 1;
+    if(model.stamp=0) {
+        extra.x = 0;
+        extra.y = 1;
+    }
 }
 
 function orderStop() {
