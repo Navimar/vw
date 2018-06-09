@@ -40,7 +40,7 @@ exe.wrapper = (me) => {
             if (!Array.isArray(tp)) tp = [tp];
             for (let t of tp) {
                 let i = world.lay(t, me.x, me.y);
-                if (i) return i;
+                if (i && i !== me) return i;
             }
         },
         move: (dir) => {
@@ -239,6 +239,15 @@ exe.onTick = () => {
                         tool.tp.onApply(p.order.target, exe.wrapper(tool));
                     } else {
                         console.log("can not apply " + JSON.stringify(tool.tp));
+                    }
+                    p.order = {};
+                    break;
+                case "useinv":
+                    let tlfi = p.order.tool;
+                    if (_.isFunction(tlfi.tp.onApply)) {
+                        tlfi.tp.onApply(p.order.target, exe.wrapper(tlfi));
+                    } else {
+                        console.log("can not apply " + JSON.stringify(tlfi.tp));
                     }
                     p.order = {};
                     break;

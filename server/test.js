@@ -50,6 +50,7 @@ module.exports = () => {
 
 
     test(true, false, "Tests are working, they could be false");
+    test(_.random(100), 93, "random isn't random");
 
     world.init();
     let p = world.addPlayer(false, false, 371, 250);
@@ -87,15 +88,11 @@ module.exports = () => {
     test(p.y, 0, 'player onTurn dirTo left');
     world.init();
     p = world.addPlayer();
-    let o = world.createObj({isSolid:true},0,1);
+    let o = world.createObj({isSolid: true}, 0, 1);
     p.data.order = {x: 1, y: 4};
     p.tp.onTurn(p.data, exe.wrapper(p));
     test(p.x, 1, 'player onTurn dirTo right when tree is on the pass');
     test(p.y, 0, 'player onTurn dirTo right when tree is on the pass');
-
-
-
-
 
 
     world.init("objArrInPoint");

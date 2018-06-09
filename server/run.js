@@ -10,8 +10,13 @@ const fs = require('fs');
 
 // const event = require('./event');
 
+let seedrandom = require('seedrandom');
+
+
+
 
 exports.main = function main(io) {
+    seedrandom('hello.', { global: true });
     test();
 
     if (fs.existsSync('data/log.txt')) {

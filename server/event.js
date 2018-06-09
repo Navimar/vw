@@ -61,8 +61,8 @@ event.bot = (val) => {
 event.login = (u, socket, pass) => {
     user.login(u, socket, pass);
 };
-event.unregistered=(id,socket)=>{
-    send.error(id,socket,id+' is unregistered, please type /start to bot');
+event.unregistered = (id, socket) => {
+    send.error(id, socket, id + ' is unregistered, please type /start to bot');
 };
 
 event.order = (p, order) => {
@@ -113,6 +113,9 @@ event.order = (p, order) => {
             } else {
                 p.order = order;
             }
+        }
+        if (order.name === 'useinv') {
+            throw "use inv";
         }
         if (order.name === 'use') {
             // if (Math.abs(order.val.targetX - p.x) < 1 && Math.abs(order.val.targetY - p.y) < 1) {
@@ -172,7 +175,7 @@ event.order = (p, order) => {
                 }
             }
         }
-    }else{
+    } else {
         p.order.name = 'respawn';
     }
 };

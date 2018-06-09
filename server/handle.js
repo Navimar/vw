@@ -40,6 +40,14 @@ handle.socket = (socket, eventName, msg) => {
                         targetY: msg.val.targetY,
                     });
                     break;
+                case'useinv':
+                    event.order(p, {
+                        name,
+                        id: msg.val.id,
+                        from: msg.val.from,
+                        target: msg.val.target,
+                    });
+                    break;
                 case 'take':
                     event.order(p, {name, id: msg.val});
                     break;

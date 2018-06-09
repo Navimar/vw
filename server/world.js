@@ -210,7 +210,7 @@ world.lay = function lay(tp, x, y) {
     if (inv != undefined) {
         for (let k of inv) {
             if (k.tp === tp) {
-                return true
+                return k
             }
         }
     }
@@ -436,27 +436,23 @@ world.start = () => {
     for (let a = 0; a < 3000; a++) {
         world.createObj(meta.stick, _.random(start, wid), _.random(start, wid));
         world.createObj(meta.orange, _.random(start, wid), _.random(start, wid));
-
+        world.createObj(meta.fire, _.random(start, wid), _.random(start, wid));
+        world.createObj(meta.fire, _.random(start, wid), _.random(start, wid));
 
     }
     for (let a = 0; a < 60000; a++) {
-        // world.createObj(meta.tree, _.random(start, wid), _.random(start, wid));
+        world.createObj(meta.highgrass, _.random(start, wid), _.random(start, wid));
         world.createObj(meta.orangetree, _.random(start, wid), _.random(start, wid));
-        // world.createObj(meta.treeseed, _.random(start, wid), _.random(start, wid));
+        // world.createObj(meta.water, _.random(start, wid), _.random(start, wid));
     }
-    for (let a = 0; a < 7000; a++) {
-        // world.createObj(meta.wolf, _.random(start, wid), _.random(start, wid));
-
+    for (let a = 0; a < 2000; a++) {
+        world.createObj(meta.wolf, _.random(start, wid), _.random(start, wid));
     }
-    // for (let a = 0; a < 1000; a++) {
-    //     // world.createObj(meta.ant, _.random(start, wid), _.random(start, wid));
-    //     world.createObj(meta.ant, _.random(start, wid), _.random(start, wid));
-    //     // world.createObj(meta.flag, _.random(start, wid), _.random(start, wid));
-    // }
-    // for (let a = 0; a < 50; a++) {
-    //     world.createObj(meta.wolf, _.random(-wid, wid), _.random(-wid, wid));
-    //
-    // }
+    for (let a = 0; a < 1000; a++) {
+        world.createObj(meta.ant, _.random(start, wid), _.random(start, wid));
+        world.createObj(meta.ant, _.random(start, wid), _.random(start, wid));
+        world.createObj(meta.aphid, _.random(start, wid), _.random(start, wid));
+    }
 };
 
 module.exports = world;
