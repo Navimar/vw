@@ -114,6 +114,22 @@ meta.stone = {
             wd.transform(wd.me, meta.axe);
         }
     }
+};meta.flinders={
+  img:'flinders',
+    z:5,
+};
+meta.torch = {
+    img: 'torch',
+    z: 9,
+    onApply: (obj, wd) => {
+        if (obj.tp === meta.flinders) {
+            wd.transform(obj, meta.fire);
+            // wd.transform(wd.me, meta.axe);
+        }
+        if (obj.tp === meta.fire) {
+            wd.getOut(obj.x, obj.y);
+        }
+    }
 };
 meta.stick = {
     img: "stick",
@@ -122,6 +138,13 @@ meta.stick = {
         if (obj.tp === meta.stone) {
             wd.transform(obj, meta.axe);
             wd.transform(wd.me, meta.axe);
+        }
+        if (obj.tp === meta.tree ||obj.tp === meta.orangetree) {
+            wd.transform(wd.me, meta.flinders);
+        }
+        if (obj.tp === meta.fire) {
+            // wd.getOut(obj.x,obj.y);
+            wd.transform(wd.me, meta.torch);
         }
     }
 };
@@ -224,10 +247,10 @@ meta.tree = {
         }
     },
 };
-meta.wwall ={
-  img: 'wwall',
-  isSolid:true,
-z:40,
+meta.wwall = {
+    img: 'wwall',
+    isSolid: true,
+    z: 40,
 };
 meta.orangetree = {
     z: 21,
@@ -337,7 +360,7 @@ meta.ant = {
                 break;
             case "search":
                 if (wd.inv() === 0 && data.times > 0) {
-                    let t = wd.find([meta.tree,meta.wwall, meta.orangetree, meta.orange, meta.seed, meta.meat, meta.oranger], 1);
+                    let t = wd.find([meta.tree, meta.wwall, meta.orangetree, meta.orange, meta.seed, meta.meat, meta.oranger], 1);
                     if (t) {
                         let dt = wd.dirTo(t.x, t.y);
                         if (Math.abs(dt.xWant) + Math.abs(dt.yWant) <= 1) {
@@ -573,9 +596,9 @@ meta.orange = {
     },
 };
 
-meta.ash ={
-  z:1,
-    img:"ash",
+meta.ash = {
+    z: 1,
+    img: "ash",
     onCreate(data) {
         data.new = true;
     },
@@ -597,7 +620,7 @@ meta.fire = {
         return "fire";
     },
     isNailed: true,
-    isSolid:true,
+    isSolid: true,
     onCreate: (data) => {
         data.new = true;
         data.satiety = 3000;
@@ -608,16 +631,16 @@ meta.fire = {
         if (wd.isHere(meta.fire)) {
             wd.movetrought(wd.dirRnd);
         }
-        let food = [meta.tree, meta.aphid, meta.seed, meta.kaka, meta.ant, meta.wolf,meta.axe,meta.highgrass, meta.bone, meta.stick,meta.orangetree, meta.orange, meta.oranger];
+        let food = [meta.tree, meta.aphid, meta.seed, meta.kaka, meta.ant, meta.wolf, meta.axe, meta.highgrass, meta.bone, meta.stick, meta.orangetree, meta.orange, meta.oranger];
         let o = wd.isHere(food);
         if (o) {
             wd.transform(o, meta.fire);
-            data.satiety+=300;
+            data.satiety += 300;
         }
         data.new = false;
-        data.satiety-=tire;
-        if(data.satiety<=0){
-            wd.transform(wd.me,meta.ash);
+        data.satiety -= tire;
+        if (data.satiety <= 0) {
+            wd.transform(wd.me, meta.ash);
         }
         wd.nextTurn(tire);
     }
@@ -651,6 +674,19 @@ meta.axe = {
         }
     }
 };
+meta.grill = {
+    img: "grill",
+    z: 8,
+    onApply: (obj, wd) => {
+        if (obj.tp.player) {
+            // wd.trade(obj);
+            wd.transform(wd.me, meta.bone);
+            if (!wd.removeWound(obj, "hungry")) {
+                wd.addWound(obj, "glut");
+            }
+        }
+    },
+};
 meta.meat = {
     z: 1,
     img: 'meat',
@@ -673,6 +709,9 @@ meta.meat = {
             if (!wd.removeWound(obj, "hungry")) {
                 wd.addWound(obj, "glut");
             }
+        }
+        if (obj.tp === meta.fire) {
+            wd.transform(wd.me, meta.grill);
         }
     }
 };

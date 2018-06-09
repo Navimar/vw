@@ -359,6 +359,155 @@ exe.onLoginBot = (val) => {
     token = user.setKey(val.msg.from.id);
     send.bot(val.msg.from.id, config.ip + ":" + config.port + "/?id=" + val.msg.from.id + "&key=" + token);
 };
+
+exe.changeOrder = (p, order) => {
+    if (!p.data.died) {
+        // if (p.lastorder.name !== order.name || p.lastorder.val.id !== order.val.id) {
+        //     console.log(p.lastorder);
+        //     console.log(order);
+        // p.lastorder = order;
+        if (order.name == "move" || order.name == "stop") {
+            p.order = order;
+        }
+        if (order.name == 'take') {
+            let obj = world.objArrInPoint(p.x, p.y);
+            let f = true;
+            if (obj) {
+                for (let o of obj) {
+                    if (o.id === order.id) {
+                        order.take = o;
+                        f = false;
+                        break;
+                    }
+                }
+            } else {
+                console.log('wrong take place');
+            }
+            if (f) {
+                console.log('wrong take id');
+            } else {
+                p.order = order;
+            }
+        }
+        if (order.name == 'drop') {
+            let inv = world.map.get(p.id);
+            let f = true;
+            if (inv) {
+                for (let i of inv) {
+                    if (i.id === order.id) {
+                        order.drop = i;
+                        f = false;
+                        break;
+                    }
+                }
+            } else {
+                console.log('wrong drop place');
+            }
+            if (f) {
+                console.log('wrong drop id');
+            } else {
+                p.order = order;
+            }
+        }
+        if (order.name === 'useinv') {
+            let check = false;
+            let inv = world.map.get(p.id);
+            if (inv) {
+                for (let o of inv) {
+                    if (o.id === order.target) {
+                        order.target = o;
+                        check = true;
+                        break;
+                    }
+                }
+            }
+            if (check) {
+                if (order.from === 'inv') {
+                    let inv = world.map.get(p.id);
+                    let f = true;
+                    if (inv) {
+                        for (let i of inv) {
+                            if (i.id === order.id) {
+                                // console.log('tool ');
+                                // console.log(i);
+                                order.tool = i;
+                                f = false;
+                                break;
+                            }
+                        }
+                    } else {
+                        // console.log('wrong tool from inv place');
+                    }
+                    if (f) {
+                        // console.log('wrong tool from inv id');
+                    } else {
+                        p.order = order;
+                    }
+                }
+            }
+        }
+        if (order.name === 'use') {
+            // if (Math.abs(order.val.targetX - p.x) < 1 && Math.abs(order.val.targetY - p.y) < 1) {
+            let targetArr = world.objArrInPoint(order.targetX, order.targetY);
+            if (targetArr) {
+                targetArr.sort((a, b) => {
+                    if (a.tp.z > b.tp.z) {
+                        return -1;
+                    } else return 1;
+                });
+                order.target = targetArr[0];
+                // console.log('target');
+                // console.log(order.target);
+                if (order.from === 'ground') {
+                    let obj = world.objArrInPoint(p.x, p.y);
+                    let f = true;
+                    if (obj) {
+                        for (let o of obj) {
+                            if (o.id === order.id) {
+                                // console.log('tool ');
+                                // console.log(o);
+                                order.tool = o;
+                                f = false;
+                                break;
+                            }
+                        }
+                    } else {
+                        // console.log('wrong tool from ground place');
+                    }
+                    if (f) {
+                        // console.log('wrong tool from ground id');
+                    } else {
+                        p.order = order;
+                    }
+                }
+                if (order.from === 'inv') {
+                    let inv = world.map.get(p.id);
+                    let f = true;
+                    if (inv) {
+                        for (let i of inv) {
+                            if (i.id === order.id) {
+                                // console.log('tool ');
+                                // console.log(i);
+                                order.tool = i;
+                                f = false;
+                                break;
+                            }
+                        }
+                    } else {
+                        // console.log('wrong tool from inv place');
+                    }
+                    if (f) {
+                        // console.log('wrong tool from inv id');
+                    } else {
+                        p.order = order;
+                    }
+                }
+            }
+        }
+    } else {
+        p.order.name = 'respawn';
+    }
+};
 //
 // exe.onNtdBot = (msg) => {
 //     login(msg);

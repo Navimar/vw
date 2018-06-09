@@ -5,7 +5,7 @@
 // const user = require('./user');
 const read = require('./read');
 // const readline = require('readline');
-const readlinesync = require('read-each-line-sync');
+const readline = require('read-each-line-sync');
 // const fs = require('fs');
 
 // module.exports = (path) => {
@@ -26,8 +26,8 @@ module.exports = (path) => {
     if (!path) {
         path = 'data/log.txt'
     }
-    readlinesync(path, function (line) {
+    readline(path, function (line) {
         let val = JSON.parse(line);
-        read(val.val);
+        read(val);
     });
 };

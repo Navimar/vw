@@ -85,6 +85,26 @@ world.playerBySocket = (socket) => {
     }
     return false;
 };
+world.playerBySocket = (socket) => {
+    if (socket) {
+        for (let p of world.player) {
+            if (p.socket == socket) {
+                return p
+            }
+        }
+    }
+    return false;
+};
+
+world.playerById = (id) => {
+    for (let p of world.player) {
+        if (id === p.id) {
+            return p
+        }
+    }
+    return false
+};
+
 world.pickUp = (objTaker, tp) => {
     let k = objTaker.x + " " + objTaker.y;
     let obs = world.map.get(k);
