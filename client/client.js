@@ -218,6 +218,11 @@ function onServer(val) {
     }
     model.px = val.px;
     model.py = val.py;
+    model.obj.sort((a, b) => {
+        if (a.z < b.z) {
+            return -1;
+        } else return 1;
+    });
     // if (!inAir && mouseDown) {
     //     // if (mouseCell.x + mouseCell.y > 8 && mouseCell.x > mouseCell.y) {
     //     //     orderRight();
@@ -361,11 +366,7 @@ function render(model) {
         drawImg("from", o.x + model.trx, o.y + model.try);
     }
 
-    model.obj.sort((a, b) => {
-        if (a.z < b.z) {
-            return -1;
-        } else return 1;
-    });
+
 
     for (let o of model.obj) {
         // drawImg(o.img, o.x + model.trx + o.trx, o.y + model.try + o.try);
@@ -428,6 +429,7 @@ function render(model) {
     }
     // // if (model.hand != "hand") drawSize(model.hand.img, 4.25, 4.25,0.6,0.6);
     // if (model.message != model.lastmessage) message(model.message);
+    // drawWeb("http://tourist.kg/wp-content/uploads/2017/04/7e623540e23ca8273a41cab254b2edb1.png",0,0,2,1);
 }
 
 let renderStatus = () => {

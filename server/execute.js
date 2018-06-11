@@ -46,6 +46,20 @@ exe.wrapper = (me) => {
         move: (dir) => {
             return world.move(me, dir)
         },
+        isNear: (tp) => {
+            if (!Array.isArray(tp)) tp = [tp];
+            for (let t of tp) {
+                let i;
+                i = world.lay(t, me.x + 1, me.y);
+                if (i && i !== me) return i;
+                i = world.lay(t, me.x, me.y + 1);
+                if (i && i !== me) return i;
+                i = world.lay(t, me.x, me.y - 1);
+                if (i && i !== me) return i;
+                i = world.lay(t, me.x - 1, me.y);
+                if (i && i !== me) return i;
+            }
+        },
         movetrought: (dir) => {
             let x = me.x + dir.x;
             let y = me.y + dir.y;

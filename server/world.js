@@ -405,7 +405,7 @@ world.find = (tp, x, y, first, last) => {
         first = 0;
     }
     if (last === undefined) {
-        last = 5;
+        last = 4;
     }
     // let arr = [];
     // for (let i = 0; i < world.obj.length; i++) {
@@ -441,7 +441,7 @@ world.find = (tp, x, y, first, last) => {
         return false;
     }
 
-    for (let a = first; a < last; a++) {
+    for (let a = first; a <= last; a++) {
         let f = findInSircle(a);
         if (f) return f;
     }
@@ -452,26 +452,23 @@ world.start = () => {
     let start = 5000;
     let wid = 400;
     wid += start;
-    // world.createObj(meta.test, 2, 2);
-    for (let a = 0; a < 3000; a++) {
-        world.createObj(meta.stick, _.random(start, wid), _.random(start, wid));
-        world.createObj(meta.orange, _.random(start, wid), _.random(start, wid));
-        world.createObj(meta.fire, _.random(start, wid), _.random(start, wid));
-        world.createObj(meta.fire, _.random(start, wid), _.random(start, wid));
+    let arr = [
+        {m: meta.wolf, q: 3000},
+        {m: meta.orangetree, q: 60000},
+        // {m: meta.water, q: 30000},
+        {m: meta.plant, q: 2000},
+        {m: meta.orange, q: 3000},
+        {m: meta.ant, q: 3000},
+        {m: meta.fire, q: 3000},
+        {m: meta.aphid, q: 3000},
+        {m: meta.crab, q: 3000},
+        {m: meta.highgrass, q: 40000},
+    ];
 
-    }
-    for (let a = 0; a < 60000; a++) {
-        world.createObj(meta.highgrass, _.random(start, wid), _.random(start, wid));
-        world.createObj(meta.orangetree, _.random(start, wid), _.random(start, wid));
-        // world.createObj(meta.water, _.random(start, wid), _.random(start, wid));
-    }
-    for (let a = 0; a < 2000; a++) {
-        world.createObj(meta.wolf, _.random(start, wid), _.random(start, wid));
-    }
-    for (let a = 0; a < 1000; a++) {
-        world.createObj(meta.ant, _.random(start, wid), _.random(start, wid));
-        world.createObj(meta.ant, _.random(start, wid), _.random(start, wid));
-        world.createObj(meta.aphid, _.random(start, wid), _.random(start, wid));
+    for (let a of arr) {
+        for (let i = 0; i < a.q; i++) {
+            world.createObj(a.m, _.random(start, wid), _.random(start, wid));
+        }
     }
 };
 
