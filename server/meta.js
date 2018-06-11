@@ -65,7 +65,7 @@ meta.wolf = {
         }
 
         let tire = 16;
-        let t = wd.find([meta.player, meta.meat, meta.bone, meta.aphid,meta.crab]);
+        let t = wd.find([meta.player, meta.meat, meta.bone, meta.aphid, meta.crab]);
         if (t) {
             let mt = wd.dirTo(t.x, t.y);
             if (mt.dir[0] === dir.here) {
@@ -77,7 +77,7 @@ meta.wolf = {
                     wd.transform(obj, meta.wolf);
                 }
             } else {
-                if (t.tp === meta.aphid||t.tp === meta.crab) {
+                if (t.tp === meta.aphid || t.tp === meta.crab) {
                     if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
                         wd.transform(t, meta.meat);
                     }
@@ -386,7 +386,7 @@ meta.ant = {
                 break;
             case "search":
                 if (wd.inv() === 0 && data.times > 0) {
-                    let t = wd.find([meta.plant, meta.tree, meta.wwall, meta.orangetree, meta.orange, meta.seed, meta.meat, meta.oranger], 1);
+                    let t = wd.find([meta.plant, meta.tree, meta.wwall, meta.stick,meta.orangetree, meta.orange, meta.seed, meta.meat, meta.oranger], 0, 1);
                     if (t) {
                         let dt = wd.dirTo(t.x, t.y);
                         if (Math.abs(dt.xWant) + Math.abs(dt.yWant) <= 1) {
@@ -602,7 +602,7 @@ meta.aphid = {
 
 meta.crab = {
     z: 15,
-    isSolid:true,
+    isSolid: true,
     img: 'crab',
     onCreate: (data) => {
         // data.new = true;
@@ -615,10 +615,14 @@ meta.crab = {
         if (t) {
             // let mt = wd.dirTo(t.x, t.y);
             // if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
+            if (_.random(5)) {
                 wd.transform(t, meta.stick);
-                wd.relocate(t.x, t.y);
-                meta.satiety += 500;
-            tire = 300;
+            } else {
+                wd.transform(t, meta.crab)
+            }
+            wd.relocate(t.x, t.y);
+            meta.satiety += 500;
+            tire = 100;
             // }
         } else {
             wd.move(wd.dirRnd);
@@ -742,13 +746,13 @@ meta.fire = {
     onTurn: (data, wd) => {
         wd.transformdropAll(meta.fire);
         let tire = 50;
-        if (wd.isHere(meta.water)){
-            wd.transform(wd.me,meta.water);
+        if (wd.isHere(meta.water)) {
+            wd.transform(wd.me, meta.water);
         }
         if (wd.isHere(meta.fire)) {
             wd.movetrought(wd.dirRnd);
         }
-        let food = [meta.tree,meta.crab, meta.meat, meta.wwall, meta.flinders, meta.torch, meta.aphid, meta.plant, meta.seed, meta.kaka, meta.ant, meta.wolf, meta.axe, meta.highgrass, meta.bone, meta.stick, meta.orangetree, meta.orange, meta.oranger];
+        let food = [meta.tree, meta.crab, meta.meat, meta.wwall, meta.flinders, meta.torch, meta.aphid, meta.plant, meta.seed, meta.kaka, meta.ant, meta.wolf, meta.axe, meta.highgrass, meta.bone, meta.stick, meta.orangetree, meta.orange, meta.oranger];
         let o = wd.isHere(food);
         if (o) {
             wd.transform(o, meta.fire);

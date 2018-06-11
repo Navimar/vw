@@ -2,6 +2,7 @@ const _ = require('underscore');
 const util = require('./util.js');
 const direction = util.dir;
 const meta = require('./meta.js');
+const config = require('./config.js');
 const generate = require('./generate');
 
 let world = {};
@@ -449,22 +450,16 @@ world.find = (tp, x, y, first, last) => {
 };
 
 world.start = () => {
-    let start = 5000;
-    let wid = 400;
+    let start = config.world.start;
+    let arr = config.world.obj;
+    let f = config.world.factor;
+    let q = 0;
+    for (let a of arr) {
+        q += a.q;
+    }
+    let wid = Math.round(Math.sqrt(q)*f);
+    console.log("world size: "+wid);
     wid += start;
-    let arr = [
-        {m: meta.wolf, q: 3000},
-        {m: meta.orangetree, q: 60000},
-        // {m: meta.water, q: 30000},
-        {m: meta.plant, q: 2000},
-        {m: meta.orange, q: 3000},
-        {m: meta.ant, q: 3000},
-        {m: meta.fire, q: 3000},
-        {m: meta.aphid, q: 3000},
-        {m: meta.crab, q: 3000},
-        {m: meta.highgrass, q: 40000},
-    ];
-
     for (let a of arr) {
         for (let i = 0; i < a.q; i++) {
             world.createObj(a.m, _.random(start, wid), _.random(start, wid));

@@ -367,7 +367,6 @@ function render(model) {
     }
 
 
-
     for (let o of model.obj) {
         // drawImg(o.img, o.x + model.trx + o.trx, o.y + model.try + o.try);
         //
@@ -433,7 +432,12 @@ function render(model) {
 }
 
 let renderStatus = () => {
-    let str = "status.server: " + status.server + "</br>";
+    let loc = (location.href).substr(0, 9);
+    if (loc == "http://46") loc = 'web';
+    if (loc == "http://12") loc = 'local';
+    let str = "";
+    str += "" + loc + "</br>";
+    str += "status.server: " + status.server + "</br>";
     // str += "Пинг: " + model.ping + "</br>";
     str += "Расчет: " + model.delay + "</br>";
     // str += "Ходит: " + model.cnActive + "</br>";
@@ -441,7 +445,7 @@ let renderStatus = () => {
     str += "y: " + model.py + "</br>";
     str += "Игроков: " + model.connected + "</br>";
     // str += "Err: " + model.error + "</br>";
-    str += "Клиент: " + (Date.now() - model.dtStartLoop) + "</br>";
+    // str += "Клиент: " + (Date.now() - model.dtStartLoop) + "</br>";
     str += "Время: " + model.time + "</br>";
     str += "extraX: " + extra.x + "</br>";
     str += "extraY: " + extra.y + "</br>";
