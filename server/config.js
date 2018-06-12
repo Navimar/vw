@@ -44,7 +44,7 @@ if (os.platform() == 'darwin') {
                 {m: meta.highgrass, q: 40000},
             ],
             factor: 1.2,
-            items: 360000,
+            items: 300000,
         }
     }
 }
