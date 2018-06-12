@@ -453,15 +453,19 @@ world.start = () => {
     let start = config.world.start;
     let arr = config.world.obj;
     let f = config.world.factor;
+    let items = config.world.items;
     let q = 0;
     for (let a of arr) {
         q += a.q;
     }
-    let wid = Math.round(Math.sqrt(q)*f);
-    console.log("world size: "+wid);
+    let m = items/q ;
+console.log(m);
+
+    let wid = Math.round(Math.sqrt(items) * f);
+    console.log("world size: " + wid);
     wid += start;
     for (let a of arr) {
-        for (let i = 0; i < a.q; i++) {
+        for (let i = 0; i < a.q*m; i++) {
             world.createObj(a.m, _.random(start, wid), _.random(start, wid));
         }
     }

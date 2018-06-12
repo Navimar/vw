@@ -7,7 +7,7 @@ if (os.platform() == 'darwin') {
         port: "3000",
         botkey: '320938705:AAGpcdMe9oIhFYuu11MjU4djJnj1maijkpQ',
         world: {
-            start: 5000,
+            start: 5200,
             obj: [
                 {m: meta.wolf, q: 3000},
                 {m: meta.orangetree, q: 60000},
@@ -21,6 +21,7 @@ if (os.platform() == 'darwin') {
                 {m: meta.highgrass, q: 40000},
             ],
             factor: 1.2,
+            items: 100,
         }
     }
 } else {
@@ -43,6 +44,7 @@ if (os.platform() == 'darwin') {
                 {m: meta.highgrass, q: 40000},
             ],
             factor: 1.2,
+            items: 360000,
         }
     }
 }
