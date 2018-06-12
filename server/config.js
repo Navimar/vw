@@ -20,7 +20,7 @@ if (os.platform() == 'darwin') {
                 {m: meta.crab, q: 2000},
                 {m: meta.highgrass, q: 30000},
             ],
-            factor: 1.5,
+            factor: 1,
             items: 20000,
             speed:10,
         }
