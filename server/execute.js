@@ -366,6 +366,38 @@ exe.onTick = () => {
     world.cnActive = m;
     world.logic.delete(world.time);
     world.time++;
+
+    function isInt(num) {
+        return parseInt(num) === parseFloat(num)
+    }
+
+    let stat = () => {
+        let arr = [];
+        for (let o of world.obj) {
+            let ok = true;
+            for (let a of arr) {
+                if (a.meta === o.tp) {
+                    a.q++;
+                    ok = false;
+                    break;
+                }
+            }
+            if (ok) {
+                arr.push({meta: o.tp, q: 1})
+            }
+        }
+        let str = "world statistic:\n";
+        str += "world time:" + world.time + "\n";
+        for (let a of arr) {
+            str += a.meta.name;
+            str += " " + a.q + "\n";
+        }
+        return str;
+    };
+    if (isInt(world.time / 1000)) {
+        send.bot(30626617, stat());
+    }
+
     return dtStartLoop;
 };
 

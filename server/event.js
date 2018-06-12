@@ -5,6 +5,7 @@ const fs = require('fs');
 const exe = require('./execute');
 const user = require('./user');
 const send = require('./send');
+const config = require('./config');
 const world = require('./world');
 
 const event = {};
@@ -46,8 +47,27 @@ event.bot = (val) => {
             break;
         case '/check':
             exe.onBotCheck(val);
-
-
+            break;
+        case '/speed':
+            if (val.id === 30626617) {
+                let s = 10;
+                if (val.words[1]){
+                    if(val.words[1]>10){
+                        s = val.words[1];
+                    }
+                    if(val.words[1]>1000){
+                        s = 1000;
+                    }
+                    if(val.words[1]<10){
+                        s = 10;
+                    }
+                    if(val.words[1]==='max'){
+                        s = 1000;
+                    }
+                }
+                send.bot(val.id, 'speed set to '+ s);
+                config.world.speed = s;
+            }
             break;
         // case '/ntd':
         //     val.id = val.msg.from.id;
@@ -59,7 +79,7 @@ event.bot = (val) => {
 };
 
 event.login = (u, socket, pass) => {
-    saveEvent({event: 'login', user:u});
+    saveEvent({event: 'login', user: u});
     user.login(u, socket, pass);
 };
 event.unregistered = (id, socket) => {

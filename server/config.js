@@ -9,19 +9,20 @@ if (os.platform() == 'darwin') {
         world: {
             start: 5200,
             obj: [
-                {m: meta.wolf, q: 3000},
-                {m: meta.orangetree, q: 60000},
-                // {m: meta.water, q: 30000},
-                {m: meta.plant, q: 2000},
-                {m: meta.orange, q: 3000},
-                {m: meta.ant, q: 3000},
-                {m: meta.fire, q: 3000},
-                {m: meta.aphid, q: 3000},
-                {m: meta.crab, q: 3000},
-                {m: meta.highgrass, q: 40000},
+                {m: meta.wolf, q: 200},
+                {m: meta.tree, q: 40000},
+                {m: meta.bone, q: 6000},
+                {m: meta.plant, q: 550},
+                {m: meta.orange, q: 300},
+                // {m: meta.ant, q: 3000},
+                // {m: meta.fire, q: 3000},
+                {m: meta.aphid, q: 300},
+                {m: meta.crab, q: 2000},
+                {m: meta.highgrass, q: 30000},
             ],
-            factor: 1.2,
-            items: 100,
+            factor: 1.5,
+            items: 20000,
+            speed:10,
         }
     }
 } else {
@@ -33,7 +34,7 @@ if (os.platform() == 'darwin') {
             start: 5000,
             obj: [
                 {m: meta.wolf, q: 3000},
-                {m: meta.orangetree, q: 60000},
+                {m: meta.tree, q: 60000},
                 // {m: meta.water, q: 30000},
                 {m: meta.plant, q: 2000},
                 {m: meta.orange, q: 3000},
@@ -43,8 +44,9 @@ if (os.platform() == 'darwin') {
                 {m: meta.crab, q: 3000},
                 {m: meta.highgrass, q: 40000},
             ],
-            factor: 1.2,
+            factor: 1.5,
             items: 300000,
+            speed:10,
         }
     }
 }

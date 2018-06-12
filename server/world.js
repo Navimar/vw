@@ -3,7 +3,6 @@ const util = require('./util.js');
 const direction = util.dir;
 const meta = require('./meta.js');
 const config = require('./config.js');
-const generate = require('./generate');
 
 let world = {};
 
@@ -459,9 +458,7 @@ world.start = () => {
         q += a.q;
     }
     let m = items/q ;
-console.log(m);
-
-    let wid = Math.round(Math.sqrt(items) * f);
+    let wid = Math.round(Math.sqrt(items * f));
     console.log("world size: " + wid);
     wid += start;
     for (let a of arr) {

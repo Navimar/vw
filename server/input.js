@@ -1,6 +1,7 @@
 // const _ = require('underscore');
 const event = require('./event');
 const bot = require('./bot');
+const config = require('./config');
 const handle = require('./handle');
 
 const input = {};
@@ -25,7 +26,8 @@ input.init =()=>{
  Length of a tick in milliseconds. The denominator is your desired framerate.
  e.g. 1000 / 20 = 20 fps,  1000 / 60 = 60 fps
  */
-let tickLengthMs = 1000 / 10;
+let tickLengthMs = 1000 / config.world.speed;
+
 
 /* gameLoop related variables */
 // timestamp of each loop
@@ -49,6 +51,7 @@ var aVerySlowFunction = function(milliseconds) {
 };
 
 input.tick = () => {
+    tickLengthMs = 1000 / config.world.speed;
     let now = Date.now();
     actualTicks++;
     if (previousTick + tickLengthMs <= now) {
