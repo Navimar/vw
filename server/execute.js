@@ -18,6 +18,10 @@ let token = null;
 exe.wrapper = (me) => {
     return {
         me,
+        center: {
+            x: world.center.x,
+            y: world.center.y,
+        },
         findinInv: (tp) => {
             if (Array.isArray(tp)) {
                 for (let t of tp) {
@@ -28,20 +32,44 @@ exe.wrapper = (me) => {
                 return world.inv(tp, me)
             }
         },
-        inv: () => {
-            let i = world.map.get(me.id);
+        inv: (id) => {
+            if (!id) {
+                id = me.id;
+            }
+            let i = world.map.get(id);
             if (i) {
-                return i.length
+                return i
             } else {
                 return 0
             }
         },
         isHere: (tp) => {
-            if (!Array.isArray(tp)) tp = [tp];
-            for (let t of tp) {
-                let i = world.lay(t, me.x, me.y);
-                if (i && i !== me) return i;
+            if (tp) {
+                if (!Array.isArray(tp)) tp = [tp];
+                for (let t of tp) {
+                    let i = world.lay(t, me.x, me.y);
+                    if (i && i !== me) return i;
+                }
+            } else {
+                let a = world.objArrInPoint(me.x, me.y);
+                if (a) {
+                    if (a[0] !== me) {
+                        return a[0];
+                    } else {
+                        if (a[1]) {
+                            return a[1];
+                        }
+                    }
+                }
             }
+            return false;
+        },
+        objHere: (x, y) => {
+            if (!x || !y) {
+                x = me.x;
+                y = me.y;
+            }
+            return world.objArrInPoint(x, y);
         },
         move: (dir) => {
             return world.move(me, dir)
@@ -79,6 +107,9 @@ exe.wrapper = (me) => {
         take: (obj) => {
             world.put(obj, me);
         },
+        put: (obj, to) => {
+            world.put(obj, to);
+        },
         drop: (obj) => {
             if (!obj) {
                 obj = world.map.get(me.id);
@@ -111,7 +142,7 @@ exe.wrapper = (me) => {
                 world.drop(me, x, y)
             }
         },
-        trade: (obj) => world.trade(me, obj),
+        // trade: (obj) => world.trade(me, obj),
         removeWound: (player, string) => {
             return world.removeWound(player, string)
         },
@@ -174,9 +205,9 @@ exe.onInit = () => {
     world.init();
     world.start();
     // let dtStartLoop = Date.now();
-    // for (let a = 0; a < 10000; a++) {
+    // for (let a = 0; a < 100000; a++) {
     //     exe.onTick();
-    //     console.log(a);
+    //     // console.log(a);
     // }
     // console.log('finish ' + (Date.now() - dtStartLoop));
 };
@@ -250,7 +281,7 @@ exe.onTick = () => {
                 case "use":
                     let tool = p.order.tool;
                     if (_.isFunction(tool.tp.onApply)) {
-                        tool.tp.onApply(p.order.target, exe.wrapper(tool));
+                        tool.tp.onApply(p.order.target, exe.wrapper(tool), p);
                     } else {
                         console.log("can not apply " + JSON.stringify(tool.tp));
                     }
@@ -259,7 +290,7 @@ exe.onTick = () => {
                 case "useinv":
                     let tlfi = p.order.tool;
                     if (_.isFunction(tlfi.tp.onApply)) {
-                        tlfi.tp.onApply(p.order.target, exe.wrapper(tlfi));
+                        tlfi.tp.onApply(p.order.target, exe.wrapper(tlfi), p);
                     } else {
                         console.log("can not apply " + JSON.stringify(tlfi.tp));
                     }
@@ -397,6 +428,20 @@ exe.onTick = () => {
     if (isInt(world.time / 1000)) {
         send.bot(30626617, stat());
     }
+
+
+    let i = 0;
+    let x = 0;
+    let y = 0;
+    for (let p of world.player) {
+        i++;
+        x += p.x;
+        y += p.y;
+    }
+    x = Math.round(x / i);
+    y = Math.round(y / i);
+    world.center.x = x;
+    world.center.y = y;
 
     return dtStartLoop;
 };

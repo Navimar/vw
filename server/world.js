@@ -16,6 +16,7 @@ world.init = () => {
     world.cnId = 0;
     world.cnError = 1;
     world.willgo = [];
+    world.center = {x: 0, y: 0};
 
 
     world.obj = [];
@@ -367,7 +368,8 @@ world.objArrInPoint = (x, y) => {
         }
     }
     // }
-    return false;
+    return [];
+    // return false;
 };
 
 world.objArrInInv = (obj) => {
@@ -457,12 +459,12 @@ world.start = () => {
     for (let a of arr) {
         q += a.q;
     }
-    let m = items/q ;
+    let m = items / q;
     let wid = Math.round(Math.sqrt(items * f));
     console.log("world size: " + wid);
     wid += start;
     for (let a of arr) {
-        for (let i = 0; i < a.q*m; i++) {
+        for (let i = 0; i < a.q * m; i++) {
             world.createObj(a.m, _.random(start, wid), _.random(start, wid));
         }
     }

@@ -258,10 +258,22 @@ function onStep(timeDiff) {
     for (let o of model.obj) {
         // console.log(o.sx);
         if (!_.isFinite(o.sx)) {
-            o.sx = o.x + model.dirx;
+            if (o.x === 0) {
+                o.sx = -1;
+            } else if (o.x === 8) {
+                o.sx = 9;
+            } else {
+                o.sx = o.x;
+            }
         }
         if (!_.isFinite(o.sy)) {
-            o.sy = o.y + model.diry;
+            if (o.y === 0) {
+                o.sy = -1;
+            } else if (o.y === 8) {
+                o.sy = 9;
+            } else {
+                o.sy = o.y;
+            }
         }
         let r = range(o.sx, o.sy, o.x, o.y);
         if (r < 1) {
