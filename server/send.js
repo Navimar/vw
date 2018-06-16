@@ -6,7 +6,7 @@ const user = require('./user');
 const bot = require('./bot');
 const world = require('./world');
 const config = require('./config');
-const meta = require('./meta');
+const meta = require('./meta.js').meta;
 
 const send = {};
 
@@ -22,8 +22,7 @@ send.web = (dtStartLoop) => {
             };
             for (let x = 0; x < 9; x++) {
                 // data.holst[x] = [];
-                data.wound.push(p.wound[x]);
-                // console.log(p.wound[x]);
+                data.wound.push(p.wound[x].img);
                 for (let y = 0; y < 9; y++) {
                     //         data.holst[x][y] = [];
                     let key = p.x + x - 4 + " ";

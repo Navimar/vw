@@ -3,9 +3,9 @@ const world = require('./world');
 const user = require('./user');
 
 let read = (val) => {
-    console.log(val);
+    // console.log(val);
     if (val.tick) {
-        for (let t = 0; t++; t < val.tick) {
+        for (let t = 0;  t < val.tick;t++) {
             exe.onTick();
         }
     }
@@ -16,7 +16,7 @@ let read = (val) => {
             break;
         case 'login':
             if (!world.playerById(evt.user.id)) {
-                world.addPlayer(false, evt.user.id, 5200, 5200)
+                    world.addPlayer(false, evt.user.id, 5200, 5200)
             }
             break;
         case '/start':

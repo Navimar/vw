@@ -655,7 +655,7 @@ function orderDown() {
     model.orderCn++;
     if (model.stamp === 0) {
         extra.x = 0;
-        extra.y = 1;
+        extra.y = -1;
     }
 }
 

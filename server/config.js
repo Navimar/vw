@@ -1,5 +1,5 @@
 const os = require('os');
-const meta = require('./meta.js');
+const meta = require('./meta.js').meta;
 
 if (os.platform() == 'darwin') {
     module.exports = {
@@ -10,21 +10,23 @@ if (os.platform() == 'darwin') {
             start: 5200,
             obj: [
                 {m: meta.zebra, q: 20},
+                {m: meta.wolf, q: 20},
+                {m: meta.shovel, q: 20},
                 {m: meta.zombie, q: 60},
                 {m: meta.tree, q: 1000},
                 {m: meta.bone, q: 600},
                 {m: meta.plant, q: 70},
                 {m: meta.stone, q: 70},
                 {m: meta.orange, q: 50},
-                {m: meta.ant, q: 100},
+                {m: meta.ant, q: 50},
                 {m: meta.fire, q: 30},
                 {m: meta.aphid, q: 30},
                 {m: meta.crab, q: 200},
                 {m: meta.highgrass, q: 3000},
             ],
             factor: 1.2,
-            items: 15000,
-            speed:10,
+            items: 30000,
+            speed: 10,
         }
     }
 } else {
@@ -48,7 +50,7 @@ if (os.platform() == 'darwin') {
             ],
             factor: 1,
             items: 250000,
-            speed:10,
+            speed: 10,
         }
     }
 }

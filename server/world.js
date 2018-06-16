@@ -1,7 +1,8 @@
 const _ = require('underscore');
 const util = require('./util.js');
 const direction = util.dir;
-const meta = require('./meta.js');
+const meta = require('./meta.js').meta;
+const wound = require('./meta.js').wound;
 const config = require('./config.js');
 
 let world = {};
@@ -52,6 +53,7 @@ world.addPlayer = (socket, id, x, y) => {
         y = 0;
     }
     let p = {socket, id, x, y};
+    p.wounds = [];
     p.solid = true;
     p.dirx = 0;
     p.diry = 0;
@@ -70,7 +72,7 @@ world.addPlayer = (socket, id, x, y) => {
     p.data = data;
     p.tp.onCreate(data);
     for (let a = 0; a < 9; a++) {
-        p.wound[a] = "life";
+        p.wound[a] = wound.life;
     }
     addtoMap(p.x, p.y, p);
     world.player.push(p);
@@ -263,12 +265,20 @@ world.move = function (obj, dir) {
     return false;
 };
 
-world.addWound = (player, wound) => {
+world.addWound = (player, w) => {
     if (!player.data.died) {
         let ok = true;
         for (let x in player.wound) {
-            if (player.wound[x] == "life" && ok) {
-                player.wound[x] = wound;
+            if (player.wound[x] === wound.life && ok) {
+                player.wound[x] = w;
+                let ws = true;
+                for (let a of player.wounds) {
+                    if (a.wound === w) {
+                        ws = false;
+                        break;
+                    }
+                }
+                if (ws) player.wounds.push({time: world.time + 1, wound: w, first: true});
                 ok = false;
             }
         }
@@ -280,18 +290,18 @@ world.addWound = (player, wound) => {
     }
 };
 
-world.removeWound = (player, wound) => {
-    if (wound) {
+world.removeWound = (player, w) => {
+    if (w) {
         for (let x in player.wound) {
-            if (player.wound[x] === wound) {
-                player.wound[x] = "life";
+            if (player.wound[x] === w) {
+                player.wound[x] = wound.life;
                 return true;
             }
         }
     } else {
         for (let x in player.wound) {
-            if (player.wound[x] !== 'life') {
-                player.wound[x] = "life";
+            if (player.wound[x] !== wound.life) {
+                player.wound[x] = wound.life;
                 return true;
             }
         }

@@ -9,15 +9,16 @@ const util = require('./util');
 const direction = util.dir;
 
 const send = require('./send');
-
+const wound = require('./meta').wound;
 
 const exe = {};
 
 let token = null;
 
-exe.wrapper = (me) => {
+exe.wrapper = (me, theWound) => {
     return {
         me,
+        wound,
         center: {
             x: world.center.x,
             y: world.center.y,
@@ -40,7 +41,7 @@ exe.wrapper = (me) => {
             if (i) {
                 return i
             } else {
-                return 0
+                return []
             }
         },
         isHere: (tp) => {
@@ -74,6 +75,14 @@ exe.wrapper = (me) => {
         move: (dir) => {
             return world.move(me, dir)
         },
+        goTo: (d) => {
+            let ox = me.x;
+            let oy = me.y;
+            world.move(me, d[0]);
+            if (ox === me.x && oy === me.y) {
+                world.move(me, d[1]);
+            }
+        },
         isNear: (tp) => {
             if (!Array.isArray(tp)) tp = [tp];
             for (let t of tp) {
@@ -96,6 +105,9 @@ exe.wrapper = (me) => {
         relocate: (x, y) => world.relocate(me, x, y),
         dirRnd: util.dirs[_.random(3)],
         nextTurn: (time) => world.nextTurn(time, me),
+        nextAct: (time) => {
+            me.wounds.push({time: world.time + time, wound: theWound, first: false});
+        },
         transform: (obj, tp) => world.transform(obj, tp),
         pickUp: (tp) => {
             if (!Array.isArray(tp)) tp = [tp];
@@ -149,6 +161,13 @@ exe.wrapper = (me) => {
         addWound: (player, string) => {
             return world.addWound(player, string)
         },
+        fillWound: (player, string) => {
+            for (let w of player.wound) {
+                if (w === wound.life) {
+                    return world.addWound(player, string);
+                }
+            }
+        },
         dirFrom: (x, y) => {
             let o = dirTo(x, y, me);
             for (let a = 0; a < 1; a++) {
@@ -167,7 +186,12 @@ exe.wrapper = (me) => {
         dirTo: (x, y) => {
             return dirTo(x, y, me);
         },
-        find: (target, first, last) => world.find(target, me.x, me.y, first, last),
+        find: (target, first, last) => {
+            return world.find(target, me.x, me.y, first, last)
+        },
+        findFrom: (x, y, target, first, last) => {
+            return world.find(target, x, y, first, last)
+        },
     };
 };
 
@@ -300,17 +324,18 @@ exe.onTick = () => {
                     let take = p.order.take;
                     if (take.x == p.x && take.y == p.y) {
                         if (_.isFunction(take.tp.onTake)) {
-                            take.tp.onTake(p, exe.wrapper(take));
-                        } else {
-                            if (!take.tp.isSolid && !take.tp.isNailed) {
-                                let inv = world.map.get(p.id);
-                                if (inv === undefined) {
-                                    world.put(take, p);
-                                } else if (inv.length < 9) {
-                                    world.put(take, p);
-                                }
-                                // console.log('PUT');
+                            take.tp.onTake(take.data, exe.wrapper(take), p);
+                        }
+                        // else {
+                        if (!take.tp.isSolid && !take.tp.isNailed) {
+                            let inv = world.map.get(p.id);
+                            if (inv === undefined) {
+                                world.put(take, p);
+                            } else if (inv.length < 9) {
+                                world.put(take, p);
                             }
+                            // console.log('PUT');
+                            // }
                         }
                         p.order = {};
                     } else {
@@ -332,9 +357,9 @@ exe.onTick = () => {
                     if (!world.removeWound(p)) {
                         exe.wrapper(p).dropAll();
                         p.data.died = false;
-                        world.relocate(p, p.x - 30, p.x + 30);
-                        // p.x = _.random(p.x - 30, p.x + 30);
-                        // p.y = _.random(p.y - 30, p.y + 30);
+                        let rx = _.random(p.x - 30, p.x + 30);
+                        let ry = _.random(p.y - 30, p.y + 30);
+                        world.relocate(p, rx, ry);
                         p.dirx = 0;
                         p.diry = 0;
                         p.order.name = "stop";
@@ -350,23 +375,54 @@ exe.onTick = () => {
                     break;
             }
 
-            function moveLocal(dir) {
-
-                world.move(p, dir);
-            }
+            // function moveLocal(dir) {
+            //     world.move(p, dir);
+            // }
         } else {
             p.tire -= 1;
         }
         p.satiety--;
         if (p.satiety <= 0) {
-            if (world.removeWound(p, 'glut')) {
+            if (world.removeWound(p, wound.glut)) {
                 p.satiety = 300;
             } else {
                 p.satiety = 1000;
-                world.addWound(p, "hungry");
-                world.removeWound(p, "bite");
+                world.addWound(p, wound.hungry);
+                // world.removeWound(p, "bite");
             }
         }
+
+        p.wounds.sort((a, b) => {
+            if (a.time > b.time) {
+                return 1;
+            } else {
+                return -1;
+            }
+        });
+        if (p.wounds[0]) {
+            while (p.wounds[0].time === world.time) {
+                let i = 0;
+                for (let w of p.wound) {
+                    if (w === p.wounds[0].wound) {
+                        i++;
+                    }
+                }
+                if (i > 0) {
+                    if (p.wounds[0].first && _.isFunction(p.wounds[0].wound.firstAct)) {
+                        p.wounds[0].wound.firstAct(p, i, exe.wrapper(p, p.wounds[0].wound));
+                    } else {
+                        if (_.isFunction(p.wounds[0].wound.act)) {
+                            p.wounds[0].wound.act(p, i, exe.wrapper(p, p.wounds[0].wound));
+                        }
+                    }
+                }
+                p.wounds.shift();
+                if (!p.wounds[0]) {
+                    break;
+                }
+            }
+        }
+
     }
 
     let m = 0;
@@ -419,6 +475,13 @@ exe.onTick = () => {
         }
         let str = "world statistic:\n";
         str += "world time:" + world.time + "\n";
+        arr.sort((a, b) => {
+            if (a.q > b.q) {
+                return -1;
+            } else {
+                return 1;
+            }
+        });
         for (let a of arr) {
             str += a.meta.name;
             str += " " + a.q + "\n";
@@ -540,7 +603,7 @@ exe.changeOrder = (p, order) => {
         if (order.name === 'use') {
             // if (Math.abs(order.val.targetX - p.x) < 1 && Math.abs(order.val.targetY - p.y) < 1) {
             let targetArr = world.objArrInPoint(order.targetX, order.targetY);
-            if (targetArr) {
+            if (targetArr.length > 0) {
                 targetArr.sort((a, b) => {
                     if (a.tp.z > b.tp.z) {
                         return -1;
