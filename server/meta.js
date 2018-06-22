@@ -123,10 +123,13 @@ meta.oranger = {
 
 
 meta.zebra = {
-    name: "hungry zebra",
+    name: "jackal",
     z: 10,
     isSolid: true,
     img: 'wolf',
+    onCreate(data) {
+        data.satiety = 4000;
+    },
     onTurn: (data, wd) => {
         let tire = 16;
 
@@ -150,7 +153,7 @@ meta.zebra = {
                 let obj = wd.pickUp(food);
                 if (obj) {
                     tire = 32;
-                    // data.satiety += 4000;
+                    data.satiety += 4000;
                     // data.born ? wd.transform(obj, meta.kaka) : wd.transform(obj, meta.wolf);
                     // data.born ^= true;
                     wd.transform(obj, meta.zebra);
@@ -174,8 +177,12 @@ meta.zebra = {
                 goTo(mt.dir);
             }
         }
-
-        wd.nextTurn(tire);
+        data.satiety -= tire;
+        if (data.satiety <= 0) {
+            wd.transform(wd.me, meta.bone)
+        } else {
+            wd.nextTurn(tire);
+        }
     }
 };
 
@@ -281,11 +288,11 @@ meta.plant = {
     onCreate: (data) => {
         data.new = true;
         data.kind = true;
-        data.satiety = 15000;
+        data.satiety = 12000;
     },
     onTurn: (data, wd) => {
         if (data.new) {
-            wd.relocate(wd.me.x + _.random(-10, +10), wd.me.y + _.random(-10, +10));
+            wd.relocate(wd.me.x + _.random(-4, +4), wd.me.y + _.random(-4, +4));
             data.new = false;
             wd.transformdropAll(meta.plant);
             wd.nextTurn(3500);
@@ -293,7 +300,7 @@ meta.plant = {
             data.kind = false;
             let tire = 30;
             // let t = wd.find([meta.player, meta.meat, meta.crab, meta.bone, meta.aphid], 0, 1);
-            let t = wd.isNear([meta.player, meta.ant, meta.crab, meta.wolf, meta.zombie, meta.zebra]);
+            let t = wd.isNear([meta.player, meta.aphid, meta.ant, meta.crab, meta.wolf, meta.zombie, meta.zebra]);
             if (t) {
                 let mt = wd.dirTo(t.x, t.y);
                 if (t.tp !== meta.player) {
@@ -394,12 +401,12 @@ meta.bone = {
     },
     onTurn: (data, wd) => {
         wd.transformdropAll(meta.bone);
-        // if (data.new) {
-        //     data.new = false;
-        //     wd.nextTurn(35000);
-        // } else {
-        //     wd.transform(wd.me, meta.zebra);
-        // }
+        if (data.new) {
+            data.new = false;
+            wd.nextTurn(10000);
+        } else {
+            wd.transform(wd.me, meta.highgrass);
+        }
     },
     onApply: (obj, wd) => {
         if (obj.tp === meta.seed) {
@@ -425,9 +432,9 @@ meta.test = {
     }
 };
 meta.wolf = {
-    name: "Angry Zebra",
+    name: "Hungry Wolf",
     onCreate: (data) => {
-        data.img = "wolf";
+        data.img = "zebra";
         data.satiety = 4000;
         data.born = true;
     },
@@ -739,11 +746,11 @@ meta.ant = {
                         let dt = wd.dirTo(t.x, t.y);
                         if (Math.abs(dt.xWant) + Math.abs(dt.yWant) <= 1) {
                             wd.take(t);
-                            if (t.tp === meta.tree || t.tp === meta.orangetree || t.tp === meta.plant) {
+                            if (t.tp === meta.tree || t.tp === meta.orangetree) {
                                 wd.transform(t, meta.wwall);
                                 data.satiety += 2000;
                             }
-                            if (t.tp === meta.orange || t.tp === meta.meat || t.tp === meta.bone || t.tp === meta.egg) {
+                            if (t.tp === meta.orange || t.tp === meta.meat || t.tp === meta.bone || t.tp === meta.egg || t.tp === meta.plant) {
                                 wd.transform(t, meta.ant);
                             }
                         } else {
@@ -841,7 +848,8 @@ meta.aphid = {
     onCreate(data) {
         data.satiety = 3000;
         data.sat = false;
-        data.kaka = true
+        data.kaka = true;
+        data.energy = 0;
     },
     onTurn: (data, wd) => {
         let food = meta.highgrass;
@@ -849,9 +857,15 @@ meta.aphid = {
         if (obj) {
             data.satiety += 3000;
             if (obj.tp === meta.highgrass) {
-                // data.kaka ? wd.transform(obj, meta.kaka) : wd.transform(obj, meta.seed);
-                wd.transform(obj, meta.seed);
-                data.kaka ^= true;
+                if (data.energy > 1500) {
+                    // data.kaka ? wd.transform(obj, meta.kaka) : wd.transform(obj, meta.aphid);
+                    wd.transform(obj, meta.aphid);
+                    // data.kaka ^= true;
+                    data.sat = true;
+                    data.energy = 0;
+                } else {
+                    data.sat = false;
+                }
             }
         } else {
             wd.drop();
@@ -911,6 +925,7 @@ meta.aphid = {
         // }
         let f = 20;
         data.satiety -= f;
+        data.energy += f;
         wd.nextTurn(f);
     },
     onApply: (obj, wd) => {
@@ -1052,57 +1067,6 @@ meta.rot = {
     }
 
 };
-// meta.plant = {
-//     name: "carnivorous plant",
-//     z: 20,
-//     img: (data) => {
-//         if (data.kind) {
-//             return 'kindplant';
-//         } else {
-//             return 'hungryplant';
-//         }
-//     },
-//     isSolid: true,
-//     onCreate: (data) => {
-//         data.new = true;
-//         data.kind = true;
-//         data.satiety = 10000;
-//     },
-//     onTurn: (data, wd) => {
-//         if (data.new) {
-//             wd.relocate(wd.me.x + _.random(-5, +5), wd.me.y + _.random(-5, +5));
-//             data.new = false;
-//             wd.transformdropAll(meta.plant);
-//             wd.nextTurn(3500);
-//         } else {
-//             data.kind = false;
-//             let tire = 30;
-//             // let t = wd.find([meta.player, meta.meat, meta.crab, meta.bone, meta.aphid], 0, 1);
-//             let t = wd.isNear([meta.player, meta.meat, meta.crab, meta.bone, meta.aphid]);
-//             if (t) {
-//                 let mt = wd.dirTo(t.x, t.y);
-//                 if (t.tp !== meta.player) {
-//                     if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
-//                         wd.transform(t, meta.plant);
-//                     }
-//                 }
-//                 if (t.tp === meta.player) {
-//                     if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
-//                         wd.addWound(t, "bite");
-//                     }
-//                 }
-//
-//             }
-//             data.satiety -= tire;
-//             if (data.satiety <= 0) {
-//                 wd.transform(wd.me, meta.tree)
-//             } else {
-//                 wd.nextTurn(tire);
-//             }
-//         }
-//     }
-//     ,
-// };
 
 
 meta.ash = {
