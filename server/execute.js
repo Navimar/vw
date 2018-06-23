@@ -78,10 +78,11 @@ exe.wrapper = (me, theWound) => {
         goTo: (d) => {
             let ox = me.x;
             let oy = me.y;
-            world.move(me, d[0]);
+            let m = world.move(me, d[0]);
             if (ox === me.x && oy === me.y) {
-                world.move(me, d[1]);
+                m = world.move(me, d[1]);
             }
+            return m;
         },
         isNear: (tp) => {
             if (!Array.isArray(tp)) tp = [tp];

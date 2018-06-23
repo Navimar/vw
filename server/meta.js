@@ -337,10 +337,20 @@ meta.shovel = {
     img: 'shovel',
     onApply: (obj, wd, p) => {
         function broke() {
-            wd.transform(wd.me, meta.flinders);
+            wd.transform(wd.me, meta.treeseed);
+            wd.getOut(p.x,p.y);
         }
 
         if (obj.tp === meta.plant || obj.tp === meta.tree) {
+            wd.put(obj, p);
+            broke();
+        }
+        if (obj.tp === meta.zombie) {
+            wd.transform(obj, meta.bone);
+            broke();
+        }
+        if (obj.tp === meta.potatoplant||obj.tp === meta.beaver) {
+            wd.transform(obj, meta.potato);
             wd.put(obj, p);
             broke();
         }
@@ -405,11 +415,11 @@ meta.bone = {
             data.new = false;
             wd.nextTurn(10000);
         } else {
-            wd.transform(wd.me, meta.highgrass);
+            wd.transform(wd.me, meta.zombie);
         }
     },
     onApply: (obj, wd) => {
-        if (obj.tp === meta.seed) {
+        if (obj.tp === meta.potatoseed) {
             wd.transform(obj, meta.shovel);
             wd.transform(wd.me, meta.shovel);
         }
@@ -836,6 +846,73 @@ meta.aphidka = {
         }
     },
 };
+meta.potatoseed = {
+    img: 'seed',
+    name: 'potato seed',
+    z: 5,
+    onCreate(data) {
+        data.new = true;
+    },
+    onTurn: (data, wd) => {
+        if (wd.me.carrier) {
+            wd.nextTurn(1000);
+            data.new = true;
+        } else {
+            if (data.new) {
+                data.new = false;
+                wd.nextTurn(3500);
+            } else {
+                wd.transform(wd.me, meta.potatoplant);
+            }
+        }
+    },
+};
+meta.potato = {
+    img: 'potato',
+    name: 'potato',
+    z: 20,
+    onApply: (obj, wd) => {
+        if (obj.tp.player) {
+            // wd.trade(obj);
+            wd.transform(wd.me, meta.potatoseed);
+            if (!wd.removeWound(obj, wound.hungry)) {
+                wd.addWound(obj, wound.glut);
+            }
+        }
+    },
+};
+meta.beaver = {
+    name: 'beaver',
+    img: 'beaver',
+    isSolid: true,
+    onTurn: (data, wd) => {
+        let t = wd.find(meta.potatoseed);
+        if (t) {
+            let p = wd.isHere(meta.potatoseed);
+            if (p) {
+                wd.transform(p, meta.beaver);
+            } else {
+                let mt = wd.dirTo(t.x, t.y);
+                // if (wd.goTo(mt.dir)) {
+                wd.goTo(mt.dir);
+                let o = wd.isNear([meta.tree,meta.zombie]);
+                if (o) {
+                    wd.transform(o, meta.bone);
+                }
+                // }
+            }
+        } else {
+            wd.move(wd.dirRnd);
+        }
+        wd.nextTurn(30);
+    },
+};
+meta.potatoplant = {
+    name: 'potato plant',
+    img: 'plant',
+    isNailed: true,
+    z: 13,
+};
 meta.aphid = {
     name: "aphid ",
     z: 15,
@@ -1028,6 +1105,7 @@ meta.crab = {
     },
 };
 meta.rot = {
+    name: 'rot slime',
     img: 'rot',
     z: 15,
     onCreate: (data) => {
