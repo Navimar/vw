@@ -236,30 +236,30 @@ meta.tree = {
         // data.old = 0;
         data.new = true;
     },
-    onTurn: (data, wd) => {
-        //     // let food = wd.findinInv(meta.kaka);
-        //     //
-        //     // if (food) {
-        //     //     if (data.sat) {
-        //     //         wd.transform(food, meta.orange);
-        //     //         wd.drop(food);
-        //     //         data.sat = false;
-        //     //     }
-        //     //     data.sat = true;
-        //     // } else {
-        //     //     // data.old++;
-        //     //     // if (data.old > 10) {
-        //     //     //     wd.transform(wd.me, meta.aphid);
-        //     //     // }
-        //     // }
-        //     // wd.nextTurn(3500);
-        if (data.new) {
-            data.new = false;
-            wd.nextTurn(70000);
-        } else {
-            wd.transform(wd.me, meta.zebra);
-        }
-    },
+    // onTurn: (data, wd) => {
+    //     //     // let food = wd.findinInv(meta.kaka);
+    //     //     //
+    //     //     // if (food) {
+    //     //     //     if (data.sat) {
+    //     //     //         wd.transform(food, meta.orange);
+    //     //     //         wd.drop(food);
+    //     //     //         data.sat = false;
+    //     //     //     }
+    //     //     //     data.sat = true;
+    //     //     // } else {
+    //     //     //     // data.old++;
+    //     //     //     // if (data.old > 10) {
+    //     //     //     //     wd.transform(wd.me, meta.aphid);
+    //     //     //     // }
+    //     //     // }
+    //     //     // wd.nextTurn(3500);
+    //     if (data.new) {
+    //         data.new = false;
+    //         wd.nextTurn(70000);
+    //     } else {
+    //         wd.transform(wd.me, meta.zebra);
+    //     }
+    // },
 };
 meta.swamp = {
     z: 400,
