@@ -17,7 +17,11 @@ handle.socket = (socket, eventName, msg) => {
     }
     if (eventName == 'connection') {
         // let u = user.bySocket(socket);
-        // exe.connection(u);
+        exe.connection();
+    }
+    if (eventName == 'disconnect') {
+        // let u = user.bySocket(socket);
+        exe.disconnect();
     }
     if (eventName == 'order') {
         let p = world.playerBySocket(socket);

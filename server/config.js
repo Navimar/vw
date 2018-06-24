@@ -13,7 +13,7 @@ if (os.platform() == 'darwin') {
                 // {m: meta.wolf, q: 20},
                 {m: meta.beaver, q: 20},
                 {m: meta.shovel, q: 60},
-                {m: meta.zombie, q: 120},
+                {m: meta.zombie, q: 160},
                 {m: meta.tree, q: 1000},
                 // {m: meta.bone, q: 60},
                 // {m: meta.stick, q: 30},
@@ -28,7 +28,7 @@ if (os.platform() == 'darwin') {
                 {m: meta.highgrass, q: 2000},
             ],
             factor: 1,
-            items: 30000,
+            items: 200000,
             speed: 10,
         }
     }
@@ -44,7 +44,7 @@ if (os.platform() == 'darwin') {
                 // {m: meta.wolf, q: 20},
                 {m: meta.beaver, q: 20},
                 {m: meta.shovel, q: 60},
-                {m: meta.zombie, q: 120},
+                {m: meta.zombie, q: 240},
                 {m: meta.tree, q: 1000},
                 // {m: meta.bone, q: 60},
                 // {m: meta.stick, q: 30},
@@ -59,7 +59,7 @@ if (os.platform() == 'darwin') {
                 {m: meta.highgrass, q: 2000},
             ],
             factor: 1,
-            items: 250000,
+            items: 200000,
             speed: 10,
         }
     }

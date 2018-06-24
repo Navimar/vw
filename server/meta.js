@@ -3,6 +3,7 @@ const _ = require('underscore');
 
 
 let meta = {};
+
 meta.player = {
     name: "Player",
     player: true,
@@ -16,7 +17,6 @@ meta.player = {
         return "hero"
     },
     isSolid: true,
-    z: 999,
     onTurn: (data, wd) => {
         let d = wd.dirTo(data.order.x, data.order.y).dir;
         // data.dir = d[0];
@@ -33,7 +33,6 @@ meta.player = {
 };
 meta.seed = {
     name: "orange seed",
-    z: 3,
     img: 'seed',
     onCreate(data) {
         data.new = true;
@@ -69,7 +68,6 @@ meta.seed = {
 };
 meta.orange = {
     name: "orange",
-    z: 5,
     img: 'orange',
     onCreate(data) {
         data.new = true;
@@ -98,7 +96,6 @@ meta.orange = {
 meta.oranger = {
     name: "orange plant",
     img: "fruit",
-    z: 6,
     isNailed: true,
     onApply: (obj, wd) => {
         wd.getOut(obj.x, obj.y);
@@ -124,7 +121,6 @@ meta.oranger = {
 
 meta.zebra = {
     name: "jackal",
-    z: 10,
     isSolid: true,
     img: 'wolf',
     onCreate(data) {
@@ -188,7 +184,6 @@ meta.zebra = {
 
 meta.zombie = {
     name: "zombie",
-    z: 11,
     isSolid: true,
     img: 'zombie',
     onTurn: (data, wd) => {
@@ -219,7 +214,7 @@ meta.zombie = {
                 goTo(mt.dir);
             }
         } else {
-            let mt = wd.dirTo(wd.center.x, wd.center.y);
+            let mt = wd.dirTo(wd.center.x + _.random(-100, 100), wd.center.y + _.random(-100, 100));
             goTo(mt.dir);
         }
         wd.nextTurn(tire);
@@ -228,7 +223,6 @@ meta.zombie = {
 
 meta.tree = {
     name: "i am gruuuttt",
-    z: 20,
     img: "tree",
     isSolid: true,
     onCreate(data) {
@@ -262,7 +256,6 @@ meta.tree = {
     // },
 };
 meta.swamp = {
-    z: 400,
     img: 'swamp',
     isNailed: true,
     onTurn: (data, wd) => {
@@ -276,7 +269,6 @@ meta.swamp = {
 };
 meta.plant = {
     name: "carnivorous plant",
-    z: 20,
     img: (data) => {
         if (data.kind) {
             return 'kindplant';
@@ -338,7 +330,7 @@ meta.shovel = {
     onApply: (obj, wd, p) => {
         function broke() {
             wd.transform(wd.me, meta.treeseed);
-            wd.getOut(p.x,p.y);
+            wd.getOut(p.x, p.y);
         }
 
         if (obj.tp === meta.plant || obj.tp === meta.tree) {
@@ -349,13 +341,12 @@ meta.shovel = {
             wd.transform(obj, meta.bone);
             broke();
         }
-        if (obj.tp === meta.potatoplant||obj.tp === meta.beaver) {
+        if (obj.tp === meta.potatoplant || obj.tp === meta.beaver) {
             wd.transform(obj, meta.potato);
             wd.put(obj, p);
             broke();
         }
     },
-    z: 4,
     onCreate(data) {
         data.new = true;
     },
@@ -373,7 +364,6 @@ meta.shovel = {
 
 meta.plantseed = {
     name: "orange seed",
-    z: 4,
     img: 'plantseed',
     onCreate(data) {
         data.new = true;
@@ -405,7 +395,6 @@ meta.plantseed = {
 meta.bone = {
     name: "Bone",
     img: "bone",
-    z: 4,
     onCreate(data) {
         data.new = true;
     },
@@ -431,7 +420,6 @@ meta.bone = {
 meta.highgrass = {
     name: "Highgrass",
     img: "highgrass",
-    z: 0,
     isNailed: true,
 };
 
@@ -451,7 +439,6 @@ meta.wolf = {
     img: (data) => {
         return data.img;
     },
-    z: 14,
     isSolid: true,
     onTurn: (data, wd) => {
         function goTo(d) {
@@ -511,7 +498,6 @@ meta.wolf = {
 meta.stone = {
     name: "Just Stone",
     img: "stone",
-    z: 1,
     onApply: (obj, wd) => {
         if (obj.tp === meta.stick) {
             wd.transform(obj, meta.axe);
@@ -522,7 +508,6 @@ meta.stone = {
 meta.flinders = {
     name: "a lot of flinder",
     img: 'flinders',
-    z: 5,
     onCreate(data) {
         data.new = true;
     },
@@ -539,7 +524,6 @@ meta.flinders = {
 meta.torch = {
     name: "the Hot Torch",
     img: 'torch',
-    z: 9,
     onCreate(data) {
         data.new = true;
     },
@@ -565,7 +549,6 @@ meta.torch = {
 meta.stick = {
     name: "Stick",
     img: "stick",
-    z: 1,
     onCreate(data) {
         data.new = true;
     },
@@ -597,7 +580,6 @@ meta.stick = {
 meta.kaka = {
     name: "KAKA",
     img: "kaka",
-    z: 2,
     onApply: (obj, wd) => {
         wd.getOut(obj.x, obj.y);
     },
@@ -624,11 +606,9 @@ meta.wwall = {
     name: "Wooden Wall",
     img: 'wwall',
     isSolid: true,
-    z: 40,
 };
 meta.orangetree = {
     name: "a big tree",
-    z: 21,
     img: "orangetree",
     isSolid: true,
     onCreate(data) {
@@ -663,7 +643,6 @@ meta.orangetree = {
 };
 
 meta.box = {
-    z: 10,
     img: "box",
     isSolid: true,
     onApply: (obj, wd) => {
@@ -674,7 +653,6 @@ meta.box = {
 
 meta.egg = {
     name: "crabs egg",
-    z: 5,
     img: "egg",
     onCreate(data) {
         data.new = true;
@@ -712,12 +690,10 @@ meta.egg = {
 };
 meta.flag = {
     img: 'flag',
-    z: 30,
 };
 meta.ant = {
     name: "ants",
     img: 'ant',
-    z: 15,
     isSolid: true,
     onCreate(data) {
         // data.new = true;
@@ -825,7 +801,6 @@ meta.ant = {
 meta.aphidka = {
     name: "what is it?",
     img: "fruit",
-    z: 2,
     onApply: (obj, wd) => {
         wd.getOut(obj.x, obj.y);
     },
@@ -849,7 +824,6 @@ meta.aphidka = {
 meta.potatoseed = {
     img: 'seed',
     name: 'potato seed',
-    z: 5,
     onCreate(data) {
         data.new = true;
     },
@@ -870,7 +844,6 @@ meta.potatoseed = {
 meta.potato = {
     img: 'potato',
     name: 'potato',
-    z: 20,
     onApply: (obj, wd) => {
         if (obj.tp.player) {
             // wd.trade(obj);
@@ -895,7 +868,7 @@ meta.beaver = {
                 let mt = wd.dirTo(t.x, t.y);
                 // if (wd.goTo(mt.dir)) {
                 wd.goTo(mt.dir);
-                let o = wd.isNear([meta.tree,meta.zombie]);
+                let o = wd.isNear([meta.tree, meta.zombie]);
                 if (o) {
                     wd.transform(o, meta.bone);
                 }
@@ -911,11 +884,9 @@ meta.potatoplant = {
     name: 'potato plant',
     img: 'plant',
     isNailed: true,
-    z: 13,
 };
 meta.aphid = {
     name: "aphid ",
-    z: 15,
     img: (data) => {
         if (data.sat)
             return "aphid2";
@@ -1048,7 +1019,6 @@ meta.aphid = {
 
 meta.crab = {
     name: "crab",
-    z: 15,
     isSolid: true,
     img: (data) => {
         if (data.kind) {
@@ -1107,7 +1077,6 @@ meta.crab = {
 meta.rot = {
     name: 'rot slime',
     img: 'rot',
-    z: 15,
     onCreate: (data) => {
         data.new = true;
         // data.kind = true;
@@ -1149,7 +1118,6 @@ meta.rot = {
 
 meta.ash = {
     name: "ash",
-    z: 1,
     img: "ash",
     onCreate(data) {
         data.new = true;
@@ -1168,7 +1136,6 @@ meta.ash = {
 
 meta.fire = {
     name: "fire",
-    Z: 800,
     img: (data) => {
         return "fire";
     },
@@ -1207,7 +1174,6 @@ meta.fire = {
 };
 meta.water = {
     name: "water",
-    z: 10,
     img: "water",
     onTurn: (data, wd) => {
         if (wd.isHere(meta.water)) {
@@ -1226,7 +1192,6 @@ meta.water = {
 
 meta.axe = {
     name: "axe",
-    z: 3,
     img: 'axe',
     onApply: (obj, wd) => {
         function broke() {
@@ -1264,12 +1229,10 @@ meta.axe = {
 meta.wood = {
     name: "wood",
     img: 'wood',
-    z: 15,
 };
 meta.grill = {
     name: "grill",
     img: "grill",
-    z: 8,
     onApply: (obj, wd) => {
         if (obj.tp.player) {
             // wd.trade(obj);
@@ -1282,7 +1245,6 @@ meta.grill = {
 };
 meta.meat = {
     name: "meat",
-    z: 1,
     img: 'meat',
     onCreate(data) {
         data.new = true;
@@ -1314,7 +1276,6 @@ meta.meat = {
 };
 meta.treeseed = {
     name: "treeseed",
-    z: 2,
     img: 'jelly',
     onCreate(data) {
         data.new = true;

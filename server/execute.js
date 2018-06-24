@@ -475,7 +475,8 @@ exe.onTick = () => {
             }
         }
         let str = "world statistic:\n";
-        str += "world time:" + world.time + "\n";
+        str += "world time: " + world.time + "\n";
+        str += "online: " + world.connected + "\n";
         arr.sort((a, b) => {
             if (a.q > b.q) {
                 return -1;

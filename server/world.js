@@ -4,6 +4,7 @@ const direction = util.dir;
 const meta = require('./meta.js').meta;
 const wound = require('./meta.js').wound;
 const config = require('./config.js');
+const zarr = require('./zarr.js');
 
 let world = {};
 
@@ -18,12 +19,25 @@ world.init = () => {
     world.cnError = 1;
     world.willgo = [];
     world.center = {x: 0, y: 0};
-
-
     world.obj = [];
-    // world.box.test = true;
-    // world.box.error = "everything is fine";
-    // world.box.testfail = false;
+
+    _.each(meta, (value, key, list) => {
+        // console.log(value.name, value.z);
+        _.each(zarr, (zvalue, zkey, zlist) => {
+            // console.log(zvalue);
+            // console.log(key);
+            if (zvalue == key) {
+                value.z = zkey;
+            }
+        });
+    });
+    _.each(meta, (value, key, list) => {
+        if (!value.z) {
+            console.log("НЕ ДОБВАЛЕН В МАССИВ Z", key, value.z);
+        }
+        // console.log(key, value.z);
+    });
+
 };
 
 function removefromMap(obj) {

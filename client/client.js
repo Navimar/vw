@@ -445,22 +445,22 @@ function render(model) {
 
 let renderStatus = () => {
     let loc = (location.href).substr(0, 9);
-    if (loc == "http://46") loc = 'web';
+    if (loc == "http://46") loc = '';
     if (loc == "http://12") loc = 'local';
     let str = "";
     str += "" + loc + "</br>";
-    str += "status.server: " + status.server + "</br>";
+    str += "status: " + status.server + "</br>";
     // str += "Пинг: " + model.ping + "</br>";
-    str += "Расчет: " + model.delay + "</br>";
+    str += "delay: " + model.delay + "</br>";
+    str += "time: " + model.time + "</br>";
+    str += "online: " + model.connected + "</br>";
     // str += "Ходит: " + model.cnActive + "</br>";
-    str += "x: " + model.px + "</br>";
-    str += "y: " + model.py + "</br>";
-    str += "Игроков: " + model.connected + "</br>";
+    str += "X: " + model.px + "</br>";
+    str += "Y: " + model.py + "</br>";
     // str += "Err: " + model.error + "</br>";
     // str += "Клиент: " + (Date.now() - model.dtStartLoop) + "</br>";
-    str += "Время: " + model.time + "</br>";
-    str += "extraX: " + extra.x + "</br>";
-    str += "extraY: " + extra.y + "</br>";
+    // str += "extraX: " + extra.x + "</br>";
+    // str += "extraY: " + extra.y + "</br>";
     // str += "ClickX: " + click.x + "</br>";
     // str += "ClickY: " + click.y + "</br>";
     // str += "mouseCellX: " + mouseCell.x + "</br>";
