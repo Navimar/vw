@@ -93,7 +93,12 @@ module.exports = () => {
     p.data.order = {x: 1, y: 4};
     p.tp.onTurn(p.data, exe.wrapper(p));
     test(p.x, 1, 'player onTurn dirTo right when tree is on the pass');
-    test(p.y, 0, 'player onTurn dirTo right when tree is on the pass');
+    test(p.y, 0, 'player onTurn dirTo right when tree is on the pass')
+    world.init();
+    o = world.createObj({}, 0, 0);
+    let b = world.createObj({isSolid: true}, 0, 1);
+    test(exe.wrapper(o).move(direction.down), b, 'move on solid');
+    test(o.y, 0, 'cant pass solid');
 
 
     world.init("objArrInPoint");

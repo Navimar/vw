@@ -13,7 +13,7 @@ if (os.platform() == 'darwin') {
                 // {m: meta.wolf, q: 20},
                 {m: meta.beaver, q: 20},
                 {m: meta.shovel, q: 60},
-                {m: meta.zombie, q: 160},
+                {m: meta.zombie, q: 240},
                 {m: meta.tree, q: 1000},
                 // {m: meta.bone, q: 60},
                 // {m: meta.stick, q: 30},

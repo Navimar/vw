@@ -31,6 +31,7 @@ meta.player = {
         }
     },
 };
+
 meta.seed = {
     name: "orange seed",
     img: 'seed',
@@ -117,7 +118,6 @@ meta.oranger = {
         }
     },
 };
-
 
 meta.zebra = {
     name: "jackal",
@@ -859,27 +859,31 @@ meta.beaver = {
     img: 'beaver',
     isSolid: true,
     onTurn: (data, wd) => {
-        let t = wd.find(meta.potatoseed);
-        if (t) {
-            let p = wd.isHere(meta.potatoseed);
-            if (p) {
-                wd.transform(p, meta.beaver);
-            } else {
-                let mt = wd.dirTo(t.x, t.y);
-                // if (wd.goTo(mt.dir)) {
-                wd.goTo(mt.dir);
-                let o = wd.isNear([meta.tree, meta.zombie]);
-                if (o) {
-                    wd.transform(o, meta.bone);
-                }
-                // }
-            }
+        let p = wd.isHere(meta.potatoseed);
+        if (p) {
+            wd.transform(p, meta.beaver);
         } else {
-            wd.move(wd.dirRnd);
+            let t = wd.find(meta.potatoseed);
+            if (t) {
+                let o = wd.goTo(t);
+                if (o) {
+                    if (_.contains([meta.tree, meta.zombie], o.tp)) {
+                        wd.transform(o, meta.bone);
+                    }
+                }
+                // let mt = wd.dirTo(t.x, t.y);
+                // if (wd.goTo(mt.dir)) {
+                // wd.goTo(mt.dir);
+                // let o = wd.isNear([meta.tree, meta.zombie]);
+            } else {
+                wd.move(wd.dirRnd);
+            }
+
         }
         wd.nextTurn(30);
     },
 };
+
 meta.potatoplant = {
     name: 'potato plant',
     img: 'plant',

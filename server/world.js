@@ -259,22 +259,27 @@ world.trade = function (obj, carrier) {
     addtoInv(obj, carrier);
 };
 
-world.move = function (obj, dir) {
+world.move = function (obj, dir, y) {
     if (_.isFinite(obj.x) && _.isFinite(obj.y)) {
-        let x = obj.x + (dir.x);
-        let y = obj.y + (dir.y);
-        // if (obj.x === false || obj.y === false) {
-        //     world.error = "move (obj.x && obj.y) == false";
-        //     return false;
-        // }
-
-        // if (world.map.has(x + " " + y)) {
-        if (!_.any(world.map.get(x + " " + y), (e) => {
-            return e.tp.isSolid;
-        })) {
+        let m = (x, y) => {
+            for (let o of world.objArrInPoint(x, y)) {
+                if (o.tp.isSolid) {
+                    return o
+                }
+            }
             world.relocate(obj, x, y);
+            return false
+        };
+
+        if (y) {
+            let x = dir;
+            let y = y;
+            return m(x, y);
+        } else {
+            let x = obj.x + dir.x;
+            let y = obj.y + dir.y;
+            return m(x, y);
         }
-        // }
     }
     return false;
 };

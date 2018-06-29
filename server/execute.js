@@ -73,14 +73,20 @@ exe.wrapper = (me, theWound) => {
             return world.objArrInPoint(x, y);
         },
         move: (dir) => {
-            return world.move(me, dir)
+            return world.move(me, dir);
         },
         goTo: (d) => {
+            if (_.isFinite(d.x) && _.isFinite(d.y)) {
+                d = dirTo(d.x, d.y, me).dir;
+            }
             let ox = me.x;
             let oy = me.y;
-            let m = world.move(me, d[0]);
-            if (ox === me.x && oy === me.y) {
-                m = world.move(me, d[1]);
+            let m = false;
+            if (d[0] !== direction.here) {
+                m = world.move(me, d[0]);
+                if (ox === me.x && oy === me.y && d[1] !== direction.here) {
+                    m = world.move(me, d[1]);
+                }
             }
             return m;
         },
@@ -358,9 +364,12 @@ exe.onTick = () => {
                     if (!world.removeWound(p)) {
                         exe.wrapper(p).dropAll();
                         p.data.died = false;
-                        let rx = _.random(p.x - 30, p.x + 30);
-                        let ry = _.random(p.y - 30, p.y + 30);
-                        world.relocate(p, rx, ry);
+                        let rx;
+                        let ry;
+                        do {
+                            rx = _.random(p.x - 30, p.x + 30);
+                            ry = _.random(p.y - 30, p.y + 30);
+                        } while (world.relocate(p, rx, ry));
                         p.dirx = 0;
                         p.diry = 0;
                         p.order.name = "stop";
@@ -505,8 +514,8 @@ exe.onTick = () => {
     }
     x = Math.round(x / i);
     y = Math.round(y / i);
-    world.center.x = x;
-    world.center.y = y;
+    world.center.x = x || 5200;
+    world.center.y = y || 5200;
 
     return dtStartLoop;
 };

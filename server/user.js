@@ -85,7 +85,7 @@ user.login = (user, socket, pass) => {
                 if (socket==undefined){
                     throw 'where is my socket???';
                 }
-                world.addPlayer(socket, user.id,5200,5200);
+                world.addPlayer(socket, user.id,world.center.x,world.center.y);
             }
             return ("succecs loged in " + user.id);
         }

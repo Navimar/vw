@@ -16,7 +16,7 @@ let read = (val) => {
             break;
         case 'login':
             if (!world.playerById(evt.user.id)) {
-                    world.addPlayer(false, evt.user.id, 5200, 5200)
+                    world.addPlayer(false, evt.user.id, world.center.x, world.center.x)
             }
             break;
         case '/start':
