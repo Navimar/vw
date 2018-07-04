@@ -272,9 +272,9 @@ world.move = function (obj, dir, y) {
         };
 
         if (y) {
-            let x = dir;
-            let y = y;
-            return m(x, y);
+            let xx = dir;
+            let yy = y;
+            return m(xx, yy);
         } else {
             let x = obj.x + dir.x;
             let y = obj.y + dir.y;

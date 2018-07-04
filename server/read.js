@@ -2,8 +2,9 @@ const exe = require('./execute');
 const world = require('./world');
 const user = require('./user');
 
+let line =0;
 let read = (val) => {
-    // console.log(val);
+    console.log(line++);
     if (val.tick) {
         for (let t = 0;  t < val.tick;t++) {
             exe.onTick();

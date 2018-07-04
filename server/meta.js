@@ -21,13 +21,22 @@ meta.player = {
         let d = wd.dirTo(data.order.x, data.order.y).dir;
         // data.dir = d[0];
         // wd.move(d[0]);
-        let ox = wd.me.x;
-        let oy = wd.me.y;
-        wd.move(d[0]);
-        data.dir = d[0];
-        if (ox === wd.me.x && oy === wd.me.y) {
-            data.dir = d[1];
-            wd.move(d[1]);
+        // let ox = wd.me.x;
+        // let oy = wd.me.y;
+        // wd.move(d[0]);
+        // data.dir = d[0];
+        // if (ox === wd.me.x && oy === wd.me.y) {
+        //     data.dir = d[1];
+        //     wd.move(d[1]);
+        // }
+        if(wd.move(d[0])){
+            if(wd.move(d[1])){
+                data.dir = dir.here;
+            }else{
+                data.dir = d[1];
+            }
+        }else{
+            data.dir = d[0];
         }
     },
 };
@@ -220,7 +229,43 @@ meta.zombie = {
         wd.nextTurn(tire);
     }
 };
+meta.skeleton = {
+    name: "skeleton",
+    isSolid: true,
+    img: 'zombie',
+    onTurn: (data, wd) => {
+        let tire = 64;
 
+        //куда деть эту функцию?
+        function goTo(d) {
+            let ox = wd.me.x;
+            let oy = wd.me.y;
+            wd.move(d[0]);
+            data.dir = d[0];
+            if (ox === wd.me.x && oy === wd.me.y) {
+                data.dir = d[1];
+                wd.move(d[1]);
+            }
+        }
+
+        let t = wd.find(meta.player);
+        if (t) {
+            let mt = wd.dirTo(t.x, t.y);
+            if (t.tp === meta.player) {
+                if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
+                    wd.addWound(t, wound.bite);
+                } else {
+                    goTo(mt.dir);
+                }
+            } else {
+                goTo(mt.dir);
+            }
+        } else {
+            wd.move(wd.dirRnd);
+        }
+        wd.nextTurn(tire);
+    }
+};
 meta.tree = {
     name: "i am gruuuttt",
     img: "tree",
@@ -337,12 +382,17 @@ meta.shovel = {
             wd.put(obj, p);
             broke();
         }
-        if (obj.tp === meta.zombie) {
+        if (obj.tp === meta.zombie || obj.tp === meta.skeleton) {
             wd.transform(obj, meta.bone);
             broke();
         }
-        if (obj.tp === meta.potatoplant || obj.tp === meta.beaver) {
+        if (obj.tp === meta.potatoplant) {
             wd.transform(obj, meta.potato);
+            wd.put(obj, p);
+            broke();
+        }
+        if (obj.tp === meta.beaver) {
+            wd.transform(obj, meta.potatoseed);
             wd.put(obj, p);
             broke();
         }
@@ -859,15 +909,16 @@ meta.beaver = {
     img: 'beaver',
     isSolid: true,
     onTurn: (data, wd) => {
-        let p = wd.isHere(meta.potatoseed);
+        let food = [meta.potatoseed, meta.treeseed];
+        let p = wd.isHere(food);
         if (p) {
             wd.transform(p, meta.beaver);
         } else {
-            let t = wd.find(meta.potatoseed);
+            let t = wd.find(food);
             if (t) {
                 let o = wd.goTo(t);
                 if (o) {
-                    if (_.contains([meta.tree, meta.zombie], o.tp)) {
+                    if (_.contains([meta.tree, meta.skeleton], o.tp)) {
                         wd.transform(o, meta.bone);
                     }
                 }

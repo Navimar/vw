@@ -174,7 +174,7 @@ function onServer(val) {
     for (let v of val.obj) {
         let ok = true;
         for (let m of model.obj) {
-            if (m.id == v.id) {
+            if (m.id === v.id) {
                 m.z = v.z;
                 if (m.x !== v.x) {
                     // m.ox =m.x;
@@ -256,23 +256,29 @@ function onStep(timeDiff) {
     status.server++;
     model.dtStartLoop = Date.now();
     for (let o of model.obj) {
-        // console.log(o.sx);
-        if (!_.isFinite(o.sx)) {
-            if (o.x === 0) {
-                o.sx = -1;
-            } else if (o.x === 8) {
-                o.sx = 9;
+        if (!_.isFinite(o.sx) || !_.isFinite(o.sy)) {
+            // if (model.dirx !== 0 || model.diry !== 0) {
+            //     o.sx = o.x + model.dirx;
+            //     o.sy = o.y + model.diry;
+            // } else {
+            if ((o.x === 8 && o.y === 8)||(o.x === 8 && o.y === 0)||(o.x === 0 && o.y === 8)||(o.x === 0 && o.y === 0)) {
+                o.sx = o.x + model.dirx;
+                o.sy = o.y + model.diry;
             } else {
-                o.sx = o.x;
-            }
-        }
-        if (!_.isFinite(o.sy)) {
-            if (o.y === 0) {
-                o.sy = -1;
-            } else if (o.y === 8) {
-                o.sy = 9;
-            } else {
-                o.sy = o.y;
+                if (o.x === 0) {
+                    o.sx = -1;
+                } else if (o.x === 8) {
+                    o.sx = 9;
+                } else {
+                    o.sx = o.x;
+                }
+                if (o.y === 0) {
+                    o.sy = -1;
+                } else if (o.y === 8) {
+                    o.sy = 9;
+                } else {
+                    o.sy = o.y;
+                }
             }
         }
         let r = range(o.sx, o.sy, o.x, o.y);

@@ -369,7 +369,7 @@ exe.onTick = () => {
                         do {
                             rx = _.random(p.x - 30, p.x + 30);
                             ry = _.random(p.y - 30, p.y + 30);
-                        } while (world.relocate(p, rx, ry));
+                        } while (world.move(p, rx, ry));
                         p.dirx = 0;
                         p.diry = 0;
                         p.order.name = "stop";
