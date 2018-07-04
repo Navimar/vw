@@ -35,6 +35,8 @@ body{
     position: fixed;
     right: 0;
     top: 0;
-    width: 300px;
+    /*width: 300px;*/
+    pointer-events:none;
+    text-align: right;
 }
 

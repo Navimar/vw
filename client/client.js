@@ -17,6 +17,14 @@ let mousePos = {x: 0, y: 0};
 let mouseCell = {x: 0, y: 0};
 let inAir = false;
 let extra = {x: 0, y: 0};
+let describe = {
+        show: true,
+        text: 'Добро пожаловать в ...!',
+        x: 4,
+        y: 4,
+        time: 10000,
+    }
+;
 // function Pt(x, y) {
 //     if (!_.isFinite(x)) throw "x invalid";
 //     if (!_.isFinite(y)) throw "y invalid";
@@ -56,10 +64,71 @@ function updOrder(e) {
 
 function inputMouse() {
     canvas.addEventListener("mousedown", e => {
-        mouseDown = true;
-        onMouseDown();
-        updOrder(e);
-    }, false);
+            switch (e.which) {
+                case 1:
+                    //Left Mouse button pressed.
+                    mouseDown = true;
+                    onMouseDown();
+                    updOrder(e);
+                    break;
+                case 3:
+                    //Right Mouse button pressed.
+                    let dx = mouseCell.x + 0.5;
+                    let dy = mouseCell.y;
+                    if (mouseCell.x === 7) {
+                        if (dy > 6) {
+                            dx -= 4;
+                        } else {
+                            dx = 7;
+                            dy += 1;
+                        }
+                    }
+                    if (mouseCell.y > 7) {
+                        dx -= 4;
+                    }
+                    if (mouseCell.x===9){
+                        dx=6;
+                    }
+                    describe.x = dx;
+                    describe.y = dy;
+                    describe.time = 10000;
+                    let txt = "Здесь ничего нет";
+                    if (mouseCell.x === -1) {
+                        if (model.inv[mouseCell.y]) {
+                            txt = model.inv[mouseCell.y].describe;
+                        } else {
+                            txt = "Пустой мешок. Перенесите сюда предмет с земли";
+                        }
+                    } else if (mouseCell.x == -2) {
+                        if (model.ground[mouseCell.y]) {
+                            txt = model.ground[mouseCell.y].describe;
+                        } else {
+                            txt = "Здесь перечислены предметы на земле, перенесите предмет отсюда на мешочек, чтобы подобрать его";
+                        }
+                    } else if (mouseCell.x == 9) {
+                        if (model.wound[mouseCell.y]) {
+                            txt = model.wound[mouseCell.y].describe;
+                        }
+                    } else if (mouseCell.x == 4 && mouseCell.y == 4) {
+                        txt = "Это Вы!";
+                    } else {
+                        for (let o of model.obj) {
+                            if (o.x === mouseCell.x && o.y === mouseCell.y)
+                                txt = o.describe;
+                        }
+                    }
+                    describe.text = txt;
+                    break;
+                default:
+                    alert('You have a strange Mouse!');
+            }
+
+        }
+
+        ,
+        false
+    )
+    ;
     canvas.addEventListener("mouseup", e => {
         mouseDown = false;
         onMouseUp();
@@ -105,7 +174,7 @@ function initModel() {
     model.inv = [];
     model.ground = [];
     for (let x = 0; x < 9; x++) {
-        model.wound.push("bottle");
+        model.wound.push({img:"bottle"});
         model.inv.push({img: "angel"});
         model.holst[x] = [];
         for (let y = 0; y < 9; y++) {
@@ -261,7 +330,7 @@ function onStep(timeDiff) {
             //     o.sx = o.x + model.dirx;
             //     o.sy = o.y + model.diry;
             // } else {
-            if ((o.x === 8 && o.y === 8)||(o.x === 8 && o.y === 0)||(o.x === 0 && o.y === 8)||(o.x === 0 && o.y === 0)) {
+            if ((o.x === 8 && o.y === 8) || (o.x === 8 && o.y === 0) || (o.x === 0 && o.y === 8) || (o.x === 0 && o.y === 0)) {
                 o.sx = o.x + model.dirx;
                 o.sy = o.y + model.diry;
             } else {
@@ -329,8 +398,12 @@ function onStep(timeDiff) {
             y: Math.floor((mousePos.y) / dh)
         }
     }
-
     render(model);
+    if (describe.time > 0) {
+        describe.time -= timeDiff;
+    } else {
+        describe.time = 0;
+    }
     // model.lastmessage = model.message;
 }
 
@@ -364,6 +437,7 @@ function render(model) {
     resize();
     renderStatus();
 
+
     //render grass
     for (let y = -1; y < 10; y++) {
         for (let x = -1; x < 10; x++) {
@@ -378,25 +452,14 @@ function render(model) {
     // for (let a = 0; a < model.tire; a++) {
     //     drawImg("target", 4, 4);
     // }
-    drawImg("friend", model.order.targetx - model.px + 4 + model.trx, model.order.targety - model.py + 4 + model.try);
+    drawImg("target", model.order.targetx - model.px + 4 + model.trx, model.order.targety - model.py + 4 + model.try);
+
+    // for (let o of model.obj) {
+    //     drawImg("from", o.x + model.trx, o.y + model.try);
+    // }
 
     for (let o of model.obj) {
-        drawImg("from", o.x + model.trx, o.y + model.try);
-    }
-
-
-    for (let o of model.obj) {
-        // drawImg(o.img, o.x + model.trx + o.trx, o.y + model.try + o.try);
-        //
-        // drawImg(o.img, o.sx-model.trx, o.sy - model.try);
         drawImg(o.img, o.sx, o.sy);
-
-
-    }
-    for (let o of model.obj) {
-        // drawImg(o.img, o.x + model.trx, o.y + model.try);
-
-        // drawImg(o.img, o.sx, o.sy);
     }
     for (let a = 0; a < 9; a++) {
         drawImg("black", 9, a);
@@ -409,7 +472,7 @@ function render(model) {
         drawImg("black", a, -2);
     }
     for (let l = 0; l < 9; l++) {
-        drawImg(model.wound[l], 9, l);
+        drawImg(model.wound[l].img, 9, l);
     }
     let itma = 0;
     for (let i of model.inv) {
@@ -447,12 +510,21 @@ function render(model) {
     // // if (model.hand != "hand") drawSize(model.hand.img, 4.25, 4.25,0.6,0.6);
     // if (model.message != model.lastmessage) message(model.message);
     // drawWeb("http://tourist.kg/wp-content/uploads/2017/04/7e623540e23ca8273a41cab254b2edb1.png",0,0,2,1);
+
+    //text
+
+    // drawTxt("Растение со съедобным клубнем. Выкопайте его лопатой", dx + model.trx, dy + model.try, mouseCell.x + model.trx, mouseCell.y + model.try);
+    if (describe.time > 0) drawTxt(describe.text, describe.x, describe.y, mouseCell.x + model.trx, mouseCell.y + model.try);
 }
 
 let renderStatus = () => {
     let loc = (location.href).substr(0, 9);
     if (loc == "http://46") loc = '';
     if (loc == "http://12") loc = 'local';
+    status.server+="";
+    while (status.server.length < 3) {
+        status.server = "0" + status.server;
+    }
     let str = "";
     str += "" + loc + "</br>";
     str += "status: " + status.server + "</br>";

@@ -6,6 +6,7 @@ let meta = {};
 
 meta.player = {
     name: "Player",
+    describe:"это персонаж другого игрока",
     player: true,
     onCreate: (data) => {
         data.died = false;
@@ -231,8 +232,9 @@ meta.zombie = {
 };
 meta.skeleton = {
     name: "skeleton",
+    describe: "Скелет, убегайте от него или бейте лопатой!",
     isSolid: true,
-    img: 'zombie',
+    img: 'skeleton',
     onTurn: (data, wd) => {
         let tire = 64;
 
@@ -267,7 +269,8 @@ meta.skeleton = {
     }
 };
 meta.tree = {
-    name: "i am gruuuttt",
+    name: "tree",
+    describe:"Дерево, можно пересадить с помощью лопаты",
     img: "tree",
     isSolid: true,
     onCreate(data) {
@@ -372,6 +375,7 @@ meta.plant = {
 meta.shovel = {
     name: 'shovel',
     img: 'shovel',
+    describe:'Лопата, пересаживайте ей растения и бейте врагов!',
     onApply: (obj, wd, p) => {
         function broke() {
             wd.transform(wd.me, meta.treeseed);
@@ -469,6 +473,7 @@ meta.bone = {
 
 meta.highgrass = {
     name: "Highgrass",
+    describe:"Просто трава, для красоты",
     img: "highgrass",
     isNailed: true,
 };
@@ -874,6 +879,7 @@ meta.aphidka = {
 meta.potatoseed = {
     img: 'seed',
     name: 'potato seed',
+    describe: 'Съедобный клубень, перетащите на сердечки, чтобы съесть',
     onCreate(data) {
         data.new = true;
     },
@@ -906,6 +912,7 @@ meta.potato = {
 };
 meta.beaver = {
     name: 'beaver',
+    describe:'Зверь питающийся семенами растений, уничтожает все что стоит на его пути к еде',
     img: 'beaver',
     isSolid: true,
     onTurn: (data, wd) => {
@@ -938,6 +945,7 @@ meta.beaver = {
 meta.potatoplant = {
     name: 'potato plant',
     img: 'plant',
+    describe: 'Растение со съедобным клубнем, подкопайте лопатой, чтобы съесть',
     isNailed: true,
 };
 meta.aphid = {
@@ -1381,10 +1389,13 @@ wound.rot = {
 
 wound.life = {
     img: 'life',
+    describe: "Сердечки заменяются полученными ранами, если сердечки закончатся Ваш персонаж переродится"
 };
 
 wound.hungry = {
     img: 'hungry',
+    describe: "Ваш персонаж голоден, перетащите сюда какую=нибудь еду из инвентаря, если вы ее уже нашли"
+
 };
 
 wound.glut = {
