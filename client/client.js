@@ -20,8 +20,8 @@ let extra = {x: 0, y: 0};
 let describe = {
         show: true,
         text: 'Добро пожаловать в ...!',
-        x: 4,
-        y: 4,
+        x: 1,
+        y: 1,
         time: 10000,
     }
 ;
@@ -86,8 +86,8 @@ function inputMouse() {
                     if (mouseCell.y > 7) {
                         dx -= 4;
                     }
-                    if (mouseCell.x===9){
-                        dx=6;
+                    if (mouseCell.x === 9) {
+                        dx = 6;
                     }
                     describe.x = dx;
                     describe.y = dy;
@@ -174,14 +174,14 @@ function initModel() {
     model.inv = [];
     model.ground = [];
     for (let x = 0; x < 9; x++) {
-        model.wound.push({img:"bottle"});
+        model.wound.push({img: "bottle"});
         model.inv.push({img: "angel"});
         model.holst[x] = [];
         for (let y = 0; y < 9; y++) {
             model.holst[x][y] = "grass";
         }
     }
-    model.obj = [{x: 1, y: 1, sx: 5, sy: 5, img: "test"}];
+    model.obj = [{x: 1, y: 1, sx: 5, sy: 5, img: "test", describe: "test", message: {text: "Start!!!", color: "red"}}];
     model.stamp = 1;
     model.selected = 0;
     model.tire = 0;
@@ -230,7 +230,6 @@ function onServer(val) {
         model.diry = val.dir.y;
     }
     model.wound = val.wound;
-    model.message = val.message;
     // model.hand = val.hand;
     model.inv = val.inv;
     model.delay = val.delay;
@@ -252,6 +251,11 @@ function onServer(val) {
                 if (m.y !== v.y) {
                     // m.oy =m.y;
                     m.y = v.y;
+                }
+                if (!_.isEqual(m.message , v.message)) {
+                    console.log(m.message,v.message);
+                    m.message = v.message;
+                    m.messagetime = 10000;
                 }
                 m.img = v.img;
                 ok = false;
@@ -363,6 +367,8 @@ function onStep(timeDiff) {
         o.sy = m.y;
         // o.sx = o.x;
         // o.sy = o.y;
+        if (o.messagetime > 0)
+            o.messagetime -= timeDiff;
     }
     // for (let o of model.obj) {
     //     // let dirx = o.x - o.ox;
@@ -461,6 +467,8 @@ function render(model) {
     for (let o of model.obj) {
         drawImg(o.img, o.sx, o.sy);
     }
+
+
     for (let a = 0; a < 9; a++) {
         drawImg("black", 9, a);
         drawImg("black", 10, a);
@@ -512,16 +520,21 @@ function render(model) {
     // drawWeb("http://tourist.kg/wp-content/uploads/2017/04/7e623540e23ca8273a41cab254b2edb1.png",0,0,2,1);
 
     //text
-
+    for (let o of model.obj) {
+        if (o.message) {
+            if (o.messagetime > 0)
+                drawTxt(o.message.text, o.x + model.trx + 0.5, o.y + model.try, o.message.color);
+        }
+    }
     // drawTxt("Растение со съедобным клубнем. Выкопайте его лопатой", dx + model.trx, dy + model.try, mouseCell.x + model.trx, mouseCell.y + model.try);
-    if (describe.time > 0) drawTxt(describe.text, describe.x, describe.y, mouseCell.x + model.trx, mouseCell.y + model.try);
+    if (describe.time > 0) drawTxt(describe.text, describe.x, describe.y);
 }
 
 let renderStatus = () => {
     let loc = (location.href).substr(0, 9);
     if (loc == "http://46") loc = '';
     if (loc == "http://12") loc = 'local';
-    status.server+="";
+    status.server += "";
     while (status.server.length < 3) {
         status.server = "0" + status.server;
     }

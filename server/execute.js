@@ -199,6 +199,15 @@ exe.wrapper = (me, theWound) => {
         findFrom: (x, y, target, first, last) => {
             return world.find(target, x, y, first, last)
         },
+        say: (text, obj, color) => {
+            if (_.isArray(text)) {
+                text = text[_.random(text.length - 1)];
+            }
+            if (obj.message && obj.message.text === text) {
+                text += " ";
+            }
+            obj.message = {text, color};
+        }
     };
 };
 

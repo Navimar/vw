@@ -41,7 +41,7 @@ send.web = (dtStartLoop) => {
                                 console.log(r.tp.name, "has no describe!!");
                                 r.tp.describe = r.tp.name + " has no describe!"
                             }
-                            data.obj.push({x, y, img, id: r.id, z: r.tp.z, describe: r.tp.describe});
+                            data.obj.push({x, y, img, id: r.id, z: r.tp.z, describe: r.tp.describe, message:r.message});
                             if (x === 4 && y === 4 && r.tp !== meta.player) {
                                 data.ground.push({img, id: r.id, describe: r.tp.describe})
                             }

@@ -16,6 +16,8 @@ if (os.platform() == 'darwin') {
                 {m: meta.skeleton, q: 120},
                 {m: meta.tree, q: 1000},
                 // {m: meta.bone, q: 60},
+                // {m: meta.water, q: 1000},
+                // {m: meta.mermaid, q: 120},
                 // {m: meta.stick, q: 30},
                 // {m: meta.plant, q: 70},
                 // {m: meta.stone, q: 30},

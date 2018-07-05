@@ -67,6 +67,7 @@ world.addPlayer = (socket, id, x, y) => {
         y = 0;
     }
     let p = {socket, id, x, y};
+    p.message=false;
     p.wounds = [];
     p.solid = true;
     p.dirx = 0;
@@ -213,7 +214,7 @@ world.createObj = (tp, x, y) => {
     if (tp.onCreate) {
         tp.onCreate(data);
     }
-    let o = {x: x, y: y, id: makeid(), tp, data};
+    let o = {x: x, y: y, id: makeid(), tp, data, message:false};
 
 
     addtoMap(x, y, o);

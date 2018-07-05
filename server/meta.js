@@ -6,7 +6,7 @@ let meta = {};
 
 meta.player = {
     name: "Player",
-    describe:"это персонаж другого игрока",
+    describe: "это персонаж другого игрока",
     player: true,
     onCreate: (data) => {
         data.died = false;
@@ -30,13 +30,13 @@ meta.player = {
         //     data.dir = d[1];
         //     wd.move(d[1]);
         // }
-        if(wd.move(d[0])){
-            if(wd.move(d[1])){
+        if (wd.move(d[0])) {
+            if (wd.move(d[1])) {
                 data.dir = dir.here;
-            }else{
+            } else {
                 data.dir = d[1];
             }
-        }else{
+        } else {
             data.dir = d[0];
         }
     },
@@ -236,7 +236,7 @@ meta.skeleton = {
     isSolid: true,
     img: 'skeleton',
     onTurn: (data, wd) => {
-        let tire = 64;
+        let tire = 54;
 
         //куда деть эту функцию?
         function goTo(d) {
@@ -256,6 +256,8 @@ meta.skeleton = {
             if (t.tp === meta.player) {
                 if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
                     wd.addWound(t, wound.bite);
+                    wd.say(['Кусь!', 'Ам!', 'Хрясь'], wd.me, '#aa0000');
+                    wd.say(['Ай!', 'Больно', 'Кыш!'], t);
                 } else {
                     goTo(mt.dir);
                 }
@@ -270,7 +272,7 @@ meta.skeleton = {
 };
 meta.tree = {
     name: "tree",
-    describe:"Дерево, можно пересадить с помощью лопаты",
+    describe: "Дерево, можно пересадить с помощью лопаты",
     img: "tree",
     isSolid: true,
     onCreate(data) {
@@ -375,7 +377,7 @@ meta.plant = {
 meta.shovel = {
     name: 'shovel',
     img: 'shovel',
-    describe:'Лопата, пересаживайте ей растения и бейте врагов!',
+    describe: 'Лопата, пересаживайте ей растения и бейте врагов!',
     onApply: (obj, wd, p) => {
         function broke() {
             wd.transform(wd.me, meta.treeseed);
@@ -389,6 +391,7 @@ meta.shovel = {
         if (obj.tp === meta.zombie || obj.tp === meta.skeleton) {
             wd.transform(obj, meta.bone);
             broke();
+            wd.say(['!!!','Вот тебе!','Получи лопатой!!!'],p)
         }
         if (obj.tp === meta.potatoplant) {
             wd.transform(obj, meta.potato);
@@ -473,7 +476,7 @@ meta.bone = {
 
 meta.highgrass = {
     name: "Highgrass",
-    describe:"Просто трава, для красоты",
+    describe: "Просто трава, для красоты",
     img: "highgrass",
     isNailed: true,
 };
@@ -876,10 +879,15 @@ meta.aphidka = {
         }
     },
 };
+meta.mermaid = {
+    name: 'mermaid',
+    img: 'ariel',
+    describe: 'это ариель',
+};
 meta.potatoseed = {
     img: 'seed',
     name: 'potato seed',
-    describe: 'Съедобный клубень, перетащите на сердечки, чтобы съесть',
+    describe: 'Семена, посадите или соедините с костью чтобы сделать лопату',
     onCreate(data) {
         data.new = true;
     },
@@ -900,8 +908,10 @@ meta.potatoseed = {
 meta.potato = {
     img: 'potato',
     name: 'potato',
-    onApply: (obj, wd) => {
+    describe: 'Съедобный клубень, перетащите на сердечки, чтобы съесть',
+    onApply: (obj, wd, p) => {
         if (obj.tp.player) {
+            wd.say('Съедобненько', p, '#005500');
             // wd.trade(obj);
             wd.transform(wd.me, meta.potatoseed);
             if (!wd.removeWound(obj, wound.hungry)) {
@@ -912,7 +922,7 @@ meta.potato = {
 };
 meta.beaver = {
     name: 'beaver',
-    describe:'Зверь питающийся семенами растений, уничтожает все что стоит на его пути к еде',
+    describe: 'Зверь питающийся семенами растений, уничтожает все что стоит на его пути к еде',
     img: 'beaver',
     isSolid: true,
     onTurn: (data, wd) => {
@@ -1394,7 +1404,7 @@ wound.life = {
 
 wound.hungry = {
     img: 'hungry',
-    describe: "Ваш персонаж голоден, перетащите сюда какую=нибудь еду из инвентаря, если вы ее уже нашли"
+    describe: "Ваш персонаж голоден, перетащите сюда какую-нибудь еду из инвентаря, если вы ее уже нашли"
 
 };
 
@@ -1417,6 +1427,7 @@ wound.swamp = {
 
 wound.bite = {
     img: 'bite',
+    describe: 'Легкая рана, заживет сама',
     firstAct: (player, q, wd) => {
         wd.nextAct(1000);
     },

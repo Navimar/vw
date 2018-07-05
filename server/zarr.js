@@ -42,5 +42,6 @@ module.exports = [
     'zebra',
     'beaver',
     'fire',
+    'mermaid',
     'player',
 ];
