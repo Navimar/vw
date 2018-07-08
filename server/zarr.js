@@ -43,5 +43,6 @@ module.exports = [
     'beaver',
     'fire',
     'mermaid',
+    'wall',
     'player',
 ];

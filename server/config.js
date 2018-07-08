@@ -1,6 +1,17 @@
 const os = require('os');
 const meta = require('./meta.js').meta;
 
+
+let obects = [
+    {m: meta.beaver, q: 1},
+    {m: meta.potatoseed, q: 4},
+    {m: meta.skeleton, q: 5},
+    {m: meta.bone, q: 2},
+    {m: meta.tree, q: 32},
+    {m: meta.highgrass, q: 100},
+    {m: meta.wall, q: 8},
+];
+
 if (os.platform() == 'darwin') {
     module.exports = {
         ip: "127.0.0.1",
@@ -8,30 +19,10 @@ if (os.platform() == 'darwin') {
         botkey: '320938705:AAGpcdMe9oIhFYuu11MjU4djJnj1maijkpQ',
         world: {
             start: 5200,
-            obj: [
-                // {m: meta.zebra, q: 20},
-                // {m: meta.wolf, q: 20},
-                {m: meta.beaver, q: 20},
-                {m: meta.shovel, q: 60},
-                {m: meta.skeleton, q: 120},
-                {m: meta.tree, q: 1000},
-                // {m: meta.bone, q: 60},
-                // {m: meta.water, q: 1000},
-                // {m: meta.mermaid, q: 120},
-                // {m: meta.stick, q: 30},
-                // {m: meta.plant, q: 70},
-                // {m: meta.stone, q: 30},
-                {m: meta.potato, q: 30},
-                {m: meta.potatoplant, q: 30},
-                // {m: meta.orange, q: 50},
-                // {m: meta.ant, q: 50},
-                // {m: meta.aphid, q: 3000},
-                // {m: meta.crab, q: 70},
-                {m: meta.highgrass, q: 2000},
-            ],
+            obj: obects,
             factor: 1,
-            items: 200000,
-            speed: 10,
+            items: 50000,
+            speed: 1000,
         }
     }
 } else {
@@ -41,27 +32,7 @@ if (os.platform() == 'darwin') {
         botkey: '602673396:AAFHMT_6QTnuPnDBYNLKDGFiiVnwbvZYYHM',
         world: {
             start: 5200,
-            obj: [
-                // {m: meta.zebra, q: 20},
-                // {m: meta.wolf, q: 20},
-                {m: meta.beaver, q: 20},
-                {m: meta.shovel, q: 60},
-                {m: meta.skeleton, q: 120},
-                {m: meta.tree, q: 1000},
-                // {m: meta.bone, q: 60},
-                // {m: meta.water, q: 1000},
-                // {m: meta.mermaid, q: 120},
-                // {m: meta.stick, q: 30},
-                // {m: meta.plant, q: 70},
-                // {m: meta.stone, q: 30},
-                {m: meta.potato, q: 30},
-                {m: meta.potatoplant, q: 30},
-                // {m: meta.orange, q: 50},
-                // {m: meta.ant, q: 50},
-                // {m: meta.aphid, q: 3000},
-                // {m: meta.crab, q: 70},
-                {m: meta.highgrass, q: 2000},
-            ],
+            obj: obects,
             factor: 1,
             items: 200000,
             speed: 10,

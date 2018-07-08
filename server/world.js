@@ -67,7 +67,7 @@ world.addPlayer = (socket, id, x, y) => {
         y = 0;
     }
     let p = {socket, id, x, y};
-    p.message=false;
+    p.message = false;
     p.wounds = [];
     p.solid = true;
     p.dirx = 0;
@@ -214,14 +214,14 @@ world.createObj = (tp, x, y) => {
     if (tp.onCreate) {
         tp.onCreate(data);
     }
-    let o = {x: x, y: y, id: makeid(), tp, data, message:false};
+    let o = {x: x, y: y, id: makeid(), tp, data, message: false};
 
 
     addtoMap(x, y, o);
     world.obj.push(o);
 
     if (tp.onTurn) {
-        let t = world.time + _.random(99);
+        let t = world.time + _.random(9999);
 
         addtologic(o, t);
     }
@@ -498,6 +498,14 @@ world.start = () => {
             world.createObj(a.m, _.random(start, wid), _.random(start, wid));
         }
     }
+    let a = Math.round((wid - start) / 10);
+    for (let w = start - a; w < wid + a; w++) {
+        world.createObj(meta.wall, w, start - a);
+        world.createObj(meta.wall, w, wid + a);
+        world.createObj(meta.wall, start - a, w);
+        world.createObj(meta.wall, wid + a, w);
+    }
+
 };
 
 module.exports = world;

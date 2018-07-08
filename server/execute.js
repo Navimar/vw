@@ -508,7 +508,7 @@ exe.onTick = () => {
         }
         return str;
     };
-    if (isInt(world.time / 1000)) {
+    if (isInt(world.time / 1000) || world.time === 1) {
         send.bot(30626617, stat());
     }
 

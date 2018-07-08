@@ -235,6 +235,9 @@ meta.skeleton = {
     describe: "Скелет, убегайте от него или бейте лопатой!",
     isSolid: true,
     img: 'skeleton',
+    onCreate: (data) => {
+        data.satiety = 100000;
+    },
     onTurn: (data, wd) => {
         let tire = 54;
 
@@ -267,6 +270,10 @@ meta.skeleton = {
         } else {
             wd.move(wd.dirRnd);
         }
+        // data.satiety -= tire;
+        // if (data.satiety < 0) {
+        //     wd.transform(wd.me, meta.bone)
+        // }
         wd.nextTurn(tire);
     }
 };
@@ -342,7 +349,7 @@ meta.plant = {
             data.kind = false;
             let tire = 30;
             // let t = wd.find([meta.player, meta.meat, meta.crab, meta.bone, meta.aphid], 0, 1);
-            let t = wd.isNear([meta.player, meta.aphid, meta.ant, meta.crab, meta.wolf, meta.zombie, meta.zebra]);
+            let t = wd.isNear([meta.player, meta.skeleton]);
             if (t) {
                 let mt = wd.dirTo(t.x, t.y);
                 if (t.tp !== meta.player) {
@@ -380,7 +387,7 @@ meta.shovel = {
     describe: 'Лопата, пересаживайте ей растения и бейте врагов!',
     onApply: (obj, wd, p) => {
         function broke() {
-            wd.transform(wd.me, meta.treeseed);
+            wd.transform(wd.me, meta.stick);
             wd.getOut(p.x, p.y);
         }
 
@@ -391,16 +398,16 @@ meta.shovel = {
         if (obj.tp === meta.zombie || obj.tp === meta.skeleton) {
             wd.transform(obj, meta.bone);
             broke();
-            wd.say(['!!!','Вот тебе!','Получи лопатой!!!'],p)
+            wd.say(['!!!', 'Вот тебе!', 'Получи лопатой!!!'], p)
         }
         if (obj.tp === meta.potatoplant) {
             wd.transform(obj, meta.potato);
+            wd.say(['Огродная работа', 'Свежая картошечка!', 'Лучшее применение лопаты'], p);
             wd.put(obj, p);
             broke();
         }
         if (obj.tp === meta.beaver) {
             wd.transform(obj, meta.potatoseed);
-            wd.put(obj, p);
             broke();
         }
     },
@@ -457,11 +464,16 @@ meta.bone = {
     },
     onTurn: (data, wd) => {
         wd.transformdropAll(meta.bone);
-        if (data.new) {
-            data.new = false;
+        if (wd.me.carrier) {
             wd.nextTurn(10000);
+            data.new = true;
         } else {
-            wd.transform(wd.me, meta.zombie);
+            if (data.new) {
+                data.new = false;
+                wd.nextTurn(60000);
+            } else {
+                wd.transform(wd.me, meta.skeleton);
+            }
         }
     },
     onApply: (obj, wd) => {
@@ -611,27 +623,24 @@ meta.stick = {
         data.new = true;
     },
     onTurn: (data, wd) => {
-        wd.transformdropAll(meta.treeseed);
+        wd.transformdropAll(meta.stick);
         if (data.new) {
             data.new = false;
-            wd.nextTurn(25000);
+            wd.nextTurn(40000);
         } else {
-            wd.transform(wd.me, meta.highgrass);
+            wd.transform(wd.me, meta.bone);
         }
     },
-    onApply: (obj, wd) => {
-        if (obj.tp === meta.stone) {
-            wd.transform(obj, meta.axe);
-            wd.transform(wd.me, meta.axe);
-        }
-        if (obj.tp === meta.tree || obj.tp === meta.orangetree) {
-            wd.transform(wd.me, meta.flinders);
-        }
-        if (obj.tp === meta.fire) {
-            // wd.getOut(obj.x,obj.y);
-            wd.transform(wd.me, meta.torch);
-        }
-    }
+    // onApply: (obj, wd) => {
+    //     // if (obj.tp === meta.stone) {
+    //     //     wd.transform(obj, meta.axe);
+    //     //     wd.transform(wd.me, meta.axe);
+    //     // }
+    //     if (obj.tp === meta.tree) {
+    //         wd.transform(obj, meta.treeseed);
+    //     }
+    // },
+    // // if (obj}
 };
 
 
@@ -665,6 +674,12 @@ meta.wwall = {
     img: 'wwall',
     isSolid: true,
 };
+meta.wall = {
+    name: "stone Wall",
+    img: 'wall',
+    isSolid: true,
+};
+
 meta.orangetree = {
     name: "a big tree",
     img: "orangetree",
@@ -893,17 +908,23 @@ meta.potatoseed = {
     },
     onTurn: (data, wd) => {
         if (wd.me.carrier) {
-            wd.nextTurn(1000);
+            wd.nextTurn(3000);
             data.new = true;
         } else {
             if (data.new) {
                 data.new = false;
-                wd.nextTurn(3500);
+                wd.nextTurn(7000);
             } else {
                 wd.transform(wd.me, meta.potatoplant);
             }
         }
     },
+    onApply: (obj, wd) => {
+        if (obj.tp === meta.bone) {
+            wd.transform(obj, meta.shovel);
+            wd.transform(wd.me, meta.shovel);
+        }
+    }
 };
 meta.potato = {
     img: 'potato',
@@ -922,22 +943,30 @@ meta.potato = {
 };
 meta.beaver = {
     name: 'beaver',
-    describe: 'Зверь питающийся семенами растений, уничтожает все что стоит на его пути к еде',
+    describe: 'Зверь питающийся растениями, уничтожает все что стоит на его пути к еде',
     img: 'beaver',
     isSolid: true,
+    onCreate: (data) => {
+        data.satiety = 10000;
+    },
     onTurn: (data, wd) => {
-        let food = [meta.potatoseed, meta.treeseed];
-        let p = wd.isHere(food);
+        let food = [meta.potatoplant];
+        let p = wd.isNear(food);
         if (p) {
             wd.transform(p, meta.beaver);
+            wd.goTo(p);
         } else {
             let t = wd.find(food);
             if (t) {
                 let o = wd.goTo(t);
                 if (o) {
-                    if (_.contains([meta.tree, meta.skeleton], o.tp)) {
+                    if (_.contains([meta.tree], o.tp)) {
+                        wd.transform(o, meta.treeseed);
+                    }
+                    if (_.contains([meta.skeleton], o.tp)) {
                         wd.transform(o, meta.bone);
                     }
+
                 }
                 // let mt = wd.dirTo(t.x, t.y);
                 // if (wd.goTo(mt.dir)) {
@@ -948,6 +977,10 @@ meta.beaver = {
             }
 
         }
+        if (data.satiety < 0) {
+            wd.transform(wd.me, meta.potatoseed);
+        }
+        data.satiety -= 30;
         wd.nextTurn(30);
     },
 };

@@ -257,6 +257,7 @@ function onServer(val) {
                     m.message = v.message;
                     m.messagetime = 10000;
                 }
+                m.describe = v.describe;
                 m.img = v.img;
                 ok = false;
             }
