@@ -29,6 +29,7 @@ module.exports = [
     'axe',
     'plant',
     'shovel',
+    'wall',
     'tree',
     'torch',
     'rot',
@@ -43,6 +44,5 @@ module.exports = [
     'beaver',
     'fire',
     'mermaid',
-    'wall',
     'player',
 ];

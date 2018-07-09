@@ -35,7 +35,9 @@ world.init = () => {
         if (!value.z) {
             console.log("НЕ ДОБВАЛЕН В МАССИВ Z", key, value.z);
         }
-        // console.log(key, value.z);
+        if(!value.describe){
+            console.log("Нет описания", key);
+        }
     });
 
 };

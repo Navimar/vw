@@ -628,7 +628,12 @@ meta.stick = {
             data.new = false;
             wd.nextTurn(40000);
         } else {
-            wd.transform(wd.me, meta.bone);
+            if (_.random()) {
+                wd.transform(wd.me, meta.bone);
+            } else {
+                wd.transform(wd.me, meta.potatoseed);
+
+            }
         }
     },
     // onApply: (obj, wd) => {

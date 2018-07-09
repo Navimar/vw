@@ -21,8 +21,8 @@ if (os.platform() == 'darwin') {
             start: 5200,
             obj: obects,
             factor: 1,
-            items: 50000,
-            speed: 1000,
+            items: 5000,
+            speed: 10,
         }
     }
 } else {
