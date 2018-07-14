@@ -9,8 +9,8 @@ const input = {};
 let dtLoop = Date.now();
 // let token = GenerateToken();
 
-input.init =()=>{
-  event.init();
+input.init =(m)=>{
+  event.init(m);
 };
 
 // input.tick = () => {

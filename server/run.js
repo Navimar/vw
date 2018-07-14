@@ -19,12 +19,12 @@ exports.main = function main(io) {
     seedrandom('hello.', { global: true });
     test();
 
-    if (fs.existsSync('data/log.txt')) {
-        load();
-    }else{
-        input.init();
-    }
-    // input.init();
+    // if (fs.existsSync('data/log.txt')) {
+    //     load();
+    // }else{
+    //     input.init();
+    // }
+    input.init(true);
 
     input.socket(io);
     input.bot();

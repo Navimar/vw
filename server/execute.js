@@ -7,6 +7,7 @@ const user = require('./user');
 const world = require('./world');
 const util = require('./util');
 const direction = util.dir;
+const config = require('./config.js');
 
 const send = require('./send');
 const wound = require('./meta').wound;
@@ -14,6 +15,7 @@ const wound = require('./meta').wound;
 const exe = {};
 
 let token = null;
+let laststatarr = [];
 
 exe.wrapper = (me, theWound) => {
     return {
@@ -73,6 +75,9 @@ exe.wrapper = (me, theWound) => {
             return world.objArrInPoint(x, y);
         },
         move: (dir) => {
+            if (!dir) {
+                dir = exe.wrapper().dirRnd;
+            }
             return world.move(me, dir);
         },
         goTo: (d) => {
@@ -103,6 +108,14 @@ exe.wrapper = (me, theWound) => {
                 i = world.lay(t, me.x - 1, me.y);
                 if (i && i !== me) return i;
             }
+            return false;
+        },
+        isHereNear: (tp) => {
+            let f = exe.wrapper(me).isHere(tp);
+            if (!f) {
+                f = exe.wrapper(me).isNear(tp);
+            }
+            return f;
         },
         movetrought: (dir) => {
             let x = me.x + dir.x;
@@ -247,11 +260,11 @@ exe.onInit = () => {
     // let dtStartLoop = Date.now();
     // for (let a = 0; a < 100000; a++) {
     //     exe.onTick();
-    //     // console.log(a);
+    //     console.log(a);
     // }
     // console.log('finish ' + (Date.now() - dtStartLoop));
 };
-exe.onTick = () => {
+exe.onTick = (isMain) => {
     let dtStartLoop = Date.now();
     for (let p of world.player) {
         if (p.tire <= 0) {
@@ -373,12 +386,16 @@ exe.onTick = () => {
                     if (!world.removeWound(p)) {
                         exe.wrapper(p).dropAll();
                         p.data.died = false;
-                        let rx;
-                        let ry;
-                        do {
-                            rx = _.random(p.x - 30, p.x + 30);
-                            ry = _.random(p.y - 30, p.y + 30);
-                        } while (world.move(p, rx, ry));
+                        if (p.x !== world.center.x && p.y !== world.center.y) {
+                            world.move(p, world.center.x, world.center.y);
+                        } else {
+                            let rx;
+                            let ry;
+                            do {
+                                rx = _.random(p.x - 30, p.x + 30);
+                                ry = _.random(p.y - 30, p.y + 30);
+                            } while (world.move(p, rx, ry));
+                        }
                         p.dirx = 0;
                         p.diry = 0;
                         p.order.name = "stop";
@@ -407,7 +424,7 @@ exe.onTick = () => {
             } else {
                 p.satiety = 1000;
                 world.addWound(p, wound.hungry);
-                // world.removeWound(p, "bite");
+                // world.removeWound(p, "hit");
             }
         }
 
@@ -477,13 +494,16 @@ exe.onTick = () => {
         return parseInt(num) === parseFloat(num)
     }
 
+
     let stat = () => {
+        let sum = 0;
         let arr = [];
         for (let o of world.obj) {
             let ok = true;
             for (let a of arr) {
                 if (a.meta === o.tp) {
                     a.q++;
+                    sum++;
                     ok = false;
                     break;
                 }
@@ -491,6 +511,9 @@ exe.onTick = () => {
             if (ok) {
                 arr.push({meta: o.tp, q: 1})
             }
+        }
+        for (let a of arr) {
+            a.p = Math.round((a.q / sum) * 100 * 100) / 100;
         }
         let str = "world statistic:\n";
         str += "world time: " + world.time + "\n";
@@ -502,13 +525,22 @@ exe.onTick = () => {
                 return 1;
             }
         });
-        for (let a of arr) {
-            str += a.meta.name;
-            str += " " + a.q + "\n";
+        for (let a in arr) {
+            let smile = "";
+            if (laststatarr[a]) {
+                if (arr[a].p > laststatarr[a].p) {
+                    smile = "🔼";
+                } else if (arr[a].p < laststatarr[a].p) {
+                    smile = "🔻";
+                }
+            }
+            str += arr[a].meta.name;
+            str += " " + arr[a].p + "% " + smile + "\n";
         }
+        laststatarr = arr;
         return str;
     };
-    if (isInt(world.time / 1000) || world.time === 1) {
+    if ((isInt(world.time / 1000) || world.time === 1) && isMain) {
         send.bot(30626617, stat());
     }
 
@@ -521,18 +553,21 @@ exe.onTick = () => {
         x += p.x;
         y += p.y;
     }
+    x += config.world.start;
+    y += config.world.start;
+    i++;
     x = Math.round(x / i);
     y = Math.round(y / i);
-    world.center.x = x || 5200;
-    world.center.y = y || 5200;
+    world.center.x = x;
+    world.center.y = y;
 
     return dtStartLoop;
 };
 
-exe.onLoginBot = (val) => {
-    token = user.setKey(val.msg.from.id);
-    send.bot(val.msg.from.id, config.ip + ":" + config.port + "/?id=" + val.msg.from.id + "&key=" + token);
-};
+// exe.onLoginBot = (val) => {
+//     token = user.setKey(val.msg.from.id);
+//     send.bot(val.msg.from.id, config.ip + ":" + config.port + "/?id=" + val.msg.from.id + "&key=" + token);
+// };
 
 exe.changeOrder = (p, order) => {
     if (!p.data.died) {
@@ -776,7 +811,6 @@ exe.changeOrder = (p, order) => {
 // };
 exe.connection = () => {
     world.connected++;
-    // user.player = (world.addPlayer()
     //show player
 };
 exe.disconnect = () => {

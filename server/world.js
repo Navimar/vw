@@ -35,7 +35,7 @@ world.init = () => {
         if (!value.z) {
             console.log("НЕ ДОБВАЛЕН В МАССИВ Z", key, value.z);
         }
-        if(!value.describe){
+        if (!value.describe) {
             console.log("Нет описания", key);
         }
     });
@@ -223,7 +223,7 @@ world.createObj = (tp, x, y) => {
     world.obj.push(o);
 
     if (tp.onTurn) {
-        let t = world.time + _.random(9999);
+        let t = world.time + _.random(99);
 
         addtologic(o, t);
     }
@@ -266,7 +266,12 @@ world.move = function (obj, dir, y) {
     if (_.isFinite(obj.x) && _.isFinite(obj.y)) {
         let m = (x, y) => {
             for (let o of world.objArrInPoint(x, y)) {
-                if (o.tp.isSolid) {
+                let solid =
+                    _.isFunction(o.tp.isSolid) ?
+                        o.tp.isSolid(o.data)
+                        :
+                        o.tp.isSolid;
+                if (solid) {
                     return o
                 }
             }

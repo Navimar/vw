@@ -100,6 +100,23 @@ module.exports = () => {
     test(exe.wrapper(o).move(direction.down), b, 'move on solid');
     test(o.y, 0, 'cant pass solid');
 
+    world.init();
+    let m = {p: true};
+    // world.createObj(m, 0, 0);
+    o = exe.wrapper({x: 0, y: 0}).isHereNear(m);
+    test(o, false, 'isHereNear false');
+
+    world.init();
+     m = {p: true};
+    world.createObj(m, 0, 0);
+    o = exe.wrapper({x: 0, y: 0}).isHereNear(m);
+    test(o.tp.p, true, 'isHereNear HERE');
+
+    world.init();
+    m = {p: true};
+    world.createObj(m,1, 0);
+    o = exe.wrapper({x: 0, y: 0}).isHereNear(m);
+    test(o.tp.p, true, 'isHereNear NEAR');
 
     world.init("objArrInPoint");
     world.createObj(meta.test, 5, 5);
@@ -133,12 +150,12 @@ module.exports = () => {
 
     world.init();
     p = world.addPlayer();
-    world.addWound(p, wound.bite);
-    test(p.wound[0], wound.bite, 'worldAddWound');
+    world.addWound(p, wound.hit);
+    test(p.wound[0], wound.hit, 'worldAddWound');
     for (let i = 0; i < 1002; i++) {
         exe.onTick();
     }
-    test(p.wound[0], wound.life, 'bite dissapears');
+    test(p.wound[0], wound.life, 'hit dissapears');
 
 
     world.init();
@@ -244,7 +261,6 @@ module.exports = () => {
     }
     exe.wrapper(p).dropAll();
     test(world.map.get(p.id).length, 0, 'dropAll() drops everything');
-
     // world.init();
     // for (let a = 0; a < 200000; a++) {
     //     world.createObj(meta.test, _.random(-1000, 1000), _.random(-1000, 1000));

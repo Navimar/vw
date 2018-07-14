@@ -14,18 +14,18 @@ let tick = 0;
 module.exports = event;
 
 
-event.init = () => {
+event.init = (m) => {
     let val = {
         event: 'init',
     };
     saveEvent(val);
-    exe.onInit();
+    exe.onInit(m);
     // send.web();
 };
 
 event.tick = (val) => {
     saveEvent({event: 'tick'});
-    send.web(exe.onTick());
+    send.web(exe.onTick(true));
 };
 
 event.bot = (val) => {
