@@ -3,13 +3,14 @@ const meta = require('./meta.js').meta;
 
 
 let objects = [
-    {m: meta.beaver, q: 1},
-    {m: meta.potatoseed, q: 4},
-    {m: meta.potatoplant, q: 1},
-    {m: meta.skeleton, q: 5},
-    {m: meta.bone, q: 2},
-    {m: meta.tree, q: 40},
-    {m: meta.highgrass, q: 100},
+    {m: 'beaver', q: 1},
+    {m: 'potatoseed', q: 4},
+    {m: 'potatoplant', q: 1},
+    {m: 'skeleton', q: 5},
+    {m: 'bone', q: 2},
+    {m: 'tree', q: 40},
+    {m: 'wall', q: 5},
+    {m: 'highgrass', q: 100},
 ];
 
 if (os.platform() == 'darwin') {
@@ -21,7 +22,7 @@ if (os.platform() == 'darwin') {
             start: 5200,
             obj: objects,
             factor: 1,
-            items: 10000,
+            items: 1000,
             speed: 10,
         }
     }

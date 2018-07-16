@@ -13,10 +13,9 @@ const fs = require('fs');
 let seedrandom = require('seedrandom');
 
 
-
-
 exports.main = function main(io) {
-    seedrandom('hello.', { global: true });
+    seedrandom('hello.', {global: true});
+    // console.log(Math.random());
     test();
 
     // if (fs.existsSync('data/log.txt')) {
@@ -25,7 +24,9 @@ exports.main = function main(io) {
     //     input.init();
     // }
     input.init(true);
-
+    if (fs.existsSync('data/snap.txt')) {
+        load();
+    }
     input.socket(io);
     input.bot();
     input.tick();

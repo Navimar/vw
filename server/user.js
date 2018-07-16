@@ -74,7 +74,7 @@ user.login = (user, socket, pass) => {
         let key = sha(pass);
         if (user.key === key) {
             let f = true;
-            for (let p of world.player) {
+            for (let p of world.player()) {
                 if (user.id === p.id) {
                     p.socket = socket;
                     f = false;

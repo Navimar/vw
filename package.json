@@ -10,8 +10,11 @@
   "author": "Ionut-Cristian Florescu <ionut.florescu@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "circular-json": "^0.5.5",
+    "circular-json-es6": "^2.0.2",
     "express": "^4.14.0",
     "forever": "^0.15.3",
+    "lodash": "^4.17.10",
     "path": "^0.12.7",
     "read-each-line-sync": "^1.0.5",
     "seedrandom": "^2.4.3",

@@ -252,8 +252,8 @@ function onServer(val) {
                     // m.oy =m.y;
                     m.y = v.y;
                 }
-                if (!_.isEqual(m.message , v.message)) {
-                    console.log(m.message,v.message);
+                if (!_.isEqual(m.message, v.message)) {
+                    console.log(m.message, v.message);
                     m.message = v.message;
                     m.messagetime = 10000;
                 }
@@ -493,6 +493,7 @@ function render(model) {
     }
     //
     for (let i in model.ground) {
+        if (model.ground[i].isNailed) drawImg('isNailed', -2, i);
         drawImg(model.ground[i].img, -2, i);
     }
 
@@ -525,6 +526,7 @@ function render(model) {
         if (o.message) {
             if (o.messagetime > 0)
                 drawTxt(o.message.text, o.x + model.trx + 0.5, o.y + model.try, o.message.color);
+            // drawTxt(o.message.text, o.x + 0.5, o.y, o.message.color);
         }
     }
     // drawTxt("Растение со съедобным клубнем. Выкопайте его лопатой", dx + model.trx, dy + model.try, mouseCell.x + model.trx, mouseCell.y + model.try);

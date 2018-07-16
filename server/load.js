@@ -3,9 +3,11 @@
  */
 // const exe = require('./execute');
 // const user = require('./user');
-const read = require('./read');
+// const read = require('./read');
+const world = require('./world');
 // const readline = require('readline');
 const readline = require('read-each-line-sync');
+const CircularJSON = require('circular-json');
 // const fs = require('fs');
 
 // module.exports = (path) => {
@@ -21,13 +23,20 @@ const readline = require('read-each-line-sync');
 //         read(val.val);
 //     });
 // };
-
 module.exports = (path) => {
     if (!path) {
-        path = 'data/log.txt'
+        path = 'data/snap.txt'
     }
     readline(path, function (line) {
-        let val = JSON.parse(line);
-        read(val);
+        world.loadgame(CircularJSON.parse(line));
     });
 };
+// module.exports = (path) => {
+//     if (!path) {
+//         path = 'data/log.txt'
+//     }
+//     readline(path, function (line) {
+//         let val = JSON.parse(line);
+//         read(val);
+//     });
+// };

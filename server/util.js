@@ -6,12 +6,28 @@ let dir = {
     here: {x: 0, y: 0},
 };
 
-module.exports.dirs = [dir.up, dir.left, dir.down, dir.right];
+let color = {
+    green: '#005500',
+};
 
-module.exports.dir = dir;
-module.exports.up = dir.up;
-module.exports.left = dir.left;
-module.exports.right = dir.right;
-module.exports.down = dir.down;
-module.exports.here = dir.here;
+let random = (min, max) => {
+    if (max == null) {
+        max = min;
+        min = 0;
+    }
+    return min + Math.floor(Math.random() * (max - min + 1));
+};
+
+module.exports = {
+    color: color,
+    dirs: [dir.up, dir.left, dir.down, dir.right],
+    dir,
+    random,
+};
+
+// module.exports.up = dir.up;
+// module.exports.left = dir.left;
+// module.exports.right = dir.right;
+// module.exports.down = dir.down;
+// module.exports.here = dir.here;
 

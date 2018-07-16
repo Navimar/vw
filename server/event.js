@@ -14,12 +14,12 @@ let tick = 0;
 module.exports = event;
 
 
-event.init = (m) => {
+event.init = () => {
     let val = {
         event: 'init',
     };
     saveEvent(val);
-    exe.onInit(m);
+    exe.onInit();
     // send.web();
 };
 

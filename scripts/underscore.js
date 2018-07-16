@@ -352,7 +352,7 @@
     var length = set.length;
     var shuffled = Array(length);
     for (var index = 0, rand; index < length; index++) {
-      rand = _.random(0, index);
+      rand = random(0, index);
       if (rand !== index) shuffled[index] = shuffled[rand];
       shuffled[rand] = set[index];
     }
@@ -365,7 +365,7 @@
   _.sample = function(obj, n, guard) {
     if (n == null || guard) {
       if (!isArrayLike(obj)) obj = _.values(obj);
-      return obj[_.random(obj.length - 1)];
+      return obj[random(obj.length - 1)];
     }
     return _.shuffle(obj).slice(0, Math.max(0, n));
   };

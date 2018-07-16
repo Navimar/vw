@@ -1,45 +1,98 @@
-const _ = require('underscore');
-const util = require('./util.js');
+const _ = require('lodash');
+const util = require('./util');
 const direction = util.dir;
+const random = util.random;
+
 const meta = require('./meta.js').meta;
 const wound = require('./meta.js').wound;
 const config = require('./config.js');
 const zarr = require('./zarr.js');
 
 let world = {};
+let game = {};
+
+let server = {
+    connected: 0,
+};
 
 world.init = () => {
-    world.player = [];
-    world.time = 0;
-    world.connected = 0;
-    world.map = new Map();
-    world.logic = new Map();
-    world.cnMass = 0;
-    world.cnId = 0;
-    world.cnError = 1;
-    world.willgo = [];
-    world.center = {x: 0, y: 0};
-    world.obj = [];
+    game.player = [];
+    game.time = 0;
+    game.map = new Map();
+    game.logic = new Map();
+    game.cnMass = 0;
+    game.cnId = 0;
+    // game.cnError = 1;
+    // game.willgo = [];
+    game.center = {x: 0, y: 0};
+    game.obj = [];
 
-    _.each(meta, (value, key, list) => {
-        // console.log(value.name, value.z);
-        _.each(zarr, (zvalue, zkey, zlist) => {
-            // console.log(zvalue);
-            // console.log(key);
+    _.forEach(meta, (value, key, list) => {
+        _.forEach(zarr, (zvalue, zkey, zlist) => {
             if (zvalue == key) {
                 value.z = zkey;
             }
         });
-    });
-    _.each(meta, (value, key, list) => {
+        // console.log(value.key);
+        value.key = key;
+        // console.log(key);
         if (!value.z) {
-            console.log("НЕ ДОБВАЛЕН В МАССИВ Z", key, value.z);
+            console.log("НЕ ДОБВАЛЕН В МАССИВ Z", key);
         }
         if (!value.describe) {
             console.log("Нет описания", key);
         }
     });
-
+};
+world.center = () => {
+    return game.center;
+};
+world.player = () => {
+    return game.player;
+};
+world.obj = () => {
+    return game.obj;
+};
+world.logic = () => {
+    return game.logic;
+};
+world.time = () => {
+    return game.time;
+};
+world.game = () => {
+    return game;
+};
+world.snap = () => {
+    let snap = game;
+    snap.maparr = Array.from(game.map);
+    snap.logicarr = Array.from(game.logic);
+    // console.log('???');
+    return snap;
+};
+world.loadgame = (g) => {
+    game = g;
+    let gm = new Map;
+    _.forEach(g.maparr, function (value) {
+        gm.set(value[0], value[1]);
+    });
+    game.map = gm;
+    let gl = new Map;
+    _.forEach(g.logicarr, function (value) {
+        gl.set(value[0], value[1]);
+    });
+    game.logic = gl;
+};
+world.timeplus = () => {
+    game.time++;
+};
+world.connection = () => {
+    server.connected++
+};
+world.disconnect = () => {
+    server.connected--
+};
+world.connected = () => {
+    return server.connected;
 };
 
 function removefromMap(obj) {
@@ -51,8 +104,8 @@ function removefromMap(obj) {
 }
 
 function remove(k, obj) {
-    if (world.map.has(k)) {
-        let m = world.map.get(k);
+    if (game.map.has(k)) {
+        let m = game.map.get(k);
         for (let i in m) {
             if (obj === m[i]) {
                 m.splice(i, 1);
@@ -84,15 +137,15 @@ world.addPlayer = (socket, id, x, y) => {
     // p.died = false;
     // p.tool = {typ: "hand"};
     p.slct = 0;
-    p.tp = meta.player;
+    p.tp = 'player';
     let data = {};
     p.data = data;
-    p.tp.onCreate(data);
+    meta[p.tp].onCreate(data);
     for (let a = 0; a < 9; a++) {
         p.wound[a] = wound.life;
     }
     addtoMap(p.x, p.y, p);
-    world.player.push(p);
+    game.player.push(p);
     return p;
 };
 world.playerBySocket = (socket) => {
@@ -107,7 +160,7 @@ world.playerBySocket = (socket) => {
 };
 world.playerBySocket = (socket) => {
     if (socket) {
-        for (let p of world.player) {
+        for (let p of game.player) {
             if (p.socket == socket) {
                 return p
             }
@@ -142,12 +195,13 @@ world.pickUp = (objTaker, tp) => {
 };
 
 function addtologic(obj, t) {
-    if (world.logic.has(t)) {
-        let i = world.logic.get(t);
+    // console.log(game.logic,'       ___________        ');
+    if (game.logic.has(t)) {
+        let i = game.logic.get(t);
         i.push(obj);
-        world.logic.set(t, i);
+        game.logic.set(t, i);
     } else {
-        world.logic.set(t, [obj]);
+        game.logic.set(t, [obj]);
     }
     obj.nextTurn = t;
 }
@@ -190,8 +244,8 @@ function makeid() {
     //
     // for (let i = 0; i < 12; i++)
     //     text += possible.charAt(Math.floor(Math.random() * possible.length));
-    world.cnId++;
-    return world.cnId;
+    game.cnId++;
+    return game.cnId;
 }
 
 function addtoMap(x, y, obj) {
@@ -202,29 +256,28 @@ function addtoMap(x, y, obj) {
 }
 
 function addkey(k, obj) {
-    if (world.map.has(k)) {
-        let i = world.map.get(k);
+    if (game.map.has(k)) {
+        let i = game.map.get(k);
         i.push(obj);
-        world.map.set(k, i);
+        game.map.set(k, i);
     } else {
-        world.map.set(k, [obj]);
+        game.map.set(k, [obj]);
     }
 }
 
 world.createObj = (tp, x, y) => {
     let data = {};
-    if (tp.onCreate) {
-        tp.onCreate(data);
+    if (meta[tp].onCreate) {
+        meta[tp].onCreate(data);
     }
     let o = {x: x, y: y, id: makeid(), tp, data, message: false};
 
 
     addtoMap(x, y, o);
-    world.obj.push(o);
+    game.obj.push(o);
 
-    if (tp.onTurn) {
-        let t = world.time + _.random(99);
-
+    if (meta[tp].onTurn) {
+        let t = world.time() + random(99);
         addtologic(o, t);
     }
     world.cnMass++;
@@ -246,7 +299,7 @@ world.inv = function (tp, obj) {
 
 world.lay = function lay(tp, x, y) {
     let key = x + " " + y;
-    let inv = world.map.get(key);
+    let inv = game.map.get(key);
     if (inv != undefined) {
         for (let k of inv) {
             if (k.tp === tp) {
@@ -265,12 +318,12 @@ world.trade = function (obj, carrier) {
 world.move = function (obj, dir, y) {
     if (_.isFinite(obj.x) && _.isFinite(obj.y)) {
         let m = (x, y) => {
-            for (let o of world.objArrInPoint(x, y)) {
+            for (let o of world.point(x, y)) {
                 let solid =
-                    _.isFunction(o.tp.isSolid) ?
-                        o.tp.isSolid(o.data)
+                    _.isFunction(meta[o.tp].isSolid) ?
+                        meta[o.tp].isSolid(o.data)
                         :
-                        o.tp.isSolid;
+                        meta[o.tp].isSolid;
                 if (solid) {
                     return o
                 }
@@ -305,7 +358,7 @@ world.addWound = (player, w) => {
                         break;
                     }
                 }
-                if (ws) player.wounds.push({time: world.time + 1, wound: w, first: true});
+                if (ws) player.wounds.push({time: game.time + 1, wound: w, first: true});
                 ok = false;
             }
         }
@@ -335,7 +388,7 @@ world.removeWound = (player, w) => {
     }
 };
 world.isInInv = (obj, carrier) => {
-    let arr = world.objArrInInv(carrier);
+    let arr = world.inv(carrier);
     if (arr) {
         for (let o of arr) {
             if (o === obj) {
@@ -360,29 +413,28 @@ world.relocate = (obj, x, y) => {
     //     }
     // }
 
-
     removefromMap(obj);
     addtoMap(x, y, obj)
 };
 
 world.nextTurn = (time, obj) => {
-    let t = world.time + time;
+    let t = game.time + time;
     addtologic(obj, t);
 };
 
 world.transform = (obj, tp) => {
     obj.tp = tp;
-    if (tp.onCreate) {
+    if (meta[tp].onCreate) {
         let data = {};
-        obj.tp.onCreate(data);
+        meta[obj.tp].onCreate(data);
         obj.data = data;
     }
-    if (tp.onTurn) {
+    if (meta[tp].onTurn) {
         world.nextTurn(1, obj);
     }
 };
 
-world.objArrInPoint = (x, y) => {
+world.point = (x, y) => {
     ////array
     // let arr = [];
     // for (let o of world.obj) {
@@ -398,7 +450,7 @@ world.objArrInPoint = (x, y) => {
 
     //keys
     // if (world.map.has(x + " " + y)) {
-    let obj = world.map.get(x + " " + y);
+    let obj = game.map.get(x + " " + y);
     if (obj) {
         if (obj.length > 0) {
             return obj;
@@ -409,18 +461,19 @@ world.objArrInPoint = (x, y) => {
     // return false;
 };
 
-world.objArrInInv = (obj) => {
-    if (world.map.has(obj.id)) {
-        let arr = world.map.get(obj.id);
+world.inv = (obj) => {
+    if (game.map.has(obj.id)) {
+        let arr = game.map.get(obj.id);
         if (arr.length > 0) {
             return arr;
         }
     }
-    return false;
+    return [];
+    // return false;
 };
 
 world.findInPoint = (tp, x, y) => {
-    let o = world.objArrInPoint(x, y);
+    let o = world.point(x, y);
     if (_.isArray(o)) {
         if (tp.length) {
             for (let item of o) {
@@ -502,15 +555,15 @@ world.start = () => {
     wid += start;
     for (let a of arr) {
         for (let i = 0; i < a.q * m; i++) {
-            world.createObj(a.m, _.random(start, wid), _.random(start, wid));
+            world.createObj(a.m, random(start, wid), random(start, wid));
         }
     }
     let a = Math.round((wid - start) / 10);
     for (let w = start - a; w < wid + a; w++) {
-        world.createObj(meta.wall, w, start - a);
-        world.createObj(meta.wall, w, wid + a);
-        world.createObj(meta.wall, start - a, w);
-        world.createObj(meta.wall, wid + a, w);
+        world.createObj('wall', w, start - a);
+        world.createObj('wall', w, wid + a);
+        world.createObj('wall', start - a, w);
+        world.createObj('wall', wid + a, w);
     }
 
 };
