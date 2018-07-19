@@ -13,7 +13,7 @@ let objects = [
     {m: 'highgrass', q: 100},
 ];
 
-if (os.platform() == 'darwin') {
+if (os.platform() == 'darwin'|| os.platform() == 'win32') {
     module.exports = {
         ip: "127.0.0.1",
         port: "3000",

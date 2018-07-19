@@ -34,6 +34,10 @@ window.onload = function () {
     inputServer();
 };
 
+document.addEventListener('visibilitychange', function(e) {
+    console.log(document.hidden);
+});
+
 let test = () => {
     initModel();
 };
