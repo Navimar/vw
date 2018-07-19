@@ -380,8 +380,8 @@ exe.onTick = (isMain) => {
                     if (!world.removeWound(p)) {
                         exe.wrapper(p).dropAll();
                         p.data.died = false;
-                        if (p.x !== world.center.x && p.y !== world.center.y) {
-                            world.move(p, world.center.x, world.center.y);
+                        if (p.x !== world.center.x || p.y !== world.center.y) {
+                            world.relocate(p, world.center.x, world.center.y);
                         } else {
                             let rx;
                             let ry;
@@ -489,7 +489,11 @@ exe.onTick = (isMain) => {
     }
 
     let save = () => {
-        fs.writeFileSync('data/snap.txt', CircularJSON.stringify(world.snap()) + "\n", 'utf8');
+        // fs.writeFile('data/snap.txt', CircularJSON.stringify(world.snap()), 'utf8');
+        fs.writeFile('data/snap.txt', CircularJSON.stringify(world.snap()), function (err) {
+            if (err) throw err;
+            console.log('Saved!');
+        });
     };
     let stat = () => {
         let sum = 0;
@@ -553,13 +557,15 @@ exe.onTick = (isMain) => {
     world.center.x = x;
     world.center.y = y;
 
-    if ((isInt(world.time() / 100) || world.time() === 1) && isMain) {
-        // console.log(stat());
+    if ((isInt(world.time() / config.statfrequency) || world.time() === 1) && isMain) {
         send.bot(30626617, stat());
-        // console.log('save');
-        save();
     }
-
+    if (isInt(world.time() / config.savefrequency) && isMain) {
+        // let d = new Date;
+        save();
+        // let a = new Date;
+        // console.log(a-d);
+    }
     return dtStartLoop;
 };
 

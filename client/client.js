@@ -18,23 +18,12 @@ let mouseCell = {x: 0, y: 0};
 let inAir = false;
 let extra = {x: 0, y: 0};
 let describe = {
-        show: true,
-        text: 'Добро пожаловать в ...!',
-        x: 1,
-        y: 1,
-        time: 10000,
-    }
-;
-// function Pt(x, y) {
-//     if (!_.isFinite(x)) throw "x invalid";
-//     if (!_.isFinite(y)) throw "y invalid";
-//     this.x = x;
-//     this.y = y;
-// }
-//
-// Pt.prototype.plus = function (pt) {
-//     return new Pt(this.x + pt.x, this.y + pt.y);
-// };
+    show: true,
+    text: 'Добро пожаловать в ...!',
+    x: 1,
+    y: 1,
+    time: 10000,
+};
 
 window.onload = function () {
     inputMouse();
@@ -56,79 +45,74 @@ function updOrder(e) {
     //     y: Math.floor((mousePos.y ) / dh-model.try)
     // };
 
-    if (mouseDown)
+    if (mouseDown){
         click = mousePos;
+    }
 
     // console.log(click);
 }
 
 function inputMouse() {
     canvas.addEventListener("mousedown", e => {
-            switch (e.which) {
-                case 1:
-                    //Left Mouse button pressed.
-                    mouseDown = true;
-                    onMouseDown();
-                    updOrder(e);
-                    break;
-                case 3:
-                    //Right Mouse button pressed.
-                    let dx = mouseCell.x + 0.5;
-                    let dy = mouseCell.y;
-                    if (mouseCell.x === 7) {
-                        if (dy > 6) {
-                            dx -= 4;
-                        } else {
-                            dx = 7;
-                            dy += 1;
-                        }
-                    }
-                    if (mouseCell.y > 7) {
+        switch (e.which) {
+            case 1:
+                //Left Mouse button pressed.
+                mouseDown = true;
+                onMouseDown();
+                updOrder(e);
+                break;
+            case 3:
+                //Right Mouse button pressed.
+                let dx = mouseCell.x + 0.5;
+                let dy = mouseCell.y;
+                if (mouseCell.x === 7) {
+                    if (dy > 6) {
                         dx -= 4;
-                    }
-                    if (mouseCell.x === 9) {
-                        dx = 6;
-                    }
-                    describe.x = dx;
-                    describe.y = dy;
-                    describe.time = 10000;
-                    let txt = "Здесь ничего нет";
-                    if (mouseCell.x === -1) {
-                        if (model.inv[mouseCell.y]) {
-                            txt = model.inv[mouseCell.y].describe;
-                        } else {
-                            txt = "Пустой мешок. Перенесите сюда предмет с земли";
-                        }
-                    } else if (mouseCell.x == -2) {
-                        if (model.ground[mouseCell.y]) {
-                            txt = model.ground[mouseCell.y].describe;
-                        } else {
-                            txt = "Здесь перечислены предметы на земле, перенесите предмет отсюда на мешочек, чтобы подобрать его";
-                        }
-                    } else if (mouseCell.x == 9) {
-                        if (model.wound[mouseCell.y]) {
-                            txt = model.wound[mouseCell.y].describe;
-                        }
-                    } else if (mouseCell.x == 4 && mouseCell.y == 4) {
-                        txt = "Это Вы!";
                     } else {
-                        for (let o of model.obj) {
-                            if (o.x === mouseCell.x && o.y === mouseCell.y)
-                                txt = o.describe;
-                        }
+                        dx = 7;
+                        dy += 1;
                     }
-                    describe.text = txt;
-                    break;
-                default:
-                    alert('You have a strange Mouse!');
-            }
-
+                }
+                if (mouseCell.y > 7) {
+                    dx -= 4;
+                }
+                if (mouseCell.x === 9) {
+                    dx = 6;
+                }
+                describe.x = dx;
+                describe.y = dy;
+                describe.time = 10000;
+                let txt = "Здесь ничего нет";
+                if (mouseCell.x === -1) {
+                    if (model.inv[mouseCell.y]) {
+                        txt = model.inv[mouseCell.y].describe;
+                    } else {
+                        txt = "Пустой мешок. Перенесите сюда предмет с земли";
+                    }
+                } else if (mouseCell.x == -2) {
+                    if (model.ground[mouseCell.y]) {
+                        txt = model.ground[mouseCell.y].describe;
+                    } else {
+                        txt = "Здесь перечислены предметы на земле, перенесите предмет отсюда на мешочек, чтобы подобрать его";
+                    }
+                } else if (mouseCell.x == 9) {
+                    if (model.wound[mouseCell.y]) {
+                        txt = model.wound[mouseCell.y].describe;
+                    }
+                } else if (mouseCell.x == 4 && mouseCell.y == 4) {
+                    txt = "Это Вы!";
+                } else {
+                    for (let o of model.obj) {
+                        if (o.x === mouseCell.x && o.y === mouseCell.y)
+                            txt = o.describe;
+                    }
+                }
+                describe.text = txt;
+                break;
+            default:
+                alert('You have a strange Mouse!');
         }
-
-        ,
-        false
-    )
-    ;
+    }, false);
     canvas.addEventListener("mouseup", e => {
         mouseDown = false;
         onMouseUp();
@@ -443,7 +427,9 @@ function move(fx, fy, tx, ty, speed, timeDiff) {
 function render(model) {
     resize();
     renderStatus();
-
+    if (!inAir && mouseDown) {
+        moveOrder();
+    }
 
     //render grass
     for (let y = -1; y < 10; y++) {
@@ -493,7 +479,11 @@ function render(model) {
     }
     //
     for (let i in model.ground) {
-        if (model.ground[i].isNailed) drawImg('isNailed', -2, i);
+        if (model.ground[i].isNailed) {
+            drawImg('isNailed', -2, i);
+        } else {
+            drawImg('canTake', -2, i);
+        }
         drawImg(model.ground[i].img, -2, i);
     }
 
@@ -563,7 +553,7 @@ let renderStatus = () => {
 };
 
 function onMouseDown() {
-    console.log('mouseDown');
+    // console.log('mouseDown');
     if (mouseCell.x === -2) {
         inAir = {from: 'ground', obj: model.ground[mouseCell.y]};
     }
@@ -572,29 +562,18 @@ function onMouseDown() {
             inAir = {from: 'inv', obj: model.inv[mouseCell.y]};
         }
     }
-    if (!inAir && mouseDown) {
-        // if (mouseCell.x + mouseCell.y > 8 && mouseCell.x > mouseCell.y) {
-        //     orderRight();
-        // }
-        // if (mouseCell.x + mouseCell.y < 8 && mouseCell.x > mouseCell.y) {
-        //     orderUp();
-        // }
-        // if (mouseCell.x + mouseCell.y < 8 && mouseCell.x < mouseCell.y) {
-        //     orderLeft();
-        // }
-        // if (mouseCell.x + mouseCell.y > 8 && mouseCell.x < mouseCell.y) {
-        //     orderDown();
-        // }
-        model.order.targetx = model.px + mouseCell.x - 4;
-        model.order.targety = model.py + mouseCell.y - 4;
-        model.order.name = "move";
-        model.order.val = "point";
-        model.orderCn++;
-        if (mouseCell.x == 4 && mouseCell.y == 4) {
-            orderStop();
-        }
-    }
+
     out();
+}
+function moveOrder() {
+    model.order.targetx = model.px + mouseCell.x - 4;
+    model.order.targety = model.py + mouseCell.y - 4;
+    model.order.name = "move";
+    model.order.val = "point";
+    model.orderCn++;
+    if (mouseCell.x == 4 && mouseCell.y == 4) {
+        orderStop();
+    }
 }
 
 function onMouseUp() {

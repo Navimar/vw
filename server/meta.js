@@ -319,9 +319,10 @@ meta.tree = {
         if (data.new) {
             data.new = false;
             wd.nextTurn(200000);
-        } else {
-            wd.transform(wd.me, 'stick');
         }
+        // else {
+            // wd.transform(wd.me, 'stick');
+        // }
     },
 };
 meta.swamp = {
@@ -404,6 +405,7 @@ meta.shovel = {
             wd.transform(wd.me, 'stick');
             wd.getOut(p.x, p.y);
         }
+
         if (obj.tp === 'plant' || obj.tp === 'tree') {
             wd.put(obj, p);
             broke();
@@ -429,7 +431,7 @@ meta.shovel = {
             broke();
         }
         if (obj.tp === 'beside') {
-            wd.transform(obj, meta.blackearth);
+            wd.transform(obj, 'blackearth');
             broke();
         }
         if (obj.tp === 'player') {
@@ -442,7 +444,7 @@ meta.shovel = {
         data.new = true;
     },
     onTurn: (data, wd) => {
-        wd.transformdropAll(meta.bone);
+        wd.transformdropAll('bone');
         if (data.new) {
             data.new = false;
             wd.nextTurn(35000);
@@ -505,6 +507,7 @@ meta.bone = {
                 wd.nextTurn(40000);
             } else {
                 wd.transform(wd.me, 'skeleton');
+                wd.say('*скрипит*', wd.me);
             }
         }
     },
@@ -687,7 +690,7 @@ meta.stick = {
         data.new = true;
     },
     onTurn: (data, wd) => {
-        wd.transformdropAll(meta.stick);
+        wd.transformdropAll('stick');
         if (data.new) {
             data.new = false;
             wd.nextTurn(200000);
@@ -817,7 +820,7 @@ meta.beaveregg = {
         }
     },
     onApply: (obj, wd, p) => {
-        if (obj.tp.player) {
+        if (obj.tp === 'player') {
             // wd.trade(obj);
             wd.transform(wd.me, 'beside');
             if (!wd.removeWound(obj, wound.hungry)) {
@@ -1006,7 +1009,7 @@ meta.potatoseed = {
             wd.transform(obj, 'shovel');
             wd.transform(wd.me, 'stick');
             wd.getOut(p.x, p.y);
-        } else if (obj.tp.player) {
+        } else if (obj.tp === 'player') {
             wd.say('В животе неприятно', p);
             wd.getOut(p.x, p.y);
             wd.transform(wd.me, 'beside');
@@ -1025,13 +1028,12 @@ meta.potato = {
     name: 'potato',
     describe: 'Съедобный клубень, перетащите на сердечки, чтобы съесть',
     onTurn: (data, wd) => {
-        wd.transformdropAll(meta.potato);
+        wd.transformdropAll('potato');
     },
     onApply: (obj, wd, p) => {
-        if (obj.tp.player) {
+        if (obj.tp === 'player') {
             wd.say('Съедобненько', p, '#005500');
-            // wd.trade(obj);
-            wd.transform(wd.me, meta.potatoseed);
+            wd.transform(wd.me, 'potatoseed');
             if (!wd.removeWound(obj, wound.hungry)) {
                 wd.addWound(obj, wound.glut);
             }
@@ -1102,13 +1104,13 @@ meta.beaver = {
             }
         } else {
             tire = 9;
-            meta.beaveregg.makeangrybeaver(wd.me.x, wd.me.y, wd);
             let t = wd.isNear('player');
             if (t) {
                 wd.addWound(t, wound.hit);
             } else {
                 let t = wd.find('player', 0, 10);
                 if (t) {
+                    meta.beaveregg.makeangrybeaver(wd.me.x, wd.me.y, wd);
                     let o = wd.goTo(t);
                     if (o) {
                         if (_.includes(['tree', 'plant'], o.tp)) {
@@ -1127,6 +1129,20 @@ meta.beaver = {
         data.digestion -= tire;
         wd.nextTurn(tire);
     },
+    onApply: (obj, wd, p) => {
+        if (obj.tp === 'potatoplant') {
+            obj.data.satiety += 5000;
+            wd.transform(wd.me, 'beaveregg');
+        }
+        if (obj.tp === 'tree') {
+            wd.transform(wd.me, 'treeseed');
+            wd.getOut(obj.x, obj.y);
+        }
+        if (obj.tp === 'fence') {
+            wd.transform(wd.me, 'treeseed');
+            wd.getOut(obj.x, obj.y);
+        }
+    }
 };
 
 meta.potatoplant = {
@@ -1571,7 +1587,7 @@ meta.treeseed = {
                 data.new = false;
                 wd.nextTurn(5000);
             } else {
-                wd.transform(wd.me, meta.tree);
+                wd.transform(wd.me, 'tree');
             }
         }
     },
@@ -1658,7 +1674,7 @@ wound.hit = {
     },
     act: (player, q, wd) => {
         wd.removeWound(player, wound.hit);
-        wd.say('Рана зажила',player,color.green);
+        wd.say('Рана зажила', player, color.green);
         wd.nextAct(1000);
     },
 };

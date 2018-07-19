@@ -66,7 +66,6 @@ world.snap = () => {
     let snap = game;
     snap.maparr = Array.from(game.map);
     snap.logicarr = Array.from(game.logic);
-    // console.log('???');
     return snap;
 };
 world.loadgame = (g) => {
