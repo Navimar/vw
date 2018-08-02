@@ -5,7 +5,10 @@ const sha = require("sha256");
 
 // const config = require('./config');
 const world = require('./world');
+let config = require('./config.js');
+
 const user = {};
+
 
 // user.list = new Map;
 user.list = [];
@@ -82,10 +85,10 @@ user.login = (user, socket, pass) => {
                 }
             }
             if (f) {
-                if (socket==undefined){
+                if (socket == undefined) {
                     throw 'where is my socket???';
                 }
-                world.addPlayer(socket, user.id,world.center.x,world.center.y);
+                world.addPlayer(socket, user.id, config.world.start - 2, config.world.start - 2);
             }
             return ("succecs loged in " + user.id);
         }

@@ -7,10 +7,13 @@ let objects = [
     {m: 'potatoseed', q: 4},
     {m: 'potatoplant', q: 1},
     {m: 'skeleton', q: 5},
+    // {m: 'aphid', q: 5},
+    {m: 'stone', q: 1},
     {m: 'bone', q: 2},
     {m: 'tree', q: 40},
     {m: 'wall', q: 5},
     {m: 'highgrass', q: 100},
+    // {m: 'water', q: 100},
 ];
 
 if (os.platform() == 'darwin'|| os.platform() == 'win32') {
@@ -18,12 +21,12 @@ if (os.platform() == 'darwin'|| os.platform() == 'win32') {
         ip: "127.0.0.1",
         port: "3000",
         botkey: '320938705:AAGpcdMe9oIhFYuu11MjU4djJnj1maijkpQ',
-        savefrequency: 5000,
+        savefrequency: 1000,
         statfrequency: 1000,
         world: {
             start: 5200,
             obj: objects,
-            factor: 1,
+            factor: 0.5,
             items: 20000,
             speed: 10,
         }
@@ -33,7 +36,7 @@ if (os.platform() == 'darwin'|| os.platform() == 'win32') {
         ip: "46.101.23.21",
         port: "80",
         botkey: '602673396:AAFHMT_6QTnuPnDBYNLKDGFiiVnwbvZYYHM',
-        savefrequency: 86400000,
+        savefrequency: 864000,
         statfrequency: 5000,
         world: {
             start: 5200,

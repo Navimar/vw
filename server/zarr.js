@@ -1,6 +1,9 @@
 module.exports = [
     '',
     'water',
+    'deepwater',
+    'space',
+    'deepspace',
     'blackearth',
     'highgrass',
     'ash',

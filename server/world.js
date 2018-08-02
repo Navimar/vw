@@ -133,7 +133,6 @@ world.addPlayer = (socket, id, x, y) => {
     p.satiety = 100;
     p.wound = [];
     p.tire = 0;
-    // p.died = false;
     // p.tool = {typ: "hand"};
     p.slct = 0;
     p.tp = 'player';
@@ -179,7 +178,7 @@ world.playerById = (id) => {
 
 world.pickUp = (objTaker, tp) => {
     let k = objTaker.x + " " + objTaker.y;
-    let obs = world.map.get(k);
+    let obs = game.map.get(k);
     if (obs) {
         // if (obs.length < 8) {
         for (let o of obs) {
@@ -320,14 +319,25 @@ world.move = function (obj, dir, y) {
             for (let o of world.point(x, y)) {
                 let solid =
                     _.isFunction(meta[o.tp].isSolid) ?
-                        meta[o.tp].isSolid(o.data)
+                        meta[o.tp].isSolid(o.data, obj)
                         :
                         meta[o.tp].isSolid;
                 if (solid) {
                     return o
                 }
             }
+            for (let o of world.point(obj.x, obj.y)) {
+                if (_.isFunction(meta[o.tp].onStepout)) {
+                    if (meta[o.tp].onStepout(o.data, obj)) {
+                        return o
+                    }
+                }
+            }
             world.relocate(obj, x, y);
+            for (let o of world.point(x, y)) {
+                if (_.isFunction(meta[o.tp].onStepin))
+                    meta[o.tp].onStepin(o.data, obj);
+            }
             return false
         };
 
@@ -539,6 +549,10 @@ world.find = (tp, x, y, first, last) => {
     return false;
 };
 
+world.wid = () => {
+    return Math.round(Math.sqrt(config.world.items * config.world.factor));
+};
+
 world.start = () => {
     let start = config.world.start;
     let arr = config.world.obj;
@@ -549,20 +563,34 @@ world.start = () => {
         q += a.q;
     }
     let m = items / q;
-    let wid = Math.round(Math.sqrt(items * f));
-    console.log("world size: " + wid);
-    wid += start;
+    console.log("world size: " + world.wid());
+    let wid = start + world.wid();
     for (let a of arr) {
         for (let i = 0; i < a.q * m; i++) {
             world.createObj(a.m, random(start, wid), random(start, wid));
         }
     }
-    let a = Math.round((wid - start) / 10);
-    for (let w = start - a; w < wid + a; w++) {
-        world.createObj('wall', w, start - a);
-        world.createObj('wall', w, wid + a);
-        world.createObj('wall', start - a, w);
-        world.createObj('wall', wid + a, w);
+    // let a = Math.round((wid - start) / 10);
+    let p = 5;
+    for (let w = start - q; w < wid + p; w++) {
+        // for (let a = 1; a < p; a++) {
+        //     // if(!random(10)){
+        //     //     world.createObj('mermaid', w, start - a);
+        //     //     world.createObj('mermaid', w, wid + a);
+        //     //     world.createObj('mermaid', start - a, w);
+        //     //     world.createObj('mermaid', wid + a, w);
+        //     // }
+        //     world.createObj('space', w, start - a);
+        //     world.createObj('space', w, wid + a);
+        //     world.createObj('space', start - a, w);
+        //     world.createObj('space', wid + a, w);
+        // }
+        // for (let a = 0; a < p-1; a++) {
+        //     world.createObj('deepspace', w, start - p - a);
+        //     world.createObj('deepspace', w, wid + p + a);
+        //     world.createObj('deepspace', start - p - a, w);
+        //     world.createObj('deepspace', wid + p + a, w);
+        // }
     }
 
 };

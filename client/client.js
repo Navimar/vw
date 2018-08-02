@@ -34,8 +34,8 @@ window.onload = function () {
     inputServer();
 };
 
-document.addEventListener('visibilitychange', function(e) {
-    console.log(document.hidden);
+document.addEventListener('visibilitychange', function (e) {
+    // console.log(document.hidden);
 });
 
 let test = () => {
@@ -49,7 +49,7 @@ function updOrder(e) {
     //     y: Math.floor((mousePos.y ) / dh-model.try)
     // };
 
-    if (mouseDown){
+    if (mouseDown) {
         click = mousePos;
     }
 
@@ -169,7 +169,16 @@ function initModel() {
             model.holst[x][y] = "grass";
         }
     }
-    model.obj = [{x: 1, y: 1, sx: 5, sy: 5, img: "test", describe: "test", message: {text: "Start!!!", color: "red"}}];
+    model.obj = [{
+        x: 1,
+        y: 1,
+        sx: 5,
+        sy: 5,
+        z: 1,
+        img: "test",
+        describe: "test",
+        message: {text: "Start!!!", color: "red"}
+    }];
     model.stamp = 1;
     model.selected = 0;
     model.tire = 0;
@@ -232,21 +241,22 @@ function onServer(val) {
         for (let m of model.obj) {
             if (m.id === v.id) {
                 m.z = v.z;
-                if (m.x !== v.x) {
-                    // m.ox =m.x;
-                    m.x = v.x;
-                }
-                if (m.y !== v.y) {
-                    // m.oy =m.y;
-                    m.y = v.y;
-                }
+                // if (m.x !== v.x) {
+                // m.ox =m.x;
+                m.x = v.x;
+                // }
+                // if (m.y !== v.y) {
+                // m.oy =m.y;
+                m.y = v.y;
+                // }
                 if (!_.isEqual(m.message, v.message)) {
-                    console.log(m.message, v.message);
+                    // console.log(m.message, v.message);
                     m.message = v.message;
                     m.messagetime = 10000;
                 }
                 m.describe = v.describe;
                 m.img = v.img;
+                m.isFlat = v.isFlat;
                 ok = false;
             }
         }
@@ -281,36 +291,63 @@ function onServer(val) {
     model.px = val.px;
     model.py = val.py;
     model.obj.sort((a, b) => {
-        if (a.z < b.z) {
-            return -1;
-        } else return 1;
-    });
-    // if (!inAir && mouseDown) {
-    //     // if (mouseCell.x + mouseCell.y > 8 && mouseCell.x > mouseCell.y) {
-    //     //     orderRight();
-    //     // }
-    //     // if (mouseCell.x + mouseCell.y < 8 && mouseCell.x > mouseCell.y) {
-    //     //     orderUp();
-    //     // }
-    //     // if (mouseCell.x + mouseCell.y < 8 && mouseCell.x < mouseCell.y) {
-    //     //     orderLeft();
-    //     // }
-    //     // if (mouseCell.x + mouseCell.y > 8 && mouseCell.x < mouseCell.y) {
-    //     //     orderDown();
-    //     // }
-    //     model.order.targetx = model.px + mouseCell.x - 4;
-    //     model.order.targety = model.py + mouseCell.y - 4;
-    //     model.order.name = "move";
-    //     model.order.val = "point";
-    //     model.orderCn++;
-    //     if (mouseCell.x == 4 && mouseCell.y == 4) {
-    //         orderStop();
-    //     }
-    // }
-    // if (model.order.targetx === model.px && model.order.targety === model.py) {
-    //     if (model.order.name == "move") orderStop();
-    // } else {
-    // }
+            // console.log('x:', a.x, b.x);
+            // console.log('sx:', a.sx+'', b.sx+'');
+            // console.log('sy:', a.sy, b.sy);
+            // console.log(a, b);
+            if (a.isFlat && !b.isFlat) {
+                return -1
+            } else if (!a.isFlat && b.isFlat) {
+                return 1;
+            } else if ((a.isFlat && b.isFlat) || (!a.isFlat && !b.isFlat)) {
+                if (a.y - b.y >= 1) {
+                    return 1
+                } else if ((a.y - b.y < 1) && (a.y - b.y >= 0)) {
+                    if (a.z > b.z) {
+                        return 1
+                    } else if (a.z < b.z) {
+                        return -1
+                    } else if (a.z === b.z) {
+                        if (a.x > b.x) {
+                            return 1
+                        } else {
+                            return -1;
+                        }
+                    }
+                } else if (a.y - b.y < 0) {
+                    return -1
+                }
+            }
+
+            return 0
+        }
+    );
+// if (!inAir && mouseDown) {
+//     // if (mouseCell.x + mouseCell.y > 8 && mouseCell.x > mouseCell.y) {
+//     //     orderRight();
+//     // }
+//     // if (mouseCell.x + mouseCell.y < 8 && mouseCell.x > mouseCell.y) {
+//     //     orderUp();
+//     // }
+//     // if (mouseCell.x + mouseCell.y < 8 && mouseCell.x < mouseCell.y) {
+//     //     orderLeft();
+//     // }
+//     // if (mouseCell.x + mouseCell.y > 8 && mouseCell.x < mouseCell.y) {
+//     //     orderDown();
+//     // }
+//     model.order.targetx = model.px + mouseCell.x - 4;
+//     model.order.targety = model.py + mouseCell.y - 4;
+//     model.order.name = "move";
+//     model.order.val = "point";
+//     model.orderCn++;
+//     if (mouseCell.x == 4 && mouseCell.y == 4) {
+//         orderStop();
+//     }
+// }
+// if (model.order.targetx === model.px && model.order.targety === model.py) {
+//     if (model.order.name == "move") orderStop();
+// } else {
+// }
     out();
 }
 
@@ -425,7 +462,11 @@ function vector(fx, fy, tx, ty, s) {
 
 function move(fx, fy, tx, ty, speed, timeDiff) {
     const s = vector(fx, fy, tx, ty, speed);
-    return {x: fx + s.x * timeDiff, y: fy + s.y * timeDiff};
+    // let x = Math.trunc((fx + s.x * timeDiff) * 100) / 100;
+    // let y = Math.trunc((fy + s.y * timeDiff) * 100) / 100;
+    let x = fx + s.x * timeDiff;
+    let y = fy + s.y * timeDiff;
+    return {x, y};
 }
 
 function render(model) {
@@ -449,7 +490,6 @@ function render(model) {
     // for (let a = 0; a < model.tire; a++) {
     //     drawImg("target", 4, 4);
     // }
-    drawImg("target", model.order.targetx - model.px + 4 + model.trx, model.order.targety - model.py + 4 + model.try);
 
     // for (let o of model.obj) {
     //     drawImg("from", o.x + model.trx, o.y + model.try);
@@ -459,16 +499,15 @@ function render(model) {
         drawImg(o.img, o.sx, o.sy);
     }
 
-
     for (let a = 0; a < 9; a++) {
         drawImg("black", 9, a);
         drawImg("black", 10, a);
         drawImg("black", -1, a);
         drawImg("black", -2, a);
-        drawImg("black", a, 9);
-        drawImg("black", a, 10);
-        drawImg("black", a, -1);
-        drawImg("black", a, -2);
+        // drawImg("black", a, 9);
+        // drawImg("black", a, 10);
+        // drawImg("black", a, -1);
+        // drawImg("black", a, -2);
     }
     for (let l = 0; l < 9; l++) {
         drawImg(model.wound[l].img, 9, l);
@@ -482,13 +521,20 @@ function render(model) {
         drawImg("slot", -1, bag);
     }
     //
+    model.ground.sort((a, b) => {
+        if (a.isNailed) {
+            return 1
+        } else {
+            return -1
+        }
+    });
     for (let i in model.ground) {
+        drawImg(model.ground[i].img, -2, i);
         if (model.ground[i].isNailed) {
             drawImg('isNailed', -2, i);
         } else {
             drawImg('canTake', -2, i);
         }
-        drawImg(model.ground[i].img, -2, i);
     }
 
     // let y = 0;
@@ -523,7 +569,8 @@ function render(model) {
             // drawTxt(o.message.text, o.x + 0.5, o.y, o.message.color);
         }
     }
-    // drawTxt("Растение со съедобным клубнем. Выкопайте его лопатой", dx + model.trx, dy + model.try, mouseCell.x + model.trx, mouseCell.y + model.try);
+    if (model.order.targetx - model.px + 4 + model.trx !== 4 || model.order.targety - model.py + 4 + model.try !== 4)
+        drawImg("target", model.order.targetx - model.px + 4 + model.trx, model.order.targety - model.py + 4 + model.try);
     if (describe.time > 0) drawTxt(describe.text, describe.x, describe.y);
 }
 
@@ -569,6 +616,7 @@ function onMouseDown() {
 
     out();
 }
+
 function moveOrder() {
     model.order.targetx = model.px + mouseCell.x - 4;
     model.order.targety = model.py + mouseCell.y - 4;

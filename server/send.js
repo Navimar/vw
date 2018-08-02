@@ -43,6 +43,7 @@ send.web = (dtStartLoop) => {
                             id: r.id,
                             z: meta[r.tp].z,
                             describe: meta[r.tp].describe,
+                            isFlat: meta[r.tp].isFlat,
                             message: r.message
                         });
                         if (x === 4 && y === 4 && r.tp !== 'player') {

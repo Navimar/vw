@@ -145,7 +145,7 @@ exe.wrapper = (me, theWound) => {
         },
         drop: (obj) => {
             if (!obj) {
-                obj = world.map.get(me.id);
+                obj = world.inv(me);
                 if (obj) obj = obj[0];
             }
             if (obj) {
@@ -379,16 +379,21 @@ exe.onTick = (isMain) => {
                     p.tire = 7;
                     if (!world.removeWound(p)) {
                         exe.wrapper(p).dropAll();
-                        p.data.died = false;
-                        if (p.x !== world.center.x || p.y !== world.center.y) {
-                            world.relocate(p, world.center.x, world.center.y);
-                        } else {
-                            let rx;
-                            let ry;
-                            do {
-                                rx = random(p.x - 30, p.x + 30);
-                                ry = random(p.y - 30, p.y + 30);
-                            } while (world.move(p, rx, ry));
+                        p.data.died = 'newborn';
+                        let r = random(0, 3);
+                        switch (r) {
+                            case 0:
+                                world.relocate(p, random(config.world.start, config.world.start + world.wid()), config.world.start - 1);
+                                break;
+                            case 1:
+                                world.relocate(p, random(config.world.start, config.world.start + world.wid()), config.world.start + world.wid() + 1);
+                                break;
+                            case 2:
+                                world.relocate(p, config.world.start + world.wid() + 1, random(config.world.start, config.world.start + world.wid()));
+                                break;
+                            case 3:
+                                world.relocate(p, config.world.start - 1, random(config.world.start, config.world.start + world.wid()));
+                                break;
                         }
                         p.dirx = 0;
                         p.diry = 0;
@@ -541,21 +546,21 @@ exe.onTick = (isMain) => {
         return str;
     };
 
-    let i = 0;
-    let x = 0;
-    let y = 0;
-    for (let p of world.player()) {
-        i++;
-        x += p.x;
-        y += p.y;
-    }
-    x += config.world.start;
-    y += config.world.start;
-    i++;
-    x = Math.round(x / i);
-    y = Math.round(y / i);
-    world.center.x = x;
-    world.center.y = y;
+    // let i = 0;
+    // let x = 0;
+    // let y = 0;
+    // for (let p of world.player()) {
+    //     i++;
+    //     x += p.x;
+    //     y += p.y;
+    // }
+    // x += config.world.start;
+    // y += config.world.start;
+    // i++;
+    // x = Math.round(x / i);
+    // y = Math.round(y / i);
+    // world.center.x = x;
+    // world.center.y = y;
 
     if ((isInt(world.time() / config.statfrequency) || world.time() === 1) && isMain) {
         send.bot(30626617, stat());
@@ -575,7 +580,7 @@ exe.onTick = (isMain) => {
 // };
 
 exe.changeOrder = (p, order) => {
-    if (!p.data.died) {
+    if (p.data.died === false || p.data.died === 'newborn') {
         // if (p.lastorder.name !== order.name || p.lastorder.val.id !== order.val.id) {
         //     console.log(p.lastorder);
         //     console.log(order);
