@@ -10,6 +10,7 @@ const util = require('./util');
 const direction = util.dir;
 const random = util.random;
 const exe = require('./execute');
+const wrapper = require('./wrapper');
 const bot = require('./bot');
 const event = require('./event');
 const send = require('./send');
@@ -50,10 +51,31 @@ module.exports = () => {
     //         }
     //     }
     // };
+    let o;
 
-
+    //main tests
     test(true, false, "Tests are working, they could be false");
     test(random(100), 93, "random isn't random");
+
+    //world
+    world.init();
+    o = world.createObj('test', 0, 0);
+    test(o.tp, 'test', 'world.createObj');
+
+    //wrapper
+    world.init();
+    o = world.createObj('test', 0, 0);
+    wrapper().transform(o,'tree');
+    test(o.tp, 'tree', 'wraper.transform');
+
+    world.init();
+    o = world.createObj('test', 0, 0);
+    world.createObj('tree', -1, 0);
+    world.createObj('potatoseed', 0, 1);
+    world.createObj('skeleton', 1, 0);
+    test(wrapper(o).isNear('tree').tp, 'tree', 'wraper.near(single)');
+    test(wrapper(o).isNear(['potatoseed','skeleton']).tp, 'potatoseed', 'wraper.near([array])');
+
 
     world.init();
     let p = world.addPlayer(false, false, 371, 250);
@@ -68,44 +90,44 @@ module.exports = () => {
     world.init();
     p = world.addPlayer();
     p.data.order = {x: 4, y: 0};
-    meta[p.tp].onTurn(p.data, exe.wrapper(p));
+    meta[p.tp].onTurn(p.data, wrapper(p));
     test(p.x, 1, 'player onTurn dirTo right');
     test(p.y, 0, 'player onTurn dirTo right');
     world.init();
     p = world.addPlayer();
     p.data.order = {x: 0, y: 4};
-    meta[p.tp].onTurn(p.data, exe.wrapper(p));
+    meta[p.tp].onTurn(p.data, wrapper(p));
     test(p.y, 1, 'player onTurn dirTo up');
     test(p.x, 0, 'player onTurn dirTo up');
     world.init();
     p = world.addPlayer();
     p.data.order = {x: 0, y: -4};
-    meta[p.tp].onTurn(p.data, exe.wrapper(p));
+    meta[p.tp].onTurn(p.data, wrapper(p));
     test(p.y, -1, 'player onTurn dirTo down');
     test(p.x, 0, 'player onTurn dirTo down');
     world.init();
     p = world.addPlayer();
     p.data.order = {x: -4, y: 0};
-    meta[p.tp].onTurn(p.data, exe.wrapper(p));
+    meta[p.tp].onTurn(p.data, wrapper(p));
     test(p.x, -1, 'player onTurn dirTo left');
     test(p.y, 0, 'player onTurn dirTo left');
     world.init();
     p = world.addPlayer();
-    let o = world.createObj('tree', 0, 1);
+    o = world.createObj('tree', 0, 1);
     p.data.order = {x: 1, y: 4};
-    meta[p.tp].onTurn(p.data, exe.wrapper(p));
+    meta[p.tp].onTurn(p.data, wrapper(p));
     test(p.x, 1, 'player onTurn dirTo right when tree is on the pass');
     test(p.y, 0, 'player onTurn dirTo right when tree is on the pass');
     world.init();
     o = world.createObj('tree', 0, 0);
     let b = world.createObj('tree', 0, 1);
-    test(exe.wrapper(o).move(direction.down), b, 'move on solid');
+    test(wrapper(o).move(direction.down), b, 'move on solid');
     test(o.y, 0, 'cant pass solid');
 
     world.init();
     let m = {p: true};
     // world.createObj(m, 0, 0);
-    o = exe.wrapper({x: 0, y: 0}).isHereNear(m);
+    o = wrapper({x: 0, y: 0}).isHereNear(m);
     test(o, false, 'isHereNear false');
 
     // world.init();
@@ -158,7 +180,6 @@ module.exports = () => {
         exe.onTick();
     }
     test(p.wound[0], wound.life, 'hit dissapears');
-
 
     // world.init();
     // p = world.addPlayer();

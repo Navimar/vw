@@ -15,6 +15,7 @@ const CircularJSON = require('circular-json');
 
 const send = require('./send');
 const wound = require('./meta').wound;
+const wrapper = require('./wrapper');
 const meta = require('./meta').meta;
 const load = require('./load');
 
@@ -22,236 +23,6 @@ const exe = {};
 
 let token = null;
 let laststatarr = [];
-
-exe.wrapper = (me, theWound) => {
-    return {
-        me,
-        wound,
-        center: {
-            x: world.center.x,
-            y: world.center.y,
-        },
-        findinInv: (tp) => {
-            if (Array.isArray(tp)) {
-                for (let t of tp) {
-                    let i = world.inv(t, me);
-                    if (i) return i;
-                }
-            } else {
-                return world.inv(tp, me)
-            }
-        },
-        inv: (obj) => {
-            if (!obj) {
-                obj = me;
-            }
-            return world.inv(obj);
-        },
-        isHere: (tp) => {
-            if (tp) {
-                if (!Array.isArray(tp)) tp = [tp];
-                for (let t of tp) {
-                    let i = world.lay(t, me.x, me.y);
-                    if (i && i !== me) return i;
-                }
-            } else {
-                let a = world.point(me.x, me.y);
-                if (a) {
-                    if (a[0] !== me) {
-                        return a[0];
-                    } else {
-                        if (a[1]) {
-                            return a[1];
-                        }
-                    }
-                }
-            }
-            return false;
-        },
-        objHere: (x, y) => {
-            if (!x || !y) {
-                x = me.x;
-                y = me.y;
-            }
-            return world.objArrInPoint(x, y);
-        },
-        move: (dir) => {
-            if (!dir) {
-                dir = exe.wrapper().dirRnd;
-            }
-            return world.move(me, dir);
-        },
-        goTo: (d) => {
-            if (_.isFinite(d.x) && _.isFinite(d.y)) {
-                d = dirTo(d.x, d.y, me).dir;
-            }
-            let ox = me.x;
-            let oy = me.y;
-            let m = false;
-            if (d[0] !== direction.here) {
-                m = world.move(me, d[0]);
-                if (ox === me.x && oy === me.y && d[1] !== direction.here) {
-                    m = world.move(me, d[1]);
-                }
-            }
-            return m;
-        },
-        isNear: (tp) => {
-            if (!Array.isArray(tp)) tp = [tp];
-            for (let t of tp) {
-                let i;
-                i = world.lay(t, me.x + 1, me.y);
-                if (i && i !== me) return i;
-                i = world.lay(t, me.x, me.y + 1);
-                if (i && i !== me) return i;
-                i = world.lay(t, me.x, me.y - 1);
-                if (i && i !== me) return i;
-                i = world.lay(t, me.x - 1, me.y);
-                if (i && i !== me) return i;
-            }
-            return false;
-        },
-        isHereNear: (tp) => {
-            let f = exe.wrapper(me).isHere(tp);
-            if (!f) {
-                f = exe.wrapper(me).isNear(tp);
-            }
-            return f;
-        },
-        movetrought: (dir) => {
-            let x = me.x + dir.x;
-            let y = me.y + dir.y;
-            world.relocate(me, x, y)
-        },
-        relocate: (x, y) => world.relocate(me, x, y),
-        dirRnd: util.dirs[random(3)],
-        nextTurn: (time) => world.nextTurn(time, me),
-        nextAct: (time) => {
-            me.wounds.push({time: world.time() + time, wound: theWound, first: false});
-        },
-        transform: (obj, tp) => world.transform(obj, tp),
-        pickUp: (tp) => {
-            if (!Array.isArray(tp)) tp = [tp];
-            for (let t of tp) {
-                let i = world.pickUp(me, t);
-                if (i) return i;
-            }
-        },
-        take: (obj) => {
-            world.put(obj, me);
-        },
-        put: (obj, to) => {
-            world.put(obj, to);
-        },
-        drop: (obj) => {
-            if (!obj) {
-                obj = world.inv(me);
-                if (obj) obj = obj[0];
-            }
-            if (obj) {
-                world.drop(obj, me.x, me.y);
-            } else {
-                return false
-            }
-        },
-        dropAll: () => {
-            let obj = world.inv(me);
-            if (obj) {
-                while (obj[0])
-                    world.drop(obj[0], me.x, me.y);
-            }
-        },
-        transformdropAll: (tp) => {
-            let obj = world.inv(me);
-            while (obj[0]) {
-                world.transform(obj[0], tp);
-                world.drop(obj[0], me.x, me.y);
-            }
-        },
-        getOut: (x, y) => {
-            if (me.carrier) {
-                world.drop(me, x, y)
-            }
-        },
-        // trade: (obj) => world.trade(me, obj),
-        removeWound: (player, string) => {
-            return world.removeWound(player, string)
-        },
-        addWound: (player, string) => {
-            return world.addWound(player, string)
-        },
-        fillWound: (player, string) => {
-            for (let w of player.wound) {
-                if (w === wound.life) {
-                    return world.addWound(player, string);
-                }
-            }
-        },
-        dirFrom: (x, y) => {
-            let o = dirTo(x, y, me);
-            for (let a = 0; a < 1; a++) {
-                if (o.dir[a] === direction.up) {
-                    o.dir[a] = direction.down
-                } else if (o.dir[a] === direction.down) {
-                    o.dir[a] = direction.up
-                } else if (o.dir[a] === direction.left) {
-                    o.dir[a] = direction.right
-                } else if (o.dir[a] === direction.right) {
-                    o.dir[a] = direction.left
-                }
-            }
-            return o;
-        },
-        dirTo: (x, y) => {
-            return dirTo(x, y, me);
-        },
-        find: (target, first, last) => {
-            return world.find(target, me.x, me.y, first, last)
-        },
-        findFrom: (x, y, target, first, last) => {
-            return world.find(target, x, y, first, last)
-        },
-        say: (text, obj, color) => {
-            if (_.isArray(text)) {
-                text = text[random(text.length - 1)];
-            }
-            if (obj.message && obj.message.text === text) {
-                text += " ";
-            }
-            obj.message = {text, color};
-        }
-    };
-};
-
-function dirTo(x, y, me) {
-    let dir = [direction.here, direction.here];
-    let xWant = Math.abs(x - me.x);
-    let yWant = Math.abs(y - me.y);
-    let dx;
-    let dy;
-    if (xWant > yWant) {
-        dx = 0;
-        dy = 1;
-    } else {
-        dx = 1;
-        dy = 0;
-    }
-    if (x - me.x > 0) {
-        dir[dx] = direction.right;
-    } else if (x - me.x < 0) {
-        dir[dx] = direction.left;
-    } else {
-        dir[dx] = direction.here
-    }
-    if (y - me.y > 0) {
-        dir[dy] = direction.down;
-    } else if (y - me.y < 0) {
-        dir[dy] = direction.up;
-    } else {
-        dir[dy] = direction.here;
-    }
-    return {dir, xWant, yWant};
-}
 
 exe.onInit = () => {
     world.init();
@@ -295,7 +66,7 @@ exe.onTick = (isMain) => {
                     if (p.order.val === "point") {
                         p.data.order = {x: p.order.targetx, y: p.order.targety};
                         if (p.x !== p.order.targetx || p.y !== p.order.targety) {
-                            meta[p.tp].onTurn(p.data, exe.wrapper(p));
+                            meta[p.tp].onTurn(p.data, wrapper(p));
                             p.dirx = 0;
                             p.diry = 0;
                             p.tire = 7;
@@ -333,7 +104,7 @@ exe.onTick = (isMain) => {
                 case "use":
                     let tool = p.order.tool;
                     if (_.isFunction(meta[tool.tp].onApply)) {
-                        meta[tool.tp].onApply(p.order.target, exe.wrapper(tool), p);
+                        meta[tool.tp].onApply(p.order.target, wrapper(tool), p);
                     } else {
                         console.log("can not apply " + tool.tp);
                     }
@@ -342,7 +113,7 @@ exe.onTick = (isMain) => {
                 case "useinv":
                     let tlfi = p.order.tool;
                     if (_.isFunction(meta[tlfi.tp].onApply)) {
-                        meta[tlfi.tp].onApply(p.order.target, exe.wrapper(tlfi), p);
+                        meta[tlfi.tp].onApply(p.order.target, wrapper(tlfi), p);
                     } else {
                         console.log("can not apply " + tlfi.tp);
                     }
@@ -352,7 +123,7 @@ exe.onTick = (isMain) => {
                     let take = p.order.take;
                     if (take.x == p.x && take.y == p.y) {
                         if (_.isFunction(meta[take.tp].onTake)) {
-                            meta[take.tp].onTake(take.data, exe.wrapper(take), p);
+                            meta[take.tp].onTake(take.data, wrapper(take), p);
                         }
                         // else {
                         if (!meta[take.tp].isNailed) {
@@ -369,7 +140,7 @@ exe.onTick = (isMain) => {
                     let drop = world.isInInv(p.order.drop, p);
                     if (drop) {
                         if (_.isFunction(meta[drop.tp].onDrop)) {
-                            meta[drop.tp].onDrop(p, exe.wrapper(drop));
+                            meta[drop.tp].onDrop(p, wrapper(drop));
                         } else {
                             world.drop(drop, p.x, p.y);
                         }
@@ -378,8 +149,8 @@ exe.onTick = (isMain) => {
                 case "respawn":
                     p.tire = 7;
                     if (!world.removeWound(p)) {
-                        exe.wrapper(p).dropAll();
-                        p.data.died = 'newborn';
+                        wrapper(p).dropAll();
+                        p.data.died = false;
                         let r = random(0, 3);
                         switch (r) {
                             case 0:
@@ -444,10 +215,10 @@ exe.onTick = (isMain) => {
                 }
                 if (i > 0) {
                     if (p.wounds[0].first && _.isFunction(p.wounds[0].wound.firstAct)) {
-                        p.wounds[0].wound.firstAct(p, i, exe.wrapper(p, p.wounds[0].wound));
+                        p.wounds[0].wound.firstAct(p, i, wrapper(p, p.wounds[0].wound));
                     } else {
                         if (_.isFunction(p.wounds[0].wound.act)) {
-                            p.wounds[0].wound.act(p, i, exe.wrapper(p, p.wounds[0].wound));
+                            p.wounds[0].wound.act(p, i, wrapper(p, p.wounds[0].wound));
                         }
                     }
                 }
@@ -466,7 +237,7 @@ exe.onTick = (isMain) => {
     //     for (let me of go) {
     //         if (me.nextTurn === world.time) {
     //             if (me.tp.onTurn) {
-    //                 let wd = exe.wrapper(me);
+    //                 let wd = wrapper(me);
     //                 me.tp.onTurn(me.data, wd);
     //             }
     //         }
@@ -476,11 +247,16 @@ exe.onTick = (isMain) => {
     //     // console.log('nobody is moving '+world.time);
     // }
     for (let o of world.obj()) {
-        // let o =world.obj[i];
+        // let o = world.obj[i];
         if (o.nextTurn === world.time()) {
             if (meta[o.tp].onTurn) {
-                let wd = exe.wrapper(o);
-                meta[o.tp].onTurn(o.data, wd);
+                let wd = wrapper(o);
+                if (_.isFunction(meta[o.tp].onFirstTurn) && o.data.first) {
+                    o.data.first = false;
+                    meta[o.tp].onFirstTurn(o.data, wd);
+                } else {
+                    meta[o.tp].onTurn(o.data, wd);
+                }
             }
         }
     }

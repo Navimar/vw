@@ -494,6 +494,8 @@ function render(model) {
     // for (let o of model.obj) {
     //     drawImg("from", o.x + model.trx, o.y + model.try);
     // }
+    if (model.order.targetx - model.px + 4 + model.trx !== 4 || model.order.targety - model.py + 4 + model.try !== 4)
+        drawImg("target", model.order.targetx - model.px + 4 + model.trx, model.order.targety - model.py + 4 + model.try);
 
     for (let o of model.obj) {
         drawImg(o.img, o.sx, o.sy);
@@ -569,8 +571,7 @@ function render(model) {
             // drawTxt(o.message.text, o.x + 0.5, o.y, o.message.color);
         }
     }
-    if (model.order.targetx - model.px + 4 + model.trx !== 4 || model.order.targety - model.py + 4 + model.try !== 4)
-        drawImg("target", model.order.targetx - model.px + 4 + model.trx, model.order.targety - model.py + 4 + model.try);
+
     if (describe.time > 0) drawTxt(describe.text, describe.x, describe.y);
 }
 

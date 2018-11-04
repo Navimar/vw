@@ -264,7 +264,7 @@ function addkey(k, obj) {
 }
 
 world.createObj = (tp, x, y) => {
-    let data = {};
+    let data = {first: true};
     if (meta[tp].onCreate) {
         meta[tp].onCreate(data);
     }
@@ -434,13 +434,21 @@ world.nextTurn = (time, obj) => {
 world.transform = (obj, tp) => {
     obj.tp = tp;
     if (meta[tp].onCreate) {
-        let data = {};
+        let data = {first: true};
         meta[obj.tp].onCreate(data);
         obj.data = data;
     }
     if (meta[tp].onTurn) {
         world.nextTurn(1, obj);
     }
+    // if (tp.onCreate) {
+    //     let data = {first: true};
+    //     tp.onCreate(data);
+    //     obj.data = data;
+    // }
+    // if (tp.onTurn) {
+    //     world.nextTurn(1, obj);
+    // }
 };
 
 world.point = (x, y) => {
@@ -556,7 +564,7 @@ world.wid = () => {
 world.start = () => {
     let start = config.world.start;
     let arr = config.world.obj;
-    let f = config.world.factor;
+    // let f = config.world.factor;
     let items = config.world.items;
     let q = 0;
     for (let a of arr) {
