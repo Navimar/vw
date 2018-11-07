@@ -396,8 +396,15 @@ meta.plant = {
                 wd.nextTurn(tire);
             }
         }
-    }
-    ,
+    },
+    onApply: (obj, wd, p) => {
+        if (obj.tp.player) {
+            wd.transform(wd.me, meta.bone);
+            if (!wd.removeWound(obj, wound.hungry)) {
+                wd.addWound(obj, wound.glut);
+            }
+        }
+    },
 };
 meta.shovel = {
     name: 'shovel',
@@ -409,7 +416,7 @@ meta.shovel = {
             wd.getOut(p.x, p.y);
         }
 
-        if (_.includes(['tree', 'plant','box'], obj.tp) ) {
+        if (_.includes(['tree', 'plant', 'box'], obj.tp)) {
             wd.put(obj, p);
             broke();
         }
@@ -425,11 +432,11 @@ meta.shovel = {
             broke();
         }
         if (obj.tp === 'beaver') {
-            wd.transform(obj, 'potatoseed');
+            wd.transform(obj, 'meat');
             meta.beaveregg.makeangrybeaver(obj.x, obj.y, wd);
             broke();
         }
-        if (obj.tp === 'beside') {
+        if (_.includes(['beside', 'flinders'], obj.tp)) {
             wd.transform(obj, 'blackearth');
             broke();
         }
@@ -722,9 +729,9 @@ meta.stick = {
             wd.transform(obj, 'shovel');
             wd.transform(wd.me, 'shovel');
         }
-        // if (obj.tp === 'tree') {
-        //     wd.transform(obj, 'treeseed');
-        // }
+        if (_.includes(['tree', 'skeleton'], obj.tp)) {
+            wd.transform(wd.me, 'flinders');
+        }
         if (obj.tp === 'fire') {
             wd.transform(wd.me, 'torch');
         }
@@ -1548,10 +1555,10 @@ meta.water = {
 meta.axe = {
     name: "axe",
     img: 'axe',
-    onApply: (obj, wd,p) => {
+    onApply: (obj, wd, p) => {
         function broke() {
             wd.transform(wd.me, 'flinders');
-            wd.getOut(p.x,p.y);
+            wd.getOut(p.x, p.y);
         }
 
         if (_.includes([meta.wolf, meta.aphid, meta.jackal], obj.tp)) {
@@ -1618,9 +1625,9 @@ meta.meat = {
         }
     },
     onApply: (obj, wd) => {
-        if (obj.tp.player) {
+        if (obj.tp=='player') {
             // wd.trade(obj);
-            wd.transform(wd.me, meta.bone);
+            wd.transform(wd.me, 'bone');
             if (!wd.removeWound(obj, wound.hungry)) {
                 wd.addWound(obj, wound.glut);
                 if (random(5) === 0) {
@@ -1628,8 +1635,8 @@ meta.meat = {
                 }
             }
         }
-        if (obj.tp === meta.fire) {
-            wd.transform(wd.me, meta.grill);
+        if (obj.tp === 'fire') {
+            wd.transform(wd.me, 'grill');
         }
     }
 };

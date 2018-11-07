@@ -138,8 +138,11 @@ wrapper = (me, theWound) => {
                 return false
             }
         },
-        dropAll: () => {
-            let obj = world.inv(me);
+        dropAll: (o) => {
+            if (o === undefined) {
+                o = me;
+            }
+            let obj = world.inv(o);
             if (obj) {
                 while (obj[0])
                     world.drop(obj[0], me.x, me.y);

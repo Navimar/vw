@@ -3,7 +3,7 @@ const meta = require('./meta.js').meta;
 
 
 let objects = [
-    // {m: 'beaver', q: 2},
+    {m: 'beaver', q: 2},
     // {m: 'beaveregg', q: 2},
     {m: 'potatoseed', q: 2},
     {m: 'potatoplant', q: 2},
