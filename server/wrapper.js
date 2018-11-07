@@ -154,7 +154,7 @@ wrapper = (me, theWound) => {
         },
         getOut: (x, y) => {
             if (me.carrier) {
-                world.drop(me, x, y)
+                world.drop(me, x, y);
             }
         },
         // trade: (obj) => world.trade(me, obj),

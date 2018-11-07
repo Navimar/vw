@@ -103,17 +103,17 @@ meta.orange = {
             }
         }
     },
-    // onTurn: (data, wd) => {
-    //     if (data.new) {
-    //         // if (wd.isHere(meta.tree)) {
-    //         //     wd.movetrought(wd.dirRnd)
-    //         // }
-    //         data.new = false;
-    //         wd.nextTurn(5000);
-    //     } else {
-    //         wd.transform(wd.me, meta.aphid);
-    //     }
-    // },
+    onTurn: (data, wd) => {
+        if (data.new) {
+            // if (wd.isHere(meta.tree)) {
+            //     wd.movetrought(wd.dirRnd)
+            // }
+            data.new = false;
+            wd.nextTurn(20000);
+        } else {
+            wd.transform(wd.me, 'plant');
+        }
+    },
 };
 meta.oranger = {
     name: "orange plant",
@@ -303,29 +303,29 @@ meta.tree = {
         data.new = true;
     },
     onTurn: (data, wd) => {
-        //     //     // let food = wd.findinInv(meta.kaka);
-        //     //     //
-        //     //     // if (food) {
-        //     //     //     if (data.sat) {
-        //     //     //         wd.transform(food, meta.orange);
-        //     //     //         wd.drop(food);
-        //     //     //         data.sat = false;
-        //     //     //     }
-        //     //     //     data.sat = true;
-        //     //     // } else {
-        //     //     //     // data.old++;
-        //     //     //     // if (data.old > 10) {
-        //     //     //     //     wd.transform(wd.me, meta.aphid);
-        //     //     //     // }
-        //     //     // }
-        //     //     // wd.nextTurn(3500);
+        // let food = wd.findinInv(meta.kaka);
+        //
+        // if (food) {
+        //     if (data.sat) {
+        //         wd.transform(food, meta.orange);
+        //         wd.drop(food);
+        //         data.sat = false;
+        //     }
+        //     data.sat = true;
+        // } else {
+        //     // data.old++;
+        //     // if (data.old > 10) {
+        //     //     wd.transform(wd.me, meta.aphid);
+        //     // }
+        // }
+        // wd.nextTurn(3500);
         if (data.new) {
             data.new = false;
             wd.nextTurn(200000);
         }
-        // else {
-        // wd.transform(wd.me, 'stick');
-        // }
+        else {
+            wd.transform(wd.me, 'stick');
+        }
     },
 };
 meta.swamp = {
@@ -357,7 +357,7 @@ meta.plant = {
     },
     onTurn: (data, wd) => {
         if (data.new) {
-            _.times(10, () => {
+            _.times(6, () => {
                 wd.move(wd.dirRnd)
             });
             data.new = false;
@@ -409,7 +409,7 @@ meta.shovel = {
             wd.getOut(p.x, p.y);
         }
 
-        if (obj.tp === 'plant' || obj.tp === 'tree') {
+        if (_.includes(['tree', 'plant','box'], obj.tp) ) {
             wd.put(obj, p);
             broke();
         }
@@ -431,6 +431,10 @@ meta.shovel = {
         }
         if (obj.tp === 'beside') {
             wd.transform(obj, 'blackearth');
+            broke();
+        }
+        if (obj.tp === 'stick') {
+            wd.transform(obj, 'fence');
             broke();
         }
         if (obj.tp === 'player') {
@@ -615,8 +619,8 @@ meta.stone = {
     img: "stone",
     onApply: (obj, wd) => {
         if (obj.tp === 'stick') {
-            wd.transform(obj, 'axe');
-            wd.transform(wd.me, 'axe');
+            wd.transform(obj, 'shovel');
+            wd.transform(wd.me, 'shovel');
         }
         if (obj.tp === 'beaveregg') {
             wd.transform(obj, 'beside');
@@ -708,20 +712,15 @@ meta.stick = {
         wd.transformdropAll('stick');
         if (data.new) {
             data.new = false;
-            wd.nextTurn(20000);
+            wd.nextTurn(200000);
         } else {
-            if (random()) {
-                wd.transform(wd.me, 'highgrass');
-            } else {
-                wd.transform(wd.me, 'highgrass');
-
-            }
+            wd.transform(wd.me, 'potatoseed');
         }
     },
     onApply: (obj, wd) => {
         if (obj.tp === 'stone') {
-            wd.transform(obj, 'axe');
-            wd.transform(wd.me, 'axe');
+            wd.transform(obj, 'shovel');
+            wd.transform(wd.me, 'shovel');
         }
         // if (obj.tp === 'tree') {
         //     wd.transform(obj, 'treeseed');
@@ -1021,11 +1020,7 @@ meta.potatoseed = {
                 data.new = false;
                 wd.nextTurn(7000);
             } else {
-                if (random(9)) {
-                    wd.transform(wd.me, 'potatoplant');
-                } else {
-                    wd.transform(wd.me, 'plant');
-                }
+                wd.transform(wd.me, 'potatoplant');
             }
         }
     },
@@ -1179,11 +1174,19 @@ meta.potatoplant = {
     img: 'plant',
     describe: 'Растение со съедобным клубнем, подкопайте лопатой, чтобы съесть',
     isNailed: true,
-    onTurn: (data, wd) => {
+    onFirstTurn: (data, wd) => {
         let a = wd.isHereNear('blackearth');
         if (a) {
             wd.transform(a, 'potato');
             wd.take(a);
+        }
+        wd.nextTurn(100000);
+    },
+    onTurn: (data, wd) => {
+        if (random(9)) {
+            wd.transform(wd.me, 'orange');
+        } else {
+            wd.transform(wd.me, 'beaveregg');
         }
     }
 };
@@ -1545,9 +1548,10 @@ meta.water = {
 meta.axe = {
     name: "axe",
     img: 'axe',
-    onApply: (obj, wd) => {
+    onApply: (obj, wd,p) => {
         function broke() {
-            wd.transform(wd.me, meta.flinders);
+            wd.transform(wd.me, 'flinders');
+            wd.getOut(p.x,p.y);
         }
 
         if (_.includes([meta.wolf, meta.aphid, meta.jackal], obj.tp)) {
@@ -1557,11 +1561,11 @@ meta.axe = {
         } else if (obj.tp === meta.orangetree) {
             wd.transform(obj, meta.wood);
             broke()
-        } else if (obj.tp === meta.tree || obj.tp === meta.wwall) {
-            wd.transform(obj, meta.wood);
+        } else if (obj.tp === 'tree' || obj.tp === 'wwall') {
+            wd.transform(obj, 'wood');
             broke()
-        } else if (obj.tp === meta.wood) {
-            wd.transform(obj, meta.wwall);
+        } else if (obj.tp === 'wood') {
+            wd.transform(obj, 'wwall');
             broke()
         } else if (obj.tp === meta.ant) {
             wd.transform(obj, meta.treeseed);
@@ -1572,8 +1576,8 @@ meta.axe = {
         } else if (obj.tp === meta.zombie) {
             wd.transform(obj, meta.rot);
             broke()
-        } else if (obj.tp === meta.skeleton) {
-            wd.transform(obj, meta.bone);
+        } else if (obj.tp === 'skeleton') {
+            wd.transform(obj, 'bone');
             broke()
         } else if (obj.tp === meta.crab) {
             wd.transform(obj, meta.stick);
