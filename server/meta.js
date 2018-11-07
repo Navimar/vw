@@ -163,21 +163,21 @@ meta.jackal = {
             }
         }
 
-        let t = wd.find([meta.player, meta.bone, meta.beaver]);
+        let t = wd.find(['player', 'bone', 'beaver']);
         if (t) {
             let mt = wd.dirTo(t.x, t.y);
             if (mt.dir[0] === dir.here) {
-                let food = [meta.bone, meta.beaver];
+                let food = ['bone', 'beaver'];
                 let obj = wd.pickUp(food);
                 if (obj) {
                     tire = 32;
                     data.satiety += 10000;
-                    data.born ? wd.transform(obj, meta.kaka) : wd.transform(obj, meta.jackal);
+                    data.born ? wd.transform(obj, 'kaka') : wd.transform(obj, 'jackal');
                     data.born ^= true;
                     // wd.transform(obj, meta.jackal);
                 }
             }
-            if (t.tp === meta.player) {
+            if (t.tp === 'player') {
                 if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
                     wd.addWound(t, wound.hit);
                 } else {
@@ -192,7 +192,7 @@ meta.jackal = {
         }
         data.satiety -= tire;
         if (data.satiety <= 0) {
-            wd.transform(wd.me, meta.bone)
+            wd.transform(wd.me, 'kaka')
         } else {
             wd.nextTurn(tire);
         }
@@ -398,8 +398,8 @@ meta.plant = {
         }
     },
     onApply: (obj, wd, p) => {
-        if (obj.tp.player) {
-            wd.transform(wd.me, meta.bone);
+        if (obj.tp === 'player') {
+            wd.transform(wd.me, 'stick');
             if (!wd.removeWound(obj, wound.hungry)) {
                 wd.addWound(obj, wound.glut);
             }
@@ -436,6 +436,10 @@ meta.shovel = {
             meta.beaveregg.makeangrybeaver(obj.x, obj.y, wd);
             broke();
         }
+        if (obj.tp === 'wolf') {
+            wd.transform(obj, 'meat');
+            broke();
+        }
         if (_.includes(['beside', 'flinders'], obj.tp)) {
             wd.transform(obj, 'blackearth');
             broke();
@@ -443,6 +447,10 @@ meta.shovel = {
         if (obj.tp === 'stick') {
             wd.transform(obj, 'fence');
             broke();
+        }
+        if (obj.tp === 'stone') {
+            wd.getOut(obj.x, obj.y);
+            wd.transform(wd.me, 'fire');
         }
         if (obj.tp === 'player') {
             wd.removeWound(p, wound.potatoplant);
@@ -527,6 +535,9 @@ meta.bone = {
             wd.transform(wd.me, 'stick');
             wd.getOut(p.x, p.y);
         }
+        if (obj.tp === 'fire') {
+            wd.getOut(obj.x, obj.y);
+        }
     }
 }
 ;
@@ -576,28 +587,28 @@ meta.wolf = {
         }
 
         let tire = 16;
-        let t = wd.find(['player', 'meat', 'beaver']);
+        let t = wd.find(['player', 'meat', 'bone',]);
         if (t) {
             let mt = wd.dirTo(t.x, t.y);
             if (mt.dir[0] === dir.here) {
-                let food = ['meat', 'beaver'];
+                let food = ['meat', 'bone'];
                 let obj = wd.pickUp(food);
                 if (obj) {
-                    tire = 32;
+                    tire = 64;
                     data.satiety += 8000;
                     if (!random(2)) {
                         wd.transform(obj, 'wolf')
                     } else {
-                        wd.transform(obj, 'kaka');
+                        wd.transform(obj, 'potatoseed');
                     }
                     // wd.transform(obj, meta.wolf);
                 }
             } else {
-                if (t.tp === 'beaver') {
-                    if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
-                        wd.transform(t, 'meat');
-                    }
-                }
+                // if (t.tp === 'beaver') {
+                //     if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
+                //         wd.transform(t, 'meat');
+                //     }
+                // }
                 if (t.tp === 'player') {
                     if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
                         wd.addWound(t, wound.hit);
@@ -614,7 +625,7 @@ meta.wolf = {
         }
         data.satiety -= tire;
         if (data.satiety <= 0) {
-            wd.transform(wd.me, 'bone')
+            wd.transform(wd.me, 'potatoseed')
         } else {
             wd.nextTurn(tire);
         }
@@ -760,7 +771,7 @@ meta.kaka = {
                 data.new = false;
                 wd.nextTurn(3500);
             } else {
-                wd.transform(wd.me, meta.highgrass);
+                wd.transform(wd.me, 'blackearth');
             }
         }
     },
@@ -821,7 +832,29 @@ meta.box = {
     }
 };
 
-
+meta.firedegg = {
+    name: "fired bevaer egg",
+    describe: "жаренное яйцо",
+    img: "firedegg",
+    onCreate(data) {
+    },
+    onApply: (obj, wd, p) => {
+        if (obj.tp === 'player') {
+            // wd.trade(obj);
+            wd.transform(wd.me, 'bone');
+            if (!wd.removeWound(obj, wound.hungry)) {
+                wd.addWound(obj, wound.glut);
+            }
+            wd.getOut(p.x, p.y);
+        }
+    },
+    onFirstTurn:(data, wd)=>{
+        wd.nextTurn(10000);
+    },
+    onTurn:(data, wd) =>{
+        wd.transform(wd.me,'stone');
+    }
+};
 meta.beaveregg = {
     name: "bevaer egg",
     describe: "Вкусное яйцо",
@@ -837,13 +870,17 @@ meta.beaveregg = {
             data.new = false;
             wd.nextTurn(5000);
         } else {
-            wd.transform(wd.me, 'beaver');
+            if (random(29)) {
+                wd.transform(wd.me, 'beaver');
+            } else {
+                wd.transform(wd.me, 'wolf');
+            }
         }
     },
     onApply: (obj, wd, p) => {
         if (obj.tp === 'player') {
             // wd.trade(obj);
-            wd.transform(wd.me, 'beside');
+            wd.transform(wd.me, 'bone');
             if (!wd.removeWound(obj, wound.hungry)) {
                 wd.addWound(obj, wound.glut);
             }
@@ -852,6 +889,9 @@ meta.beaveregg = {
         }
         if (obj.tp === 'beaver') {
             obj.data.kind = false;
+        }
+        if (obj.tp === 'fire') {
+            wd.transform(wd.me, 'firedegg');
         }
     },
     makeangrybeaver: (x, y, wd) => {
@@ -1471,29 +1511,29 @@ meta.fire = {
         data.satiety = 6000;
     },
     onTurn: (data, wd) => {
-
-        wd.transformdropAll(meta.fire);
+        wd.transformdropAll('fire');
         let tire = 50;
         if (wd.isHere(meta.water)) {
             wd.transform(wd.me, meta.water);
         }
-        if (wd.isHere(meta.fire)) {
+        if (wd.isHere('fire')) {
             wd.movetrought(wd.dirRnd);
         }
-        let food = [meta.tree, meta.crab, meta.jackal, meta.zombie, meta.meat, meta.wwall, meta.flinders, meta.torch, meta.aphid, meta.plant, meta.seed, meta.kaka, meta.ant, meta.wolf, meta.axe, meta.highgrass, meta.bone, meta.stick, meta.orangetree, meta.orange, meta.oranger];
+        // let food = [meta.tree, meta.crab, meta.jackal, meta.zombie, meta.meat, meta.wwall, meta.flinders, meta.torch, meta.aphid, meta.plant, meta.seed, meta.kaka, meta.ant, meta.wolf, meta.axe, meta.highgrass, meta.bone, meta.stick, meta.orangetree, meta.orange, meta.oranger];
+        let food = ['tree', 'crab', 'jackal', 'fence', 'skeleton', 'meat', 'wwall', 'flinders', 'torch', 'aphid', 'plant', 'seed', 'bone', 'stick',];
         let o = wd.isHere(food);
         if (o) {
             if (food.tp === meta.zombie) {
-                wd.transform(o, meta.rot);
+                wd.transform(o, 'rot');
             } else {
-                wd.transform(o, meta.fire);
+                wd.transform(o, 'fire');
                 data.satiety += 3000;
             }
         }
         data.new = false;
         data.satiety -= tire;
         if (data.satiety <= 0) {
-            wd.transform(wd.me, meta.ash);
+            wd.transform(wd.me, 'ash');
         }
         wd.nextTurn(tire);
     }
@@ -1599,10 +1639,10 @@ meta.wood = {
 meta.grill = {
     name: "grill",
     img: "grill",
-    onApply: (obj, wd) => {
-        if (obj.tp.player) {
-            // wd.trade(obj);
-            wd.transform(wd.me, meta.bone);
+    onApply: (obj, wd, p) => {
+        if (obj.tp == 'player') {
+            wd.getOut(p.x, p.y);
+            wd.transform(wd.me, 'bone');
             if (!wd.removeWound(obj, wound.hungry)) {
                 wd.addWound(obj, wound.glut);
             }
@@ -1616,16 +1656,16 @@ meta.meat = {
         data.new = true;
     },
     onTurn: (data, wd) => {
-        wd.transformdropAll(meta.meat);
+        wd.transformdropAll('meat');
         if (data.new) {
             data.new = false;
             wd.nextTurn(5000);
         } else {
-            wd.transform(wd.me, meta.bone);
+            wd.transform(wd.me, 'bone');
         }
     },
     onApply: (obj, wd) => {
-        if (obj.tp=='player') {
+        if (obj.tp == 'player') {
             // wd.trade(obj);
             wd.transform(wd.me, 'bone');
             if (!wd.removeWound(obj, wound.hungry)) {

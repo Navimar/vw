@@ -156,7 +156,7 @@ wrapper = (me, theWound) => {
             }
         },
         getOut: (x, y) => {
-            if (me.carrier) {
+            if (me.carrier && _.isFinite(x) && _.isFinite(y)) {
                 world.drop(me, x, y);
             }
         },
