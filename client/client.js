@@ -608,6 +608,11 @@ function onMouseDown() {
     // console.log('mouseDown');
     if (mouseCell.x === -2) {
         inAir = {from: 'ground', obj: model.ground[mouseCell.y]};
+        model.order = {
+            name: 'take',
+            val: inAir.obj.id
+        };
+        model.orderCn++;
     }
     if (mouseCell.x === -1) {
         if (model.inv[mouseCell.y]) {
@@ -633,9 +638,20 @@ function onMouseUp() {
     if (inAir) {
         if (mouseCell.x === -1 && inAir.from === 'ground') {
             // alert('take ' + inAir.obj.id + " " + inAir.obj.img);
+            // model.order = {
+            //     name: 'take',
+            //     val: inAir.obj.id
+            // };
+            // model.orderCn++;
+
             model.order = {
-                name: 'take',
-                val: inAir.obj.id
+                name: 'useinv',
+                val: {
+                    from: inAir.from,
+                    id: inAir.obj.id,
+                    target: model.inv[mouseCell.y].id
+                }
+
             };
             model.orderCn++;
         }
@@ -658,6 +674,13 @@ function onMouseUp() {
                 val: inAir.obj.id
             };
             model.orderCn++;
+        }
+        if (mouseCell.x === -2 && inAir.from === 'ground') {
+            // model.order = {
+            //     name: 'take',
+            //     val: inAir.obj.id
+            // };
+            // model.orderCn++;
         }
         if (mouseCell.x >= 0) {
             model.order = {

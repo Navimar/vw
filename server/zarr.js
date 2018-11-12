@@ -1,6 +1,8 @@
 module.exports = [
     '',
     'water',
+    'wagon',
+    'train',
     'deepwater',
     'space',
     'deepspace',
@@ -32,6 +34,7 @@ module.exports = [
     'swamp',
     'oranger',
     'axe',
+    'pickaxe',
     'plant',
     'shovel',
     'wall',
