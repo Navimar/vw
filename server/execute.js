@@ -15,7 +15,7 @@ const CircularJSON = require('circular-json');
 
 const send = require('./send');
 const wound = require('./meta').wound;
-const wrapper = require('./wrapper');
+const wrapper = world.wrapper;
 const meta = require('./meta').meta;
 const load = require('./load');
 

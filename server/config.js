@@ -9,7 +9,7 @@ let objects = [
     {m: 'potatoplant', q: 2},
     {m: 'skeleton', q: 5},
     {m: 'plant', q: 1},
-    {m: 'train', q: 2},
+    {m: 'crab', q: 2},
     {m: 'shovel', q: 5},
     {m: 'wolf', q: 5},
     {m: 'door', q: 3},
