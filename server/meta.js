@@ -692,11 +692,11 @@ meta.wolf = {
                     // wd.transform(obj, meta.wolf);
                 }
             } else {
-                // if (t.tp === 'beaver') {
-                //     if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
-                //         wd.transform(t, 'meat');
-                //     }
-                // }
+                if (t.tp === 'beaver') {
+                    if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
+                        wd.transform(t, 'meat');
+                    }
+                }
                 if (t.tp === 'player') {
                     if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
                         wd.addWound(t, wound.hit);
