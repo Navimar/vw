@@ -4,7 +4,7 @@
 // const exe = require('./execute');
 // const user = require('./user');
 // const read = require('./read');
-const world = require('./world');
+const world = require('../engine/world');
 // const readline = require('readline');
 const readline = require('read-each-line-sync');
 const CircularJSON = require('circular-json');

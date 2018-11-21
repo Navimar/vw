@@ -1,12 +1,12 @@
 const _ = require('lodash');
-const util = require('./util');
+const util = require('../web/util');
 const direction = util.dir;
 const random = util.random;
 
-const meta = require('./meta.js').meta;
-const wound = require('./meta.js').wound;
-const config = require('./config.js');
-const zarr = require('./zarr.js');
+const meta = require('../logic/meta.js').meta;
+const wound = require('../logic/meta.js').wound;
+const config = require('../logic/config.js');
+const zarr = require('../logic/zarr.js');
 
 let world = {};
 let game = {};
@@ -362,15 +362,14 @@ world.addPlayer = (socket, id, x, y) => {
     p.order = "stop";
     p.order.n = 0;
     p.lastorder = {val: {}};
-    // p.img = meta.player.img;
     p.satiety = 100;
     p.wound = [];
     p.tire = 0;
-    // p.tool = {typ: "hand"};
     p.slct = 0;
     p.tp = 'player';
     let data = {};
     p.data = data;
+    p.remembers = new Map();
     meta[p.tp].onCreate(data);
     for (let a = 0; a < 9; a++) {
         p.wound[a] = wound.life;
@@ -709,6 +708,38 @@ world.point = (x, y) => {
     // }
     return [];
     // return false;
+};
+
+world.recall = (p, x, y) => {
+    let obj = p.remembers.get(p.x + x + " " + p.y + y);
+    if (obj) {
+        if (obj.length > 0) {
+            return obj;
+        }
+    }
+    // }
+    return [];
+    // return false;
+};
+
+
+world.remember = (p, x, y, obj) => {
+    let k = p.x + x + " " + p.y + y;
+    if (p.remembers.has(k)) {
+        let i = p.remembers.get(k);
+        i.push(obj);
+        p.remembers.set(k, i);
+    } else {
+        p.remembers.set(k, [obj]);
+    }
+    obj.x = x;
+    obj.y = y;
+    obj.carrier = false;
+};
+
+world.forget = (p, x, y) => {
+    let k = p.x + x + " " + p.y + y;
+    p.remembers.delete(k);
 };
 
 world.inv = (obj) => {

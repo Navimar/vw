@@ -3,20 +3,20 @@
  */
 const _ = require('lodash');
 const fs = require('fs');
-const world = require('./world');
+const world = require('../engine/world');
 const wrapper = world.wrapper;
-const meta = require('./meta.js').meta;
-const wound = require('./meta.js').wound;
-const util = require('./util');
+const meta = require('../logic/meta.js').meta;
+const wound = require('../logic/meta.js').wound;
+const util = require('../web/util');
 const direction = util.dir;
 const random = util.random;
-const exe = require('./execute');
-const bot = require('./bot');
-const event = require('./event');
-const send = require('./send');
-const user = require('./user');
-const load = require('./load');
-const handle = require('./handle');
+const exe = require('../logic/execute');
+const bot = require('../web/bot');
+const event = require('../web/event');
+const send = require('../web/send');
+const user = require('../web/user');
+const load = require('../web/load');
+const handle = require('../web/handle');
 
 module.exports = () => {
     let testFail = false;

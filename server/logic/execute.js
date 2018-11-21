@@ -3,9 +3,9 @@
  */
 const _ = require('lodash');
 
-const user = require('./user');
-const world = require('./world');
-const util = require('./util');
+const user = require('../web/user');
+const world = require('../engine/world');
+const util = require('../web/util');
 const direction = util.dir;
 const random = util.random;
 const config = require('./config.js');
@@ -13,11 +13,11 @@ const config = require('./config.js');
 const fs = require('fs');
 const CircularJSON = require('circular-json');
 
-const send = require('./send');
+const send = require('../web/send');
 const wound = require('./meta').wound;
 const wrapper = world.wrapper;
 const meta = require('./meta').meta;
-const load = require('./load');
+const load = require('../web/load');
 
 const exe = {};
 

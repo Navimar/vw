@@ -2,11 +2,11 @@
  * Created by igor on 14/02/2017.
  */
 const fs = require('fs');
-const exe = require('./execute');
+const exe = require('../logic/execute');
 const user = require('./user');
 const send = require('./send');
-const config = require('./config');
-const world = require('./world');
+const config = require('../logic/config');
+const world = require('../engine/world');
 
 const event = {};
 

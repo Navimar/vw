@@ -161,12 +161,16 @@ function initModel() {
     model.wound = [];
     model.inv = [];
     model.ground = [];
+    model.fow = [];
+    model.remembers = [];
     for (let x = 0; x < 9; x++) {
         model.wound.push({img: "bottle"});
         model.inv.push({img: "angel"});
         model.holst[x] = [];
+        model.fow[x] = [];
         for (let y = 0; y < 9; y++) {
             model.holst[x][y] = "grass";
+            model.fow[x][y] = false;
         }
     }
     model.obj = [{
@@ -236,6 +240,8 @@ function onServer(val) {
     model.time = val.time;
     model.cnActive = val.cnActive;
     model.ground = val.ground;
+    model.fow = val.fow;
+    model.remembers = val.remembers;
     for (let v of val.obj) {
         let ok = true;
         for (let m of model.obj) {
@@ -472,28 +478,39 @@ function move(fx, fy, tx, ty, speed, timeDiff) {
 function render(model) {
     resize();
     renderStatus();
-    if (!inAir && mouseDown) {
+    if (!inAir && mouseDown && mouseCell.x >= 0 && mouseCell.x < 9) {
         moveOrder();
     }
 
     //render grass
     for (let y = -1; y < 10; y++) {
         for (let x = -1; x < 10; x++) {
-            // drawImg("grass", x, y);
             drawImg("dark", x + model.trx, y + model.try);
-            // for (let h of model.holst[x][y]) {
-            //     drawImg(model.holst[x][y], x + model.trx, y + model.try);
-            // }
+        }
+        // for (let h of model.holst[x][y]) {
+        //     drawImg(model.holst[x][y], x + model.trx, y + model.try);
+        // }
+    }
+
+    //render fow
+    for (let o of model.remembers) {
+        drawImgNormal(o.img, o.x + model.trx, o.y + model.try);
+    }
+    for (let y = 0; y < 9; y++) {
+        for (let x = 0; x < 9; x++) {
+            if (model.fow[x][y]) {
+                drawImgNormal("map", x + model.trx, y + model.try);
+            }
         }
     }
-    //render tire
-    // for (let a = 0; a < model.tire; a++) {
-    //     drawImg("target", 4, 4);
-    // }
+//render tire
+// for (let a = 0; a < model.tire; a++) {
+//     drawImg("target", 4, 4);
+// }
 
-    // for (let o of model.obj) {
-    //     drawImg("from", o.x + model.trx, o.y + model.try);
-    // }
+// for (let o of model.obj) {
+//     drawImg("from", o.x + model.trx, o.y + model.try);
+// }
     if (model.order.targetx - model.px + 4 + model.trx !== 4 || model.order.targety - model.py + 4 + model.try !== 4)
         drawImg("target", model.order.targetx - model.px + 4 + model.trx, model.order.targety - model.py + 4 + model.try);
 
@@ -522,7 +539,7 @@ function render(model) {
     for (let bag = itma; bag < 9; bag++) {
         drawImg("slot", -1, bag);
     }
-    //
+//
     model.ground.sort((a, b) => {
         if (a.isNailed) {
             return 1
@@ -535,35 +552,41 @@ function render(model) {
         if (model.ground[i].isNailed) {
             drawImg('isNailed', -2, i);
         } else {
-            drawImg('canTake', -2, i);
+            if (model.inv.length === 9) {
+                drawImg('overweight', -2, i);
+
+            } else {
+                drawImg('canTake', -2, i);
+
+            }
         }
     }
 
-    // let y = 0;
-    // for (let o of model.obj) {
-    //     if (o.x === 4 && o.y === 4) {
-    //         if (o.img !== 'hero') {
-    //             drawImg(o.img, -2, y);
-    //             y++;
-    //         }
-    //     }
-    // }
+// let y = 0;
+// for (let o of model.obj) {
+//     if (o.x === 4 && o.y === 4) {
+//         if (o.img !== 'hero') {
+//             drawImg(o.img, -2, y);
+//             y++;
+//         }
+//     }
+// }
 
     if (mouseDown && inAir.obj) {
         drawImg(inAir.obj.img, (mousePos.x - shiftX) / dh - 0.5, mousePos.y / dh - 0.5);
     }
     if (mouseCell.x >= 0 && mouseCell.x < 9) {
-        drawImg("select", mouseCell.x + model.trx, mouseCell.y + model.try);
+        drawImgNormal("select", mouseCell.x + model.trx, mouseCell.y + model.try);
     } else {
         drawImg("select", mouseCell.x, mouseCell.y);
         // drawImg("select", mouseCell.x + model.trx, mouseCell.y + model.try);
 
     }
-    // // if (model.hand != "hand") drawSize(model.hand.img, 4.25, 4.25,0.6,0.6);
-    // if (model.message != model.lastmessage) message(model.message);
-    // drawWeb("http://tourist.kg/wp-content/uploads/2017/04/7e623540e23ca8273a41cab254b2edb1.png",0,0,2,1);
+// // if (model.hand != "hand") drawSize(model.hand.img, 4.25, 4.25,0.6,0.6);
+// if (model.message != model.lastmessage) message(model.message);
+// drawWeb("http://tourist.kg/wp-content/uploads/2017/04/7e623540e23ca8273a41cab254b2edb1.png",0,0,2,1);
 
-    //text
+//text
     for (let o of model.obj) {
         if (o.message) {
             if (o.messagetime > 0)
@@ -607,10 +630,10 @@ let renderStatus = () => {
 function onMouseDown() {
     // console.log('mouseDown');
     if (mouseCell.x === -2) {
-        inAir = {from: 'ground', obj: model.ground[mouseCell.y]};
+        // inAir = {from: 'inv', obj: model.ground[mouseCell.y]};
         model.order = {
             name: 'take',
-            val: inAir.obj.id
+            val: model.ground[mouseCell.y].id
         };
         model.orderCn++;
     }

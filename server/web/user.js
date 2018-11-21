@@ -4,8 +4,8 @@
 const sha = require("sha256");
 
 // const config = require('./config');
-const world = require('./world');
-let config = require('./config.js');
+const world = require('../engine/world');
+let config = require('../logic/config.js');
 
 const user = {};
 

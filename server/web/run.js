@@ -2,7 +2,7 @@
  * Created by igor on 16/02/2017.
  */
 const input = require('./input');
-const test = require('./test');
+const test = require('../test/test');
 const load = require('./load');
 const fs = require('fs');
 // const path = require('path');

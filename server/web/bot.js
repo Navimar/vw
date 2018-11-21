@@ -3,7 +3,7 @@
  */
 const TelegramBot = require('telebot');
 // const Telegraf = require('telegraf');
-const config = require('./config');
+const config = require('../logic/config');
 
 const bot = new TelegramBot(config.botkey);
 // const bot = new Telegraf(config.botkey);

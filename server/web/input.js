@@ -1,7 +1,7 @@
 // const _ = require('underscore');
 const event = require('./event');
 const bot = require('./bot');
-const config = require('./config');
+const config = require('../logic/config');
 const handle = require('./handle');
 
 const input = {};

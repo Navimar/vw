@@ -1,4 +1,4 @@
-const util = require('./util');
+const util = require('../web/util');
 const random = util.random;
 const dir = util.dir;
 const color = util.color;
@@ -477,7 +477,7 @@ meta.shovel = {
             wd.getOut(p.x, p.y);
         }
 
-        if (_.includes(['tree', 'plant', 'box'], obj.tp)) {
+        if (_.includes(['tree', 'box'], obj.tp)) {
             wd.put(obj, p);
             broke();
         }
@@ -486,7 +486,7 @@ meta.shovel = {
             broke();
             wd.say(['!!!', 'Вот тебе!', 'Получи лопатой!!!'], p)
         }
-        if (obj.tp === 'potatoplant') {
+        if (obj.tp === 'plant') {
             wd.transform(obj, 'potato');
             wd.say(['Огродная работа', 'Свежая картошечка!', 'Лучшее применение лопаты'], p);
             wd.put(obj, p);
@@ -744,7 +744,7 @@ meta.crab = {
         }
 
         let tire = 11;
-        let t = wd.find(['player', 'tree','wood']);
+        let t = wd.find(['player', 'tree', 'wood']);
         if (t) {
             let mt = wd.dirTo(t.x, t.y);
             if (mt.dir[0] === dir.here) {
@@ -912,6 +912,9 @@ meta.stick = {
 meta.key = {
     name: "key",
     img: "key",
+    onCreate(data) {
+        data.open = false;
+    },
     onApply: (obj, wd) => {
         if (obj.tp === 'door') {
             obj.data.open ^= true;
@@ -946,11 +949,13 @@ meta.kaka = {
 
 meta.wwall = {
     name: "Wooden Wall",
+    isFow: true,
     img: 'wwall',
     isSolid: true,
 };
 meta.wall = {
     name: "stone Wall",
+    isFow: true,
     img: 'wall',
     isSolid: true,
 };
@@ -1233,7 +1238,7 @@ meta.potatoseed = {
                 data.new = false;
                 wd.nextTurn(7000);
             } else {
-                wd.transform(wd.me, 'potatoplant');
+                wd.transform(wd.me, 'plant');
             }
         }
     },
@@ -1767,11 +1772,11 @@ meta.pickaxe = {
             wd.getOut(p.x, p.y);
         }
 
-        if (_.includes([ 'beaver'], obj.tp)) {
+        if (_.includes(['beaver'], obj.tp)) {
             // wd.trade(obj);
             wd.transform(obj, 'meat');
             broke();
-        } else   if (_.includes(['wolf'], obj.tp)) {
+        } else if (_.includes(['wolf'], obj.tp)) {
             // wd.trade(obj);
             wd.transform(obj, 'bone');
             broke();

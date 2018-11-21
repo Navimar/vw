@@ -1,7 +1,7 @@
 const event = require('./event');
 const user = require('./user');
-const exe = require('./execute');
-const world = require('./world');
+const exe = require('../logic/execute');
+const world = require('../engine/world');
 
 let handle = {};
 
