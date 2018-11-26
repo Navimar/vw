@@ -561,6 +561,23 @@ function render(model) {
             }
         }
     }
+    function initAudio() {
+        let audios = new Map();
+        return {
+            play(url) {
+                let audio = audios[url];
+                if (audio == null) {
+                    audio = new Audio(url+".mp3");
+                    audios[url] = audio;
+                }
+                audio.play()
+            },
+            stop(url){
+                let audio = audios[url];
+                if (audio) audio.pause();
+            }
+        }
+    }
 
 // let y = 0;
 // for (let o of model.obj) {

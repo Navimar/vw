@@ -7,3 +7,6 @@ data/testlog.txt
 data/testlog.txt
 data/testlog.txt
 data/snap.txt
+.DS_Store
+img/.DS_Store
+img/undefined.pxm
