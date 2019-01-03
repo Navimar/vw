@@ -37,6 +37,8 @@ module.exports = [
     'axe',
     'pickaxe',
     'tree',
+    'antegg',
+    'door',
     'wall',
     'shovel',
     'wwall',

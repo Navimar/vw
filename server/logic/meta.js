@@ -53,6 +53,7 @@ meta.player = {
 //     name:'respawn',
 //     describe:'здесь возродится ваш персонаж, если'
 // };
+
 meta.seed = {
     name: "orange seed",
     img: 'seed',
@@ -282,12 +283,11 @@ meta.skeleton = {
                 goTo(mt.dir);
             }
         } else {
-
-            wd.move(wd.dirRnd);
+            // wd.move(wd.dirRnd);
         }
         data.satiety -= tire;
         if (data.satiety < 0) {
-            wd.transform(wd.me, 'bone')
+            // wd.transform(wd.me, 'bone')
         }
         wd.nextTurn(tire);
     }
@@ -605,7 +605,7 @@ meta.bone = {
         }
     }
 }
-;
+    ;
 
 //old
 
@@ -1076,6 +1076,7 @@ meta.beaveregg = {
 meta.beside = {
     img: 'beside',
     describe: 'очистки',
+
     onApply(obj, wd, p) {
         if (obj.tp === 'treeseed') {
             wd.transform(obj, 'fence');
@@ -1087,8 +1088,106 @@ meta.beside = {
 meta.flag = {
     img: 'flag',
 };
+meta.antqueen = {
+    name: "queen",
+    img: 'cow',
+    isSolid: true,
+    onTurn: (data, wd) => {
+        let o = wd.isHereNear();
+        if (o && o.tp != 'player') {
+            wd.transform(o, 'ant');
+        }
+        wd.nextTurn(100);
+    },
+}
 meta.ant = {
-    name: "ants",
+    name: "ant",
+    img: 'ant',
+    isSolid: true,
+    onCreate(data) {
+        data.dropCn = 0;
+        data.takeCn = 0;
+        data.lifetime = 0;
+    },
+    onTurn: (data, wd) => {
+        let o = wd.move();
+        if (o) {
+            data.dropCn = 0;
+            data.takeCn++;
+        } else {
+            data.takeCn = 0;
+            data.dropCn++;
+        }
+        if (o && data.takeCn >= 7) {
+            if (o.tp != 'player') {
+                if (random(7)) {
+                    wd.take(o);
+                } else {
+                    wd.transform(o, 'ant');
+                }
+                data.takeCn = 0;
+            }
+        }
+        if (data.dropCn >= 20) {
+            wd.drop();
+            data.dropCn = 0;
+        }
+        if (data.lifetime > 1000) {
+            wd.dropAll();
+            wd.transform(wd.me, 'skeleton');
+        }
+        data.lifetime++;
+        wd.nextTurn(15);
+    }
+}
+meta.antegg = {
+    name: "ant egg",
+    describe: "Вкусное яйцо",
+    img: "egg",
+    onCreate(data) {
+        data.new = true;
+    },
+    onTake: (data, wd, p) => {
+        meta.beaveregg.makeangrybeaver(wd.me.x, wd.me.y, wd);
+    },
+    onTurn: (data, wd) => {
+        if (data.new) {
+            data.new = false;
+            wd.nextTurn(5000);
+        } else {
+            if (random(29)) {
+                wd.transform(wd.me, 'ant');
+            } else {
+                wd.transform(wd.me, 'ant');
+            }
+        }
+    },
+    onApply: (obj, wd, p) => {
+        if (obj.tp === 'player') {
+            // wd.trade(obj);
+            wd.transform(wd.me, 'bone');
+            if (!wd.removeWound(obj, wound.hungry)) {
+                wd.addWound(obj, wound.glut);
+            }
+            meta.beaveregg.makeangrybeaver(p.x, p.y, wd);
+            wd.getOut(p.x, p.y);
+        }
+        if (obj.tp === 'beaver') {
+            obj.data.kind = false;
+        }
+        if (obj.tp === 'fire') {
+            wd.transform(wd.me, 'firedegg');
+        }
+    },
+    makeangrybeaver: (x, y, wd) => {
+        let t = wd.findFrom(x, y, 'beaver', 1, 4);
+        if (t) {
+            t.data.kind = false;
+        }
+    },
+};
+meta.dwarf = {
+    name: "dwarf",
     img: 'ant',
     isSolid: true,
     onCreate(data) {
@@ -1191,7 +1290,7 @@ meta.ant = {
         }
     }
 }
-;
+    ;
 
 
 meta.aphidka = {
@@ -1968,4 +2067,4 @@ wound.hit = {
     },
 };
 
-module.exports = {meta, wound};
+module.exports = { meta, wound };

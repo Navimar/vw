@@ -42,7 +42,7 @@ send.web = (dtStartLoop) => {
             for (let x = 0; x < 9; x++) {
                 for (let y = 0; y < 9; y++) {
                     if (!fowmap[x][y]) {
-                        world.forget(p,x,y);
+            //             world.forget(p,x,y);
                         for (let r of world.point(p.x + x - 4, p.y + y - 4)) {
                             let img =
                                 _.isFunction(meta[r.tp].img) ?
@@ -62,15 +62,15 @@ send.web = (dtStartLoop) => {
                                 isFlat: meta[r.tp].isFlat,
                                 message: r.message
                             });
-                            world.remember(p,x,y,{
-                                x,
-                                y,
-                                img,
-                                id: r.id,
-                                z: meta[r.tp].z,
-                                describe: meta[r.tp].describe,
-                                isFlat: meta[r.tp].isFlat,
-                            });
+            //                 // world.remember(p,x,y,{
+            //                 //     x,
+            //                 //     y,
+            //                 //     img,
+            //                 //     id: r.id,
+            //                 //     z: meta[r.tp].z,
+            //                 //     describe: meta[r.tp].describe,
+            //                 //     isFlat: meta[r.tp].isFlat,
+            //                 // });
 
                             if (x === 4 && y === 4 && r.tp !== 'player') {
                                 data.ground.push({
@@ -81,15 +81,15 @@ send.web = (dtStartLoop) => {
                                 })
                             }
                         }
-                    } else {
-                        for (let r of world.recall(p, x, y)){
-                            data.remembers.push({
-                                x,
-                                y,
-                                img:r.img,
-                                id: r.id,
-                            });
-                        }
+            //         } else {
+            //             for (let r of world.recall(p, x, y)){
+            //                 data.remembers.push({
+            //                     x,
+            //                     y,
+            //                     img:r.img,
+            //                     id: r.id,
+            //                 });
+            //             }
                     }
                 }
             }

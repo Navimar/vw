@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const util = require('../web/util');
 const direction = util.dir;
+const dirs = util.dirs;
 const random = util.random;
 
 const meta = require('../logic/meta.js').meta;
@@ -69,7 +70,7 @@ world.wrapper = (me, theWound) => {
         },
         move: (dir) => {
             if (!dir) {
-                dir = exe.wrapper().dirRnd;
+                dir = world.wrapper().dirRnd;
             }
             return world.move(me, dir);
         },
@@ -89,17 +90,28 @@ world.wrapper = (me, theWound) => {
             return m;
         },
         isNear: (tp) => {
-            if (!Array.isArray(tp)) tp = [tp];
-            for (let t of tp) {
-                let i;
-                i = world.lay(t, me.x + 1, me.y);
-                if (i && i !== me) return i;
-                i = world.lay(t, me.x, me.y + 1);
-                if (i && i !== me) return i;
-                i = world.lay(t, me.x, me.y - 1);
-                if (i && i !== me) return i;
-                i = world.lay(t, me.x - 1, me.y);
-                if (i && i !== me) return i;
+            if (tp) {
+                if (!Array.isArray(tp)) tp = [tp];
+                for (let t of tp) {
+                    let i;
+                    i = world.lay(t, me.x + 1, me.y);
+                    if (i && i !== me) return i;
+                    i = world.lay(t, me.x, me.y + 1);
+                    if (i && i !== me) return i;
+                    i = world.lay(t, me.x, me.y - 1);
+                    if (i && i !== me) return i;
+                    i = world.lay(t, me.x - 1, me.y);
+                    if (i && i !== me) return i;
+                }
+            } else {
+                let a = world.point(me.x, me.y + 1);
+                if (a) return a[0];
+                a = world.point(me.x + 1, me.y);
+                if (a) return a[0];
+                a = world.point(me.x - 1, me.y);
+                if (a) return a[0];
+                a = world.point(me.x, me.y - 1);
+                if (a) return a[0];
             }
             return false;
         },
@@ -116,10 +128,10 @@ world.wrapper = (me, theWound) => {
             world.relocate(me, x, y)
         },
         relocate: (x, y) => world.relocate(me, x, y),
-        dirRnd: util.dirs[random(3)],
+        dirRnd: dirs[random(3)],
         nextTurn: (time) => world.nextTurn(time, me),
         nextAct: (time) => {
-            me.wounds.push({time: world.time() + time, wound: theWound, first: false});
+            me.wounds.push({ time: world.time() + time, wound: theWound, first: false });
         },
         transform: (obj, tp) => world.transform(obj, tp),
         pickUp: (tp) => {
@@ -141,7 +153,7 @@ world.wrapper = (me, theWound) => {
                 if (obj) obj = obj[0];
             }
             if (obj) {
-                world.drop(obj, me.x, me.y);
+                return world.drop(obj, me.x, me.y);
             } else {
                 return false
             }
@@ -213,7 +225,7 @@ world.wrapper = (me, theWound) => {
             if (obj.message && obj.message.text === text) {
                 text += " ";
             }
-            obj.message = {text, color};
+            obj.message = { text, color };
         }
     };
 };
@@ -245,7 +257,7 @@ function dirTo(x, y, me) {
     } else {
         dir[dy] = direction.here;
     }
-    return {dir, xWant, yWant};
+    return { dir, xWant, yWant };
 }
 
 world.init = () => {
@@ -257,7 +269,7 @@ world.init = () => {
     game.cnId = 0;
     // game.cnError = 1;
     // game.willgo = [];
-    game.center = {x: 0, y: 0};
+    game.center = { x: 0, y: 0 };
     game.obj = [];
 
     _.forEach(meta, (value, key, list) => {
@@ -353,7 +365,7 @@ world.addPlayer = (socket, id, x, y) => {
         x = 0;
         y = 0;
     }
-    let p = {socket, id, x, y};
+    let p = { socket, id, x, y };
     p.message = false;
     p.wounds = [];
     p.solid = true;
@@ -361,7 +373,7 @@ world.addPlayer = (socket, id, x, y) => {
     p.diry = 0;
     p.order = "stop";
     p.order.n = 0;
-    p.lastorder = {val: {}};
+    p.lastorder = { val: {} };
     p.satiety = 100;
     p.wound = [];
     p.tire = 0;
@@ -496,11 +508,11 @@ function addkey(k, obj) {
 }
 
 world.createObj = (tp, x, y) => {
-    let data = {first: true};
+    let data = { first: true };
     if (meta[tp].onCreate) {
         meta[tp].onCreate(data);
     }
-    let o = {x: x, y: y, id: makeid(), tp, data, message: false};
+    let o = { x: x, y: y, id: makeid(), tp, data, message: false };
 
 
     addtoMap(x, y, o);
@@ -599,7 +611,7 @@ world.addWound = (player, w) => {
                         break;
                     }
                 }
-                if (ws) player.wounds.push({time: game.time + 1, wound: w, first: true});
+                if (ws) player.wounds.push({ time: game.time + 1, wound: w, first: true });
                 ok = false;
             }
         }
@@ -666,7 +678,7 @@ world.nextTurn = (time, obj) => {
 world.transform = (obj, tp) => {
     obj.tp = tp;
     if (meta[tp].onCreate) {
-        let data = {first: true};
+        let data = { first: true };
         meta[obj.tp].onCreate(data);
         obj.data = data;
     }
@@ -684,7 +696,7 @@ world.transform = (obj, tp) => {
 };
 
 world.point = (x, y) => {
-    ////array
+    ////arrayf
     // let arr = [];
     // for (let o of world.obj) {
     //     if (o.x === x && o.x === y) {
