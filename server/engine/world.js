@@ -153,7 +153,8 @@ world.wrapper = (me, theWound) => {
                 if (obj) obj = obj[0];
             }
             if (obj) {
-                return world.drop(obj, me.x, me.y);
+                world.drop(obj, me.x, me.y);
+                return obj;
             } else {
                 return false
             }
@@ -165,7 +166,7 @@ world.wrapper = (me, theWound) => {
             let obj = world.inv(o);
             if (obj) {
                 while (obj[0])
-                    world.drop(obj[0], me.x, me.y);
+                    world.drop(obj[0], o.x, o.y);
             }
         },
         transformdropAll: (tp) => {
@@ -289,7 +290,10 @@ world.init = () => {
         }
     });
 };
-world.center = () => {
+world.center = (x, y) => {
+    if (x && y) {
+        game.center = { x, y };
+    }
     return game.center;
 };
 world.player = () => {
@@ -456,7 +460,6 @@ function addtologic(obj, t) {
 //         }
 //     }
 // }
-
 
 world.put = (obj, carrier) => {
     removefromMap(obj);

@@ -43,6 +43,7 @@ module.exports = [
     'shovel',
     'wwall',
     'plant',
+    'carnivorous',
     'torch',
     'rot',
     'ant',

@@ -322,21 +322,21 @@ exe.onTick = (isMain) => {
         return str;
     };
 
-    // let i = 0;
-    // let x = 0;
-    // let y = 0;
-    // for (let p of world.player()) {
-    //     i++;
-    //     x += p.x;
-    //     y += p.y;
-    // }
-    // x += config.world.start;
-    // y += config.world.start;
-    // i++;
-    // x = Math.round(x / i);
-    // y = Math.round(y / i);
-    // world.center.x = x;
-    // world.center.y = y;
+    let i = 0;
+    let x = 0;
+    let y = 0;
+    for (let p of world.player()) {
+        i++;
+        x += p.x;
+        y += p.y;
+    }
+    x += config.world.start;
+    y += config.world.start;
+    i++;
+    x = Math.round(x / i);
+    y = Math.round(y / i);
+    world.center.x = x;
+    world.center.y = y;
 
     if ((isInt(world.time() / config.statfrequency) || world.time() === 1) && isMain) {
         send.bot(30626617, stat());
