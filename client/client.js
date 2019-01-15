@@ -19,7 +19,7 @@ let inAir = false;
 let extra = { x: 0, y: 0 };
 let describe = {
   show: true,
-  text: 'Добро пожаловать в ...!',
+  text: 'Добро пожаловать в Craft\'n\'Die! \n Нажмите правой кнопкой чтобы прочитать описание предмета, драгндроп чтобы применить',
   x: 1,
   y: 1,
   time: 10000,
@@ -316,8 +316,12 @@ function onServer(val) {
         } else if (a.z === b.z) {
           if (a.x > b.x) {
             return 1
-          } else {
+          } else if (a.x < b.x) {
             return -1;
+          } else if (a.id > b.id) {
+            return 1;
+          } else {
+            return 1;
           }
         }
       } else if (a.y - b.y < 0) {
@@ -500,6 +504,8 @@ function render(model) {
     for (let x = 0; x < 9; x++) {
       if (model.fow[x][y]) {
         drawImg("black", x + model.trx, y + model.try);
+        drawImg("black", x, y);
+
         // drawImgNormal("fog", x + model.trx, y + model.try);
         // drawImgNormal("map", x, y );
       }

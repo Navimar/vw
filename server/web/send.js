@@ -20,7 +20,7 @@ send.web = (dtStartLoop) => {
                 wound: [],
                 inv: [],
                 ground: [],
-                remembers:[],
+                remembers: [],
             };
             let viewmap = [];
             for (let x = 0; x < 9; x++) {
@@ -28,10 +28,10 @@ send.web = (dtStartLoop) => {
                 if (!p.wound[x].describe) {
                     p.wound[x].describe = p.wound[x].img + " has no describe!"
                 }
-                data.wound.push({img: p.wound[x].img, describe: p.wound[x].describe});
+                data.wound.push({ img: p.wound[x].img, describe: p.wound[x].describe });
                 for (let y = 0; y < 9; y++) {
+                    viewmap[x][y] = false;
                     for (let r of world.point(p.x + x - 4, p.y + y - 4)) {
-                        viewmap[x][y] = false;
                         if (meta[r.tp].isFow) {
                             viewmap[x][y] = true;
                         }
@@ -42,15 +42,19 @@ send.web = (dtStartLoop) => {
             for (let x = 0; x < 9; x++) {
                 for (let y = 0; y < 9; y++) {
                     if (!fowmap[x][y]) {
-            //             world.forget(p,x,y);
+                        //             world.forget(p,x,y);
                         for (let r of world.point(p.x + x - 4, p.y + y - 4)) {
                             let img =
                                 _.isFunction(meta[r.tp].img) ?
                                     meta[r.tp].img(r.data)
                                     :
                                     meta[r.tp].img;
-                            if (!meta[r.tp].describe) {
-                                meta[r.tp].describe = meta[r.tp].key + " has no describe!"
+                            let describe = _.isFunction(meta[r.tp].describe) ?
+                                meta[r.tp].describe(r.data)
+                                :
+                                meta[r.tp].describe;
+                            if (!describe) {
+                                describe = meta[r.tp].key + " has no describe!"
                             }
                             data.obj.push({
                                 x,
@@ -58,19 +62,19 @@ send.web = (dtStartLoop) => {
                                 img,
                                 id: r.id,
                                 z: meta[r.tp].z,
-                                describe: meta[r.tp].describe,
+                                describe,
                                 isFlat: meta[r.tp].isFlat,
                                 message: r.message
                             });
-            //                 // world.remember(p,x,y,{
-            //                 //     x,
-            //                 //     y,
-            //                 //     img,
-            //                 //     id: r.id,
-            //                 //     z: meta[r.tp].z,
-            //                 //     describe: meta[r.tp].describe,
-            //                 //     isFlat: meta[r.tp].isFlat,
-            //                 // });
+                            //                 // world.remember(p,x,y,{
+                            //                 //     x,
+                            //                 //     y,
+                            //                 //     img,
+                            //                 //     id: r.id,
+                            //                 //     z: meta[r.tp].z,
+                            //                 //     describe: meta[r.tp].describe,
+                            //                 //     isFlat: meta[r.tp].isFlat,
+                            //                 // });
 
                             if (x === 4 && y === 4 && r.tp !== 'player') {
                                 data.ground.push({
@@ -81,15 +85,15 @@ send.web = (dtStartLoop) => {
                                 })
                             }
                         }
-            //         } else {
-            //             for (let r of world.recall(p, x, y)){
-            //                 data.remembers.push({
-            //                     x,
-            //                     y,
-            //                     img:r.img,
-            //                     id: r.id,
-            //                 });
-            //             }
+                        //         } else {
+                        //             for (let r of world.recall(p, x, y)){
+                        //                 data.remembers.push({
+                        //                     x,
+                        //                     y,
+                        //                     img:r.img,
+                        //                     id: r.id,
+                        //                 });
+                        //             }
                     }
                 }
             }
@@ -101,7 +105,7 @@ send.web = (dtStartLoop) => {
                         meta[i.tp].img(i.data)
                         :
                         meta[i.tp].img;
-                data.inv.push({img, id: i.id, describe: meta[i.tp].describe});
+                data.inv.push({ img, id: i.id, describe: meta[i.tp].describe });
             }
             data.px = p.x;
             data.py = p.y;

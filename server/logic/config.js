@@ -3,26 +3,25 @@ const meta = require('./meta.js').meta;
 
 
 let objects = [
-  // { m: 'beaver', q: 2 },
-  // { m: 'key', q: 2 },
-  // { m: 'potatoseed', q: 2 },
-  // { m: 'potatoplant', q: 2 },
-  // { m: 'skeleton', q: 5 },
-  // { m: 'plant', q: 10 },
-  // { m: 'crab', q: 2 },
-  // { m: 'shovel', q: 5 },
+  { m: 'beaver', q: 2 },
+  { m: 'key', q: 2 },
+  { m: 'potatoseed', q: 2 },
+  { m: 'potatoplant', q: 2 },
+  { m: 'skeleton', q: 5 },
+  { m: 'crab', q: 2 },
+  { m: 'shovel', q: 5 },
   { m: 'wolf', q: 5 },
-  // { m: 'door', q: 3 },
-  // { m: 'pickaxe', q: 10 },
-  // { m: 'stone', q: 2 },
-  // { m: 'stick', q: 2 },
-  // { m: 'tree', q: 30 },
+  { m: 'door', q: 3 },
+  { m: 'ant', q: 5 },
+  { m: 'pickaxe', q: 10 },
+  { m: 'cow', q: 5 },
+  { m: 'tree', q: 30 },
   { m: 'wall', q: 300 },
-  // { m: 'water', q: 50 },
+  { m: 'bone', q: 5 },
   { m: 'zombie', q: 5 },
-  // { m: 'highgrass', q: 200 },
-  { m: 'carnivorous', q: 1 },
-  { m: 'ant', q: 10 },
+  { m: 'highgrass', q: 200 },
+  { m: 'carnivorous', q: 5 },
+  { m: 'stonegolem', q: 5 },
 ];
 
 if (os.platform() == 'darwin' || os.platform() == 'win32') {
@@ -30,13 +29,13 @@ if (os.platform() == 'darwin' || os.platform() == 'win32') {
     ip: "127.0.0.1",
     port: "3000",
     botkey: '320938705:AAGpcdMe9oIhFYuu11MjU4djJnj1maijkpQ',
-    savefrequency: 10000,
+    savefrequency: 5000,
     statfrequency: 1000,
     world: {
       start: 5200,
       obj: objects,
       factor: 1,
-      items: 50000,
+      items: 200000,
       speed: 10,
     }
   }

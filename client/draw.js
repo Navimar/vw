@@ -44,19 +44,19 @@ function resize() {
 // }
 
 function drawImg(name, x, y) {
-    let p = dh/10;
+    let p = dh / 10;
     let img = grafio(name);
     if (img === undefined || img === null) {
         img = questionmark;
         drawTxt(name, x, y, '#897f0e');
     }
     // console.log(img);
-    ctx.drawImage(img, x * dh-p + shiftX, y * dh-p, dh +2*p, dh+2*p);
+    ctx.drawImage(img, x * dh - p + shiftX, y * dh - p, dh + 2 * p, dh + 2 * p);
     // ctx.drawImage(img, x * dh + shiftX, y * dh, dh, dh);
 }
 
 function drawImgNormal(name, x, y) {
-    let p = dh/10;
+    let p = dh / 10;
     let img = grafio(name);
     if (img === undefined || img === null) {
         img = questionmark;
@@ -103,16 +103,20 @@ function drawTxt(txt, x, y, color) {
             ctx.fillStyle = 'white';
             context.fillText(line, marginLeft, marginTop);
         }
-// console.log(text);
+        // console.log(text);
         let words = text.split(" ");
         let countWords = words.length;
         let line = "";
         for (let n = 0; n < countWords; n++) {
             let testLine = line + words[n] + " ";
             let testWidth = context.measureText(testLine).width;
-            if (testWidth > maxWidth) {
+            if (testWidth > maxWidth || words[n] === '\n') {
                 dt();
-                line = words[n] + " ";
+                if (words[n] === '\n') {
+                    line = words[n].slice(1);
+                } else {
+                    line = words[n] + " ";
+                }
                 marginTop += lineHeight;
             }
             else {

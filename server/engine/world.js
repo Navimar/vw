@@ -75,19 +75,23 @@ world.wrapper = (me, theWound) => {
             return world.move(me, dir);
         },
         goTo: (d) => {
-            if (_.isFinite(d.x) && _.isFinite(d.y)) {
-                d = dirTo(d.x, d.y, me).dir;
-            }
-            let ox = me.x;
-            let oy = me.y;
-            let m = false;
-            if (d[0] !== direction.here) {
-                m = world.move(me, d[0]);
-                if (ox === me.x && oy === me.y && d[1] !== direction.here) {
-                    m = world.move(me, d[1]);
+            if (d) {
+                if (_.isFinite(d.x) && _.isFinite(d.y)) {
+                    d = dirTo(d.x, d.y, me).dir;
                 }
+                let ox = me.x;
+                let oy = me.y;
+                let m = false;
+                if (d[0] !== direction.here) {
+                    m = world.move(me, d[0]);
+                    if (ox === me.x && oy === me.y && d[1] !== direction.here) {
+                        m = world.move(me, d[1]);
+                    }
+                }
+                return m;
+            } else {
+                return false;
             }
-            return m;
         },
         isNear: (tp) => {
             if (tp) {
