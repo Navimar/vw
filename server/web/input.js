@@ -123,7 +123,9 @@ input.bot = () => {
         // // return bot.sendMessage(fromId, `Welcome, ${ firstName }!`, { reply });
         // return bot.sendMessage(fromId, words[0]);
         event.bot(val);
+        console.log(bot.meesages);
     });
+
     // bot.on('/help', msg => {
     //     return bot.sendMessage(msg.from.id, "/login to login\n/ntd to login in ntd");
     // });

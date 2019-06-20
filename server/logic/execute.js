@@ -64,7 +64,7 @@ exe.onTick = (isMain) => {
                 //     break;
                 case "move":
                     if (p.order.val === "point") {
-                        p.data.order = {x: p.order.targetx, y: p.order.targety};
+                        p.data.order = { x: p.order.targetx, y: p.order.targety };
                         if (p.x !== p.order.targetx || p.y !== p.order.targety) {
                             meta[p.tp].onTurn(p.data, wrapper(p));
                             p.dirx = 0;
@@ -276,31 +276,34 @@ exe.onTick = (isMain) => {
             console.log('Saved!');
         });
     };
-    let stat = () => {
+    let stat = (arr) => {
         let sum = 0;
-        let arr = [];
+        // let arr = [];
         for (let o of world.obj()) {
             let ok = true;
             for (let a of arr) {
-                if (a.meta === o.tp) {
-                    a.q++;
+                if (a.m === o.tp) {
+                    if (!a.s) {
+                        a.s = 0;
+                    }
+                    a.s++;
                     sum++;
                     ok = false;
                     break;
                 }
             }
             if (ok) {
-                arr.push({meta: o.tp, q: 1})
+                arr.push({ m: o.tp, s: 1 })
             }
         }
         for (let a of arr) {
-            a.p = Math.round((a.q / sum) * 100 * 100) / 100;
+            a.p = Math.round((a.s / sum) * 100 * 100) / 100;
         }
         let str = "world statistic:\n";
         str += "world time: " + world.time() + "\n";
         str += "online: " + world.connected() + "\n";
         arr.sort((a, b) => {
-            if (a.q > b.q) {
+            if (a.s > b.s) {
                 return -1;
             } else {
                 return 1;
@@ -315,7 +318,7 @@ exe.onTick = (isMain) => {
                     smile = "🔻";
                 }
             }
-            str += arr[a].meta;
+            str += arr[a].m;
             str += " " + arr[a].p + "% " + smile + "\n";
         }
         laststatarr = arr;
@@ -339,7 +342,7 @@ exe.onTick = (isMain) => {
     world.center.y = y;
 
     if ((isInt(world.time() / config.statfrequency) || world.time() === 1) && isMain) {
-        send.bot(30626617, stat());
+        send.bot(30626617, stat(config.world.obj));
     }
     if (isInt(world.time() / config.savefrequency) && isMain) {
         // let d = new Date;

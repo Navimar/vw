@@ -68,6 +68,16 @@ world.wrapper = (me, theWound) => {
             }
             return world.objArrInPoint(x, y);
         },
+        swim: (dir) => {
+            if (!dir) {
+                dir = world.wrapper().dirRnd;
+            }
+            let x = me.x + dir.x;
+            let y = me.y + dir.y;
+            if (world.find('water', x, y, 0, 0)) {
+                return world.move(me, dir);
+            }
+        },
         move: (dir) => {
             if (!dir) {
                 dir = world.wrapper().dirRnd;
@@ -863,7 +873,7 @@ world.start = () => {
     }
     // let a = Math.round((wid - start) / 10);
     let p = 5;
-    for (let w = start - q; w < wid + p; w++) {
+    // for (let w = start - q; w < wid + p; w++) {
         // for (let a = 1; a < p; a++) {
         //     // if(!random(10)){
         //     //     world.createObj('mermaid', w, start - a);
@@ -882,7 +892,7 @@ world.start = () => {
         //     world.createObj('deepspace', start - p - a, w);
         //     world.createObj('deepspace', wid + p + a, w);
         // }
-    }
+    // }
 
 };
 
