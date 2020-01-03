@@ -6,6 +6,9 @@ const sha = require("sha256");
 // const config = require('./config');
 const world = require('../engine/world');
 let config = require('../logic/config.js');
+const util = require('../web/util');
+
+const random = util.random;
 
 const user = {};
 
@@ -16,7 +19,7 @@ user.list = [];
 user.init = () => {
 };
 
-user.new = (username, id,) => {
+user.new = (username, id, ) => {
     username = username.toLowerCase();
     user.list.push({
         key: sha(GenerateToken()),
@@ -88,7 +91,27 @@ user.login = (user, socket, pass) => {
                 if (socket == undefined) {
                     throw 'where is my socket???';
                 }
-                world.addPlayer(socket, user.id, config.world.start - 2, config.world.start - 2);
+                let x;
+                let y;
+                switch (random(0, 3)) {
+                    case 0:
+                        x = random(config.world.start, config.world.start + world.wid())
+                        y = config.world.start - 1;
+                        break;
+                    case 1:
+                        x = random(config.world.start, config.world.start + world.wid())
+                        y = config.world.start + world.wid() + 1
+                        break;
+                    case 2:
+                        x = config.world.start + world.wid() + 1
+                        y = random(config.world.start, config.world.start + world.wid())
+                        break;
+                    case 3:
+                        x = config.world.start - 1
+                        y = random(config.world.start, config.world.start + world.wid())
+                        break;
+                }
+                world.addPlayer(socket, user.id, x, y);
             }
             return ("succecs loged in " + user.id);
         }

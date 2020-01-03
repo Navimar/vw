@@ -104,7 +104,7 @@ exe.onTick = (isMain) => {
                 case "use":
                     let tool = p.order.tool;
                     if (_.isFunction(meta[tool.tp].onApply)) {
-                        meta[tool.tp].onApply(p.order.target, wrapper(tool), p);
+                        meta[tool.tp].onApply(p.order.target, wrapper(tool), p, tool.data);
                     } else {
                         console.log("can not apply " + tool.tp);
                     }
@@ -113,7 +113,7 @@ exe.onTick = (isMain) => {
                 case "useinv":
                     let tlfi = p.order.tool;
                     if (_.isFunction(meta[tlfi.tp].onApply)) {
-                        meta[tlfi.tp].onApply(p.order.target, wrapper(tlfi), p);
+                        meta[tlfi.tp].onApply(p.order.target, wrapper(tlfi), p, tlfi.data);
                     } else {
                         console.log("can not apply " + tlfi.tp);
                     }
@@ -297,7 +297,8 @@ exe.onTick = (isMain) => {
             }
         }
         for (let a of arr) {
-            a.p = Math.round((a.s / sum) * 100 * 100) / 100;
+            a.p = a.s;
+            // a.p = Math.round((a.s / sum) * 100 * 100) / 100;
         }
         let str = "world statistic:\n";
         str += "world time: " + world.time() + "\n";
@@ -352,7 +353,6 @@ exe.onTick = (isMain) => {
     }
     return dtStartLoop;
 };
-
 // exe.onLoginBot = (val) => {
 //     token = user.setKey(val.msg.from.id);
 //     send.bot(val.msg.from.id, config.ip + ":" + config.port + "/?id=" + val.msg.from.id + "&key=" + token);

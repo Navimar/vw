@@ -106,7 +106,7 @@ meta.carnivorous = {
     },
     onTurn(data, wd) {
         if (!data.kind) {
-            let o = wd.isNear(['ant', 'bone', 'wall', 'cow', 'window', 'stone', 'zombie', 'wolf', 'player']);
+            let o = wd.isNear(['ant', 'bone', 'cow', 'window', 'stone', 'zombie', 'wolf', 'player']);
             if (o) {
                 if (o.tp == 'player') {
                     wd.addWound(o, wound.hit);
@@ -123,12 +123,12 @@ meta.carnivorous = {
             }
         }
         data.hungryCn++;
-        if (data.hungryCn > 50) {
+        if (data.hungryCn > 30) {
             data.kind = false;
         }
         data.lifetime++;
-        if (data.lifetime > 1000) {
-            wd.transform(wd.me, 'water');
+        if (data.lifetime > 500) {
+            wd.transform(wd.me, 'wall');
         } else {
             wd.nextTurn(50);
         }
@@ -294,47 +294,77 @@ meta.zombie = {
         data.lifetime = 0;
     },
     onTurn: (data, wd) => {
-        let tire = 64;
+        let tire = 24;
 
         //куда деть эту функцию?
-        function goTo(d) {
-            let ox = wd.me.x;
-            let oy = wd.me.y;
-            let o;
-            o = wd.move(d[0]);
-            data.dir = d[0];
-            if (ox === wd.me.x && oy === wd.me.y) {
-                data.dir = d[1];
-                o = wd.move(d[1]);
-            }
-            // if (o.tp == 'ant') {
-            //     wd.transform(o, 'potato');
-            // }
-        }
-
-        let t = wd.find('player');
-        if (t) {
-            let mt = wd.dirTo(t.x, t.y);
-            if (t.tp === 'player') {
-                if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
-                    wd.addWound(t, wound.hit);
-                    wd.say(['Кусь!', 'Ам!', 'Хрясь'], wd.me, '#aa0000');
-                    wd.say(['Ай!', 'Больно', 'Кыш!'], t);
-                } else {
-                    goTo(mt.dir);
-                }
-            } else {
-                goTo(mt.dir);
-            }
-        } else {
-            let mt = wd.dirTo(wd.center.x + random(-100, 100), wd.center.y + random(-100, 100));
-            goTo(mt.dir);
-        }
+        // function goTo(d) {
+        //     let ox = wd.me.x;
+        //     let oy = wd.me.y;
+        //     let o;
+        //     o = wd.move(d[0]);
+        //     data.dir = d[0];
+        //     if (ox === wd.me.x && oy === wd.me.y) {
+        //         data.dir = d[1];
+        //         o = wd.move(d[1]);
+        //     }
+        //     // if (o.tp == 'ant') {
+        //     //     wd.transform(o, 'potato');
+        //     // }
+        // }
         data.lifetime++;
+        let o;
+        let p = wd.find('player');
+        if (p) {
+            o = wd.goTo(p);
+        } else {
+            // o = true;
+            o = wd.move(wd.dirTo(wd.center.x + random(-100, 100), wd.center.y + random(-100, 100)));
+        }
+        if (o) {
+            if (o === p) {
+                wd.addWound(p, wound.hit);
+                wd.say(['Кусь!', 'Ам!', 'Хрясь'], wd.me, '#aa0000');
+                wd.say(['Ай!', 'Больно', 'Кыш!'], p);
+            } else if (o.tp == 'wall') {
+                tire = 200;
+                wd.transform(o, 'stone');
+                wd.say(['*роет!*'], wd.me, '#aa0000');
+                wd.goTo(p);
+            } else if (o.tp == 'tree') {
+                tire = 200;
+                wd.transform(o, 'stick');
+                wd.say(['*крушит!*'], wd.me, '#aa0000');
+                wd.goTo(p);
+            } else if (o.tp == 'carnivorous') {
+                wd.transform(o, 'potatoseed');
+            }
+        }
         if (data.lifetime >= 1000) {
             wd.transform(wd.me, 'wall');
+        } else {
+            wd.nextTurn(tire);
         }
-        wd.nextTurn(tire);
+        // if (t) {
+        //         let mt = wd.dirTo(t.x, t.y);
+        //         if (t.tp === 'player') {
+        //             // if (Math.abs(mt.xWant) + Math.abs(mt.yWant) <= 1) {
+        //             //     wd.addWound(t, wound.hit);
+        //             //     wd.say(['Кусь!', 'Ам!', 'Хрясь'], wd.me, '#aa0000');
+        //             //     wd.say(['Ай!', 'Больно', 'Кыш!'], t);
+        //             // } else {
+        //             //     goTo(mt.dir);
+        //             // }
+        //         } else {
+        //             goTo(mt.dir);
+        //         }
+        //     } else {
+        //         let mt = wd.dirTo(wd.center.x + random(-100, 100), wd.center.y + random(-100, 100));
+        //         goTo(mt.dir);
+        //     }
+        // data.lifetime++;
+        // if (data.lifetime >= 1000) {
+        //     wd.transform(wd.me, 'wall');
+        // }
     },
     onApply: (obj, wd, p) => {
 
@@ -345,7 +375,7 @@ meta.zombie = {
         if (obj.tp === 'ant') {
             wd.getOut(obj.x, obj.y);
             wd.dropAll(obj);
-            wd.transform(obj, 'stone');
+            wd.transform(obj, 'meat');
         }
         if (obj.tp === 'wolf') {
             wd.transform(wd.me, 'bone');
@@ -605,58 +635,61 @@ meta.shovel = {
     img: 'shovel',
     describe: 'Лопата, пересаживайте ей растения и бейте врагов!',
     onApply: (obj, wd, p) => {
-        function broke() {
-            wd.transform(wd.me, 'flinders');
-            wd.getOut(p.x, p.y);
-        }
-
-        if (_.includes(['tree', 'box'], obj.tp)) {
+        if (!obj.carrier) {
             wd.put(obj, p);
             broke();
+            function broke() {
+                wd.transform(wd.me, 'stone');
+                wd.getOut(p.x, p.y);
+            }
         }
-        if (obj.tp === 'zombie' || obj.tp === 'skeleton') {
-            wd.transform(obj, 'bone');
-            broke();
-            wd.say(['!!!', 'Вот тебе!', 'Получи лопатой!!!'], p)
-        }
-        if (_.includes(['plant', 'carnivorous'], obj.tp)) {
-            wd.transform(obj, 'potato');
-            wd.say(['Огродная работа', 'Свежая картошечка!', 'Лучшее применение лопаты'], p);
-            wd.put(obj, p);
-            broke();
-        }
-        if (_.includes(['cow', 'wolf'], obj.tp)) {
-            wd.transform(obj, 'meat');
-            // meta.beaveregg.makeangrybeaver(obj.x, obj.y, wd);
-            broke();
-        }
-        if (_.includes(['beside', 'flinders'], obj.tp)) {
-            wd.transform(obj, 'blackearth');
-            broke();
-        }
-        if (obj.tp === 'stick') {
-            wd.transform(obj, 'fence');
-            broke();
-        }
-        if (_.includes(['wall', 'stonegolem'], obj.tp)) {
-            broke();
+        // if (_.includes(['tree', 'box'], obj.tp)) {
+        //     wd.put(obj, p);
+        //     broke();
+        // }
+        // if (obj.tp === 'zombie' || obj.tp === 'skeleton') {
+        //     wd.transform(obj, 'bone');
+        //     broke();
+        //     wd.say(['!!!', 'Вот тебе!', 'Получи лопатой!!!'], p)
+        // }
+        // if (_.includes(['plant', 'carnivorous'], obj.tp)) {
+        //     wd.transform(obj, 'potato');
+        //     wd.say(['Огродная работа', 'Свежая картошечка!', 'Лучшее применение лопаты'], p);
+        //     wd.put(obj, p);
+        //     broke();
+        // }
+        // if (_.includes(['cow', 'wolf'], obj.tp)) {
+        //     wd.transform(obj, 'meat');
+        //     // meta.beaveregg.makeangrybeaver(obj.x, obj.y, wd);
+        //     broke();
+        // }
+        // if (_.includes(['beside', 'flinders'], obj.tp)) {
+        //     wd.transform(obj, 'blackearth');
+        //     broke();
+        // }
+        // if (obj.tp === 'stick') {
+        //     wd.transform(obj, 'fence');
+        //     broke();
+        // }
+        // if (_.includes(['wall', 'stonegolem'], obj.tp)) {
+        //     broke();
 
-        }
-        if (obj.tp === 'wall') {
-            wd.getOut(obj.x, obj.y);
-            wd.transform(wd.me, 'fire');
-        }
-        if (obj.tp === 'ant') {
-            wd.transform(wd.me, 'stone');
-        }
-        if (obj.tp === 'player') {
-            wd.removeWound(p, wound.potatoplant);
-            wd.addWound(p, wound.hit);
-            broke();
-        } else if (obj.tp === 'crab') {
-            wd.transform(obj, 'bone');
-            broke()
-        }
+        // }
+        // if (obj.tp === 'wall') {
+        //     wd.getOut(obj.x, obj.y);
+        //     wd.transform(wd.me, 'fire');
+        // }
+        // if (obj.tp === 'ant') {
+        //     wd.transform(wd.me, 'stone');
+        // }
+        // if (obj.tp === 'player') {
+        //     wd.removeWound(p, wound.potatoplant);
+        //     wd.addWound(p, wound.hit);
+        //     broke();
+        // } else if (obj.tp === 'crab') {
+        //     wd.transform(obj, 'bone');
+        //     broke()
+        // }
     },
     onCreate(data) {
         data.new = true;
@@ -1044,14 +1077,18 @@ meta.stone = {
             wd.transform(obj, 'shovel');
             wd.transform(wd.me, 'shovel');
         }
+        if (obj.tp === 'shovel') {
+            wd.transform(obj, 'fire');
+            // wd.transform(wd.me, 'shovel');
+        }
         if (obj.tp === 'ant') {
             // wd.transform(obj, 'shovel');
             wd.transform(wd.me, 'wall');
         }
-        if (obj.tp === 'bone') {
-            wd.transform(obj, 'shovel');
-            wd.transform(wd.me, 'shovel');
-        }
+        // if (obj.tp === 'bone') {
+        //     wd.transform(obj, 'shovel');
+        //     wd.transform(wd.me, 'shovel');
+        // }
         if (obj.tp === 'beaveregg') {
             wd.transform(obj, 'beside');
         }
@@ -1382,6 +1419,12 @@ meta.ant = {
         data.takeCn = 0;
         // data.lifetime = 0;
     },
+    onApply(obj, wd, p) {
+        if (_.includes(['wall', 'window', 'stonegolem'], obj.tp)) {
+            wd.getOut(obj.x, obj.y);
+            wd.put(obj, wd.me);
+        }
+    },
     onTurn: (data, wd) => {
         let o = wd.move();
         if (o) {
@@ -1394,9 +1437,9 @@ meta.ant = {
             data.takeCn = 0;
             data.dropCn++;
         }
-        if (o && data.takeCn >= 7) {
+        if (o && data.takeCn >= 8) {
             if (o.tp != 'player') {
-                if (random(4)) {
+                if (random(6)) {
                     wd.take(o);
                     if (o.tp == 'wall') {
                         wd.transform(o, 'stone');
@@ -1407,7 +1450,7 @@ meta.ant = {
                         wd.say(['Это нужно убрать', 'Эту гадость выкопаем', 'этому тут не место'], wd.me);
                     }
                     else if (o.tp == 'tree') {
-                        wd.transform(o, 'highgrass');
+                        wd.transform(o, 'stick');
                     }
                     else if (o.tp == 'cow') {
                         wd.transform(o, 'bone');
@@ -1429,7 +1472,7 @@ meta.ant = {
                 wd.take(t);
             }
         }
-        if (data.dropCn >= 15) {
+        if (data.dropCn >= 10) {
             let d = wd.drop();
             if (d.tp == 'stone' || d.tp == 'flinders') {
                 if (random(7)) {
@@ -1437,12 +1480,17 @@ meta.ant = {
                 } else {
                     wd.transform(d, 'window');
                 }
+            }else if(d.tp == 'stick'){
+                wd.transform(d, 'tree');
+                wd.say(['Посадим', 'Пересадим', 'Засадим'], wd.me);
             }
         }
         if (data.dropCn > 50) {
             wd.dropAll();
             // wd.transformdropAll('zombie');
+            // wd.transform(wd.me, 'wall');
             wd.transform(wd.me, 'bone');
+
         }
         // data.lifetime++;
         wd.nextTurn(15);
@@ -2059,7 +2107,7 @@ meta.fire = {
             wd.movetrought(wd.dirRnd);
         }
         // let food = [meta.tree, meta.crab, meta.jackal, meta.zombie, meta.meat, meta.wwall, meta.flinders, meta.torch, meta.aphid, meta.plant, meta.seed, meta.kaka, meta.ant, meta.wolf, meta.axe, meta.highgrass, meta.bone, meta.stick, meta.orangetree, meta.orange, meta.oranger];
-        let food = ['tree', 'crab', 'jackal', 'carnivorous', 'beside', 'fence', 'wolf', 'skeleton', 'meat', 'wwall', 'flinders', 'torch', 'aphid', 'plant', 'potatoseed', 'bone', 'stick',];
+        let food = ['tree', 'crab', 'jackal', 'carnivorous', 'beside', 'fence', 'wolf', 'zombie', 'meat', 'wwall', 'flinders', 'torch', 'aphid', 'plant', 'potatoseed', 'bone', 'stick',];
         let o = wd.isHere(food);
         if (o) {
             wd.transform(o, 'fire');
@@ -2188,10 +2236,17 @@ meta.axe = {
 meta.pickaxe = {
     name: "pickaxe",
     img: 'pickaxe',
-    onApply: (obj, wd, p) => {
+    onCreate: (data) => {
+        data.durability = 5;
+    },
+    onApply: (obj, wd, p, data) => {
         function broke() {
-            wd.transform(wd.me, 'flinders');
-            wd.getOut(p.x, p.y);
+            if (data.durability > 0) {
+                data.durability--;
+            } else {
+                wd.transform(wd.me, 'flinders');
+                wd.getOut(p.x, p.y);
+            }
         }
 
         if (_.includes(['beaver'], obj.tp)) {
@@ -2252,14 +2307,12 @@ meta.grill = {
             }
         }
     },
+    onFirstTurn: (data, wd) => {
+        wd.nextTurn(40000);
+
+    },
     onTurn: (data, wd) => {
-        wd.transformdropAll('grill');
-        if (data.new) {
-            data.new = false;
-            wd.nextTurn(40000);
-        } else {
-            wd.transform(wd.me, 'bone');
-        }
+        wd.transform(wd.me, 'bone');
     },
 };
 meta.meat = {

@@ -476,8 +476,10 @@ function addtologic(obj, t) {
 // }
 
 world.put = (obj, carrier) => {
-    removefromMap(obj);
-    addtoInv(obj, carrier);
+    if (obj.carrier == false) {
+        removefromMap(obj);
+        addtoInv(obj, carrier);
+    }
 };
 
 world.drop = function (obj, x, y) {
@@ -874,24 +876,24 @@ world.start = () => {
     // let a = Math.round((wid - start) / 10);
     let p = 5;
     // for (let w = start - q; w < wid + p; w++) {
-        // for (let a = 1; a < p; a++) {
-        //     // if(!random(10)){
-        //     //     world.createObj('mermaid', w, start - a);
-        //     //     world.createObj('mermaid', w, wid + a);
-        //     //     world.createObj('mermaid', start - a, w);
-        //     //     world.createObj('mermaid', wid + a, w);
-        //     // }
-        //     world.createObj('space', w, start - a);
-        //     world.createObj('space', w, wid + a);
-        //     world.createObj('space', start - a, w);
-        //     world.createObj('space', wid + a, w);
-        // }
-        // for (let a = 0; a < p-1; a++) {
-        //     world.createObj('deepspace', w, start - p - a);
-        //     world.createObj('deepspace', w, wid + p + a);
-        //     world.createObj('deepspace', start - p - a, w);
-        //     world.createObj('deepspace', wid + p + a, w);
-        // }
+    // for (let a = 1; a < p; a++) {
+    //     // if(!random(10)){
+    //     //     world.createObj('mermaid', w, start - a);
+    //     //     world.createObj('mermaid', w, wid + a);
+    //     //     world.createObj('mermaid', start - a, w);
+    //     //     world.createObj('mermaid', wid + a, w);
+    //     // }
+    //     world.createObj('space', w, start - a);
+    //     world.createObj('space', w, wid + a);
+    //     world.createObj('space', start - a, w);
+    //     world.createObj('space', wid + a, w);
+    // }
+    // for (let a = 0; a < p-1; a++) {
+    //     world.createObj('deepspace', w, start - p - a);
+    //     world.createObj('deepspace', w, wid + p + a);
+    //     world.createObj('deepspace', start - p - a, w);
+    //     world.createObj('deepspace', wid + p + a, w);
+    // }
     // }
 
 };
