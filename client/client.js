@@ -49,9 +49,9 @@ function updOrder(e) {
   //     y: Math.floor((mousePos.y ) / dh-model.try)
   // };
 
-  if (mouseDown) {
-    click = mousePos;
-  }
+  // if (mouseDown) {
+  //   click = mousePos;
+  // }
 
   // console.log(click);
 }
@@ -114,7 +114,7 @@ function inputMouse() {
         describe.text = txt;
         break;
       default:
-        alert('You have a strange Mouse!');
+        alert('You have a wierd mouse!');
     }
   }, false);
   canvas.addEventListener("mouseup", e => {
